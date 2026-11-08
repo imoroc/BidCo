@@ -20,10 +20,10 @@
       }
     </header>
 
-    <app-estado-listado [cargando]="listado.cargando" [errorCarga]="listado.errorCarga" [total]="listado.items.length" mensajeVacio="No hay sorteos que coincidan con los filtros."></app-estado-listado>
+    <app-estado-listado [cargando]="listado.cargando()" [errorCarga]="listado.errorCarga()" [total]="listado.items().length" mensajeVacio="No hay sorteos que coincidan con los filtros."></app-estado-listado>
 
     <section class="products-grid">
-      @for (product of listado.items; track product.sorteoID) {
+      @for (product of listado.items(); track product.sorteoID) {
         <article class="product-wrapper">
           <a [routerLink]="['/raffle/product', product.sorteoID]" class="product-link">
             <app-product-item [product]="product"></app-product-item>

@@ -1,4 +1,4 @@
-import { DestroyRef } from '@angular/core';
+import { DestroyRef, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpParams } from '@angular/common/http';
 import { Observable, Subject, catchError, of, retry, switchMap, tap, throwError, timer } from 'rxjs';
@@ -36,30 +36,31 @@ function reintentarSiArranca<T>() {
  * y la lista no cambia sola cuando llegan respuestas fuera de orden.
  */
 export class ListadoFiltrado<T> {
-    items: T[] = [];
-    cargando = true;
-    errorCarga = false;
+    // Señales: la plantilla se actualiza en cuanto llega la respuesta, sin depender de un clic.
+    readonly items = signal<T[]>([]);
+    readonly cargando = signal(true);
+    readonly errorCarga = signal(false);
 
     private readonly peticiones$ = new Subject<HttpParams>();
 
     constructor(cargador: (params: HttpParams) => Observable<T[]>, destroyRef: DestroyRef) {
         this.peticiones$.pipe(
             tap(() => {
-                this.cargando = true;
-                this.errorCarga = false;
+                this.cargando.set(true);
+                this.errorCarga.set(false);
             }),
             switchMap(params => cargador(params).pipe(
                 reintentarSiArranca<T[]>(),
                 catchError(err => {
                     console.error('Error al obtener el listado: ', err);
-                    this.errorCarga = true;
+                    this.errorCarga.set(true);
                     return of([] as T[]);
                 })
             )),
             takeUntilDestroyed(destroyRef)
         ).subscribe(items => {
-            this.items = items;
-            this.cargando = false;
+            this.items.set(items);
+            this.cargando.set(false);
         });
     }
 
