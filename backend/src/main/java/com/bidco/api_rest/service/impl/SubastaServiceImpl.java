@@ -27,6 +27,8 @@ import java.util.List;
 @Service
 public class SubastaServiceImpl implements SubastaService {
 
+    private static final String[] CATEGORIAS = {"Tecnología", "Hogar", "Moda", "Deportes", "Juguetes", "Otros"};
+
     private final SubastaRepository subastaRepository;
     private final SubastaMapper subastaMapper;
     private final UsuarioMapper usuarioMapper;
@@ -149,14 +151,7 @@ public class SubastaServiceImpl implements SubastaService {
 
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroNormal(FiltroDTO filtro) {
-        String[] listaCategorias = {"Tecnología", "Hogar", "Moda", "Deportes", "Juguetes", "Otros"};
-        String[] queryCategorias;
-
-        if (filtro.getCategorias() == null || filtro.getCategorias().length == 0) {
-            queryCategorias = listaCategorias;
-        } else {
-            queryCategorias = filtro.getCategorias();
-        }
+        String[] queryCategorias = categoriasDelFiltro(filtro);
         List<Subasta> subastas = subastaRepository.findByFiltroNormal(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.getDateOrder());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
@@ -165,14 +160,7 @@ public class SubastaServiceImpl implements SubastaService {
 
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroCiega(FiltroDTO filtro) {
-        String[] listaCategorias = {"Tecnología", "Hogar", "Moda", "Deportes", "Juguetes", "Otros"};
-        String[] queryCategorias;
-
-        if (filtro.getCategorias() == null || filtro.getCategorias().length == 0) {
-            queryCategorias = listaCategorias;
-        } else {
-            queryCategorias = filtro.getCategorias();
-        }
+        String[] queryCategorias = categoriasDelFiltro(filtro);
         List<Subasta> subastas = subastaRepository.findByFiltroCiega(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.getDateOrder());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
@@ -181,14 +169,7 @@ public class SubastaServiceImpl implements SubastaService {
 
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroMisSubastas(FiltroDTO filtro, int id) {
-        String[] listaCategorias = {"Tecnología", "Hogar", "Moda", "Deportes", "Juguetes", "Otros"};
-        String[] queryCategorias;
-
-        if (filtro.getCategorias() == null || filtro.getCategorias().length == 0) {
-            queryCategorias = listaCategorias;
-        } else {
-            queryCategorias = filtro.getCategorias();
-        }
+        String[] queryCategorias = categoriasDelFiltro(filtro);
         List<Subasta> subastas = subastaRepository.findByFiltroMisSubastas(id, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.getDateOrder());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
@@ -197,14 +178,7 @@ public class SubastaServiceImpl implements SubastaService {
 
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroMisPujas(FiltroDTO filtro, int id) {
-        String[] listaCategorias = {"Tecnología", "Hogar", "Moda", "Deportes", "Juguetes", "Otros"};
-        String[] queryCategorias;
-
-        if (filtro.getCategorias() == null || filtro.getCategorias().length == 0) {
-            queryCategorias = listaCategorias;
-        } else {
-            queryCategorias = filtro.getCategorias();
-        }
+        String[] queryCategorias = categoriasDelFiltro(filtro);
         List<Subasta> subastas = subastaRepository.findByFiltroMisPujas(id, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.getDateOrder());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
@@ -213,19 +187,16 @@ public class SubastaServiceImpl implements SubastaService {
 
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroYNombre(FiltroDTO filtro, String searchTerm) {
-        String[] listaCategorias = {"Tecnología", "Hogar", "Moda", "Deportes", "Juguetes", "Otros"};
-        String[] queryCategorias;
-
-        if (filtro.getCategorias() == null || filtro.getCategorias().length == 0) {
-            queryCategorias = listaCategorias;
-        } else {
-            queryCategorias = filtro.getCategorias();
-        }
+        String[] queryCategorias = categoriasDelFiltro(filtro);
         List<Subasta> subastas = subastaRepository.findByFiltroNombre(searchTerm, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.getDateOrder());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
                 .toList();
     }
 
-    
+    /** Categorías del filtro; si no se indica ninguna se buscan todas. */
+    private static String[] categoriasDelFiltro(FiltroDTO filtro) {
+        String[] categorias = filtro.getCategorias();
+        return categorias == null || categorias.length == 0 ? CATEGORIAS.clone() : categorias;
+    }
 }
