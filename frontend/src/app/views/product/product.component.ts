@@ -169,8 +169,15 @@ export class ProductComponent {
     }
 
     setupCountdown(endDateString: string) {
-        const fullDateString = endDateString.includes('T') ? endDateString : `${endDateString}T23:59:59`;
-        const endDate = new Date(fullDateString).getTime();
+        // La subasta/sorteo termina al acabar el último día; el servidor solo permite
+        // finalizarlo a partir del día siguiente, así que se espera unos segundos de margen.
+        let endDate: number;
+        if (endDateString.includes('T')) {
+            endDate = new Date(endDateString).getTime();
+        } else {
+            const [year, month, day] = endDateString.split('-').map(Number);
+            endDate = new Date(year, month - 1, day + 1, 0, 0, 5).getTime();
+        }
 
         const interval = setInterval(() => {
             const now = new Date().getTime();
