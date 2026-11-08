@@ -2,31 +2,29 @@
 
 ## Versiones soportadas
 
-| Versión | Soporte de seguridad |
-|---------|----------------------|
-| latest (`deploy`) | ✅ Activa |
-| `master` (entrega original) | ❌ Sin mantenimiento |
+| Versión | Soporte |
+|---|---|
+| `deploy` | Activa |
+| `master` | Sin mantenimiento |
 
 ## Reportar una vulnerabilidad
 
-Si encuentras una vulnerabilidad de seguridad en BidCo, **no abras un issue público**.
+No publiques vulnerabilidades explotables en issues públicos. Utiliza la función **Report a vulnerability** de la pestaña Security del repositorio.
 
-Contacta directamente a través del apartado **"Report a vulnerability"** en la pestaña [Security](../../security/advisories/new) de este repositorio.
+Incluye:
+- Descripción e impacto potencial.
+- Pasos mínimos para reproducir el problema.
+- Commit o versión afectados.
+- Cualquier mitigación conocida.
 
-Incluye en el reporte:
-- Descripción del problema y su impacto potencial
-- Pasos para reproducirlo
-- Versión o commit afectado
-- Si tienes una propuesta de solución, es bienvenida
+## Controles del proyecto
 
-Intentaremos responder en un plazo de **72 horas** y publicar un parche lo antes posible.
+- Dependabot para actualizaciones de dependencias.
+- CodeQL para análisis estático de Java y TypeScript.
+- Secretos de ejecución suministrados mediante variables de entorno.
+- CORS con orígenes permitidos explícitos.
+- JWT firmado con una clave externa al repositorio y con longitud mínima.
+- Verificación de propiedad para operaciones sobre perfiles.
+- DTO público separado para no exponer correo, dirección ni saldo del usuario.
 
-## Prácticas de seguridad del proyecto
-
-- Dependencias auditadas semanalmente con **Dependabot**
-- Actualizaciones `patch` y `minor` se fusionan automáticamente
-- Análisis estático de código con **CodeQL**
-- Tokens y credenciales gestionados como **GitHub Secrets** (nunca en el código)
-- CORS configurado con lista de orígenes permitidos explícita
-- JWT con expiración limitada para las sesiones de usuario
-- Imágenes y archivos servidos desde **Cloudinary** (sin exposición del servidor)
+Las garantías anteriores describen los controles implementados en el código y el pipeline; no sustituyen una auditoría de seguridad independiente ni una revisión de la configuración del proveedor de despliegue.

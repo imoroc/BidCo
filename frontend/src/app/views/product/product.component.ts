@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { HeaderComponent } from '../../components/header/header.component';
@@ -9,24 +7,15 @@ import { ProductDetailsComponent } from '../../components/product-details/produc
 import { ExpertCommentsComponent } from '../../components/expert-comments/expert-comments.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 
-import { DATA_EXPERT } from '../../datos_estaticos/user_estadisticas';
 import { AuthService } from '../../services/auth.service';
-import { ProductoService, PujaCreateDTO, PujaResponseDTO, PujaSorteoCreateDTO} from '../../services/product.service';
+import { ProductoService, PujaCreateDTO, PujaResponseDTO, PujaSorteoCreateDTO } from '../../services/product.service';
 import { CommentService } from '../../services/comment.service';
 import { AuthExpertService } from '../../services/auth.expert.service';
-
 
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [
-    RouterLink,
-    FormsModule,
-    HeaderComponent,
-    ProductDetailsComponent,
-    ExpertCommentsComponent,
-    FooterComponent
-],
+  imports: [RouterLink, FormsModule, HeaderComponent, ProductDetailsComponent, ExpertCommentsComponent, FooterComponent],
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.css']
 })
@@ -34,10 +23,10 @@ export class ProductComponent {
     product: any;
     productId = 0;
     tipo = '';
-    isBlindAuction: boolean = false;
-    isRaffle: boolean = false;
-    countdown: string = '';
-    
+    isBlindAuction = false;
+    isRaffle = false;
+    countdown = '';
+
     user: any;
     isLoggedIn = false;
     cantidadPuja: number | null = null;
@@ -67,42 +56,30 @@ export class ProductComponent {
     ngOnInit() {
         this.authService.isLoggedIn$.subscribe((estado) => {
             this.isLoggedIn = estado;
-            
             const storedUser = localStorage.getItem('authUser');
-            if (storedUser) {
-                this.user = JSON.parse(storedUser);
-            }
+            if (storedUser) this.user = JSON.parse(storedUser);
         });
 
-        //Si no hay sesion de usuario se comprueba si hay sesion de experto
-        if(!this.isLoggedIn) {
+        if (!this.isLoggedIn) {
             this.expertAuthService.isLoggedIn$.subscribe((estado) => {
                 this.isLoggedIn = estado;
                 this.isExpert = estado;
-    
                 const storedUser = localStorage.getItem('authExpert');
-                if (storedUser) {
-                    this.expert = JSON.parse(storedUser);
-                }
+                if (storedUser) this.expert = JSON.parse(storedUser);
             });
         }
 
-        
         this.productId = Number(this.route.snapshot.paramMap.get('id'));
-
         this.commentService.getComments(this.productId).subscribe((comments) => {
             this.comments = comments;
-            if(this.expert) {
+            if (this.expert) {
                 comments.forEach((comment) => {
-                    if (comment.trabajadorID === this.expert.trabajadorID) {
-                        this.puedeComentar = false;
-                    }
-                })
+                    if (comment.trabajadorID === this.expert.trabajadorID) this.puedeComentar = false;
+                });
             }
         });
 
         this.tipo = this.route.snapshot.data['tipo'];
-
         switch (this.tipo) {
             case 'subasta':
                 this.productoService.getSubastaPorId(this.productId).subscribe((product) => {
@@ -120,35 +97,21 @@ export class ProductComponent {
                 break;
             default:
                 console.error('Tipo de producto no válido');
-                
         }
-            
-        
-        this.productoService.obtenerPujaMaximaPorSubasta(this.productId).subscribe((puja) => {
-            if (!puja || !puja.pujadorID) {
-                return;
-            }
-            
-            const userId = puja.pujadorID;
-            this.productoService.obtenerPrivacidad(userId).subscribe((userPriv) => {
-                if(userPriv.privacidadAnonimoPujas === false) {
-                    this.productoService.getUsuarioPorId(userId).subscribe((user) => {
-                        this.candidatoGanadorPuja = user.nombreUsuario;
-                    })
-                } else {
-                    this.candidatoGanadorPuja = "Anónimo";
-                }
-            })
-        })
 
+        this.productoService.obtenerPujaMaximaPorSubasta(this.productId).subscribe((puja) => {
+            if (!puja?.pujadorID) return;
+            this.productoService.getPerfilPublicoPorId(puja.pujadorID).subscribe((profile) => {
+                this.candidatoGanadorPuja = profile.privacidadAnonimoPujas ? 'Anónimo' : profile.nombreUsuario;
+            });
+        });
     }
 
     onSubmit() {
-        if(this.user.usuarioID == this.product.creadorId) {
+        if (this.user.usuarioID == this.product.creadorId) {
             alert('No puedes pujar en una subasta que has creado.');
             return;
         }
-
         if (this.cantidadPuja == null) {
             alert('Debes ingresar una cantidad.');
             return;
@@ -160,7 +123,7 @@ export class ProductComponent {
         } else if (this.isBlindAuction && this.product.precioInicial >= this.cantidadPuja) {
             alert('La puja tiene que ser mayor que el precio base del producto.');
             return;
-        } else if (!this.isBlindAuction && this.product.precioFinal >= this.cantidadPuja) {
+        } else if (!this.isBlindAuction && !this.isRaffle && this.product.precioFinal >= this.cantidadPuja) {
             alert('La puja tiene que ser mayor que el precio actual del producto.');
             return;
         } else if (this.isRaffle && this.cantidadPuja > this.user.puntos) {
@@ -170,14 +133,14 @@ export class ProductComponent {
             alert('Saldo insuficiente.');
             return;
         }
-        alert('Puja realizada correctamente.');
+
         if (this.isRaffle) {
             const nuevaPujaSorteo: PujaSorteoCreateDTO = {
                 puntos: this.cantidadPuja,
-                fecha: new Date().toISOString().split('T')[0], // yyyy-MM-dd
+                fecha: new Date().toISOString().split('T')[0],
                 sorteoId: this.productId,
                 pujadorId: this.user.usuarioID
-            }
+            };
             this.productoService.crearPujaSorteo(nuevaPujaSorteo).subscribe({
                 next: () => {
                     this.authService.loadUserProfile(this.user.usuarioID).subscribe({
@@ -185,58 +148,42 @@ export class ProductComponent {
                             this.user = usuarioActualizado;
                             localStorage.setItem('authUser', JSON.stringify(usuarioActualizado));
                         },
-                        error: (err) => {
-                            console.error('Error al actualizar el usuario:', err);
-                        }
+                        error: (err) => console.error('Error al actualizar el usuario:', err)
                     });
                     this.ngOnInit();
                 },
-                error: (err) => {
-                    alert('❌ Error al realizar la puja.');
-                }
+                error: () => alert('❌ Error al realizar la puja.')
             });
-
         } else {
             const nuevaPuja: PujaCreateDTO = {
                 importe: this.cantidadPuja,
-                fecha: new Date().toISOString().split('T')[0], // yyyy-MM-dd
+                fecha: new Date().toISOString().split('T')[0],
                 subastaId: this.productId,
                 pujadorId: this.user.usuarioID
-            }
+            };
             this.productoService.crearPuja(nuevaPuja).subscribe({
-                next: () => {this.ngOnInit();},
-                error: (err) => {
-                    alert('❌ Error al realizar la puja.');
-                }
+                next: () => this.ngOnInit(),
+                error: () => alert('❌ Error al realizar la puja.')
             });
         }
-
-        
     }
 
     setupCountdown(endDateString: string) {
-        const fullDateString = endDateString.includes('T') 
-            ? endDateString 
-            : `${endDateString}T23:59:59`;
-
+        const fullDateString = endDateString.includes('T') ? endDateString : `${endDateString}T23:59:59`;
         const endDate = new Date(fullDateString).getTime();
-      
+
         const interval = setInterval(() => {
             const now = new Date().getTime();
             const distance = endDate - now;
-        
             if (distance <= 0) {
                 this.countdown = "Finalizada";
-                
-                if(!this.product.ganador) {
+                if (!this.product.ganador) {
                     switch (this.tipo) {
                         case 'subasta':
                             this.productoService.finalizarSubasta(this.productId).subscribe({
-                                next: () => {
-                                    this.authService.loadUserProfile(this.user.usuarioID).subscribe({
-                                        next: (userActualizado) => this.authService.setUser(userActualizado)
-                                    });
-                                }
+                                next: () => this.authService.loadUserProfile(this.user.usuarioID).subscribe({
+                                    next: (userActualizado) => this.authService.setUser(userActualizado)
+                                })
                             });
                             break;
                         case 'sorteo':
@@ -247,46 +194,30 @@ export class ProductComponent {
                             break;
                     }
                 }
-                
-                if(this.product.ganador != null && this.tipo === 'sorteo') this.setGanadorSorteo();
-                
+                if (this.product.ganador != null && this.tipo === 'sorteo') this.setGanadorSorteo();
                 clearInterval(interval);
                 return;
             }
-        
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        
             this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
         }, 1000);
     }
 
     setGanadorSorteo() {
-        console.log(this.product.ganador);
-        this.productoService.obtenerPrivacidad(this.product.ganador).subscribe((userPriv) => {
-            if(userPriv.privacidadAnonimoPujas === false) {
-                this.productoService.getUsuarioPorId(this.product.ganador).subscribe((user) => {
-                    this.ganadorSorteo = user.nombreUsuario;
-                })
-            } else {
-                this.ganadorSorteo = "Anónimo";
-            }
+        this.productoService.getPerfilPublicoPorId(this.product.ganador).subscribe((profile) => {
+            this.ganadorSorteo = profile.privacidadAnonimoPujas ? 'Anónimo' : profile.nombreUsuario;
         });
     }
 
-    openExpertForm() {
-        this.showExpertForm = true;
-    }
+    openExpertForm() { this.showExpertForm = true; }
 
     editExpertForm(comment: any) {
         this.editandoComentario = true;
         this.comentarioAEditar = comment;
-        this.comentarioEditado = {
-            comment: comment.comentario,
-            estimated_price: comment.precioEstimado
-        };
+        this.comentarioEditado = { comment: comment.comentario, estimated_price: comment.precioEstimado };
         this.showExpertForm = true;
     }
 
@@ -301,18 +232,13 @@ export class ProductComponent {
             alert('Debes completar todos los campos requeridos');
             return;
         }
-
-        if (this.editandoComentario) {
-            this.saveEdit()
-        } else {
-            this.submitReview()
-        }
+        if (this.editandoComentario) this.saveEdit();
+        else this.submitReview();
     }
 
     submitReview() {
         const productId = Number(this.route.snapshot.paramMap.get('id'));
-
-        var nuevoComentario = {
+        const nuevoComentario = {
             comentario: this.comentarioEditado.comment,
             precioEstimado: this.comentarioEditado.estimated_price,
             subastaID: productId,
@@ -321,21 +247,17 @@ export class ProductComponent {
 
         this.commentService.createComment(nuevoComentario).subscribe({
             next: (res) => {
-                console.log('Comentario creado:', res);
                 this.comments.push(res);
                 this.closeExpertForm();
             },
-            error: (err) => {
-                console.error('Error al crear comentario:', err);
-            }
+            error: (err) => console.error('Error al crear comentario:', err)
         });
     }
 
     saveEdit(): void {
         if (!this.editandoComentario) return;
         const productId = Number(this.route.snapshot.paramMap.get('id'));
-
-        var updatedComentario = {
+        const updatedComentario = {
             comentario: this.comentarioEditado.comment,
             precioEstimado: this.comentarioEditado.estimated_price,
             subastaID: productId,
@@ -343,23 +265,13 @@ export class ProductComponent {
         };
 
         this.commentService.editComment(this.comentarioAEditar.comentarioID, updatedComentario).subscribe({
-            next: (res) => {
-                const index = this.comments.findIndex(c => c.id === this.comentarioAEditar.comentarioID);
-                if (index !== -1) {
-                    this.comments[index] = { ...this.comments[index], ...res };
-                }
-                console.log('Comentario editado:', res);
+            next: () => {
                 this.closeExpertForm();
                 this.ngOnInit();
             },
-            error: (err) => {
-                console.error('Error al editar comentario:', err);
-            }
+            error: (err) => console.error('Error al editar comentario:', err)
         });
     }
 
-    cancelEdit(): void {
-        this.closeExpertForm();
-    }
+    cancelEdit(): void { this.closeExpertForm(); }
 }
-

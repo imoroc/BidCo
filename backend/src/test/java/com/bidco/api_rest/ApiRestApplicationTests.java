@@ -1,13 +1,33 @@
 package com.bidco.api_rest;
 
+import com.bidco.api_rest.config.JwtUtil;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import static org.junit.jupiter.api.Assertions.*;
+
 class ApiRestApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    private static final String VALID_SECRET = "test-only-secret-key-with-at-least-32-bytes";
 
+    @Test
+    void jwtRoundTripPreservesSubjectAndRole() {
+        JwtUtil jwtUtil = new JwtUtil(VALID_SECRET);
+        String token = jwtUtil.generateToken("42", "USER");
+
+        assertEquals("42", jwtUtil.getClaims(token).getSubject());
+        assertEquals("USER", jwtUtil.getClaims(token).get("role", String.class));
+    }
+
+    @Test
+    void jwtSecretMustHaveAtLeastThirtyTwoBytes() {
+        assertThrows(IllegalStateException.class, () -> new JwtUtil("too-short"));
+    }
+
+    @Test
+    void jwtRejectsTamperedTokens() {
+        JwtUtil jwtUtil = new JwtUtil(VALID_SECRET);
+        String token = jwtUtil.generateToken("42", "USER");
+
+        assertThrows(Exception.class, () -> jwtUtil.getClaims(token + "tampered"));
+    }
 }

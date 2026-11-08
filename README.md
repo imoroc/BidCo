@@ -2,139 +2,114 @@
   <h1 align="center">BidCo</h1>
 
   <p align="center">
-    <strong>Plataforma web Full-Stack diseñada para gestionar subastas (normales y a ciegas) y sorteos.</strong>
-    <br />
-    <br />
+    <strong>Plataforma web Full-Stack para gestionar subastas simuladas, subastas a ciegas y sorteos.</strong>
+    <br /><br />
     <a href="https://bid-co.vercel.app/auction"><strong>Ver demostración en vivo</strong></a>
-    <br />
-    <br />
-  </p>
-
-  <p align="center">
-    <img src="https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular" />
-    <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white" alt="Spring Boot" />
-    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-    <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
-    <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render" />
-    <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white" alt="Cloudinary" />
+    <br /><br />
   </p>
 </div>
 
 ---
 
-## Sobre el Proyecto
+## Sobre el proyecto
 
-Este proyecto fue creado para la asignatura Servicios y Sistemas Web, asignatura perteneciente al segundo cuatrimestre del tercer curso. BidCo es una aplicación moderna estructurada con una arquitectura cliente-servidor. Su objetivo es ofrecer una experiencia fluida y segura en la participación de subastas y sorteos, separando un frontend basado en componentes de un backend robusto. El branch `master` es el original que desarrollamos y entregamos durante la asignatura, el branch `deploy` es el que hemos ido mejorando y actualizando y está completamente alojado en la nube.
+BidCo es una aplicación universitaria desarrollada para la asignatura Servicios y Sistemas Web. Está construida con una arquitectura cliente-servidor y utiliza créditos y puntos virtuales para simular la participación. No integra pasarelas de pago ni procesa dinero real.
 
-**Características principales:**
-- Gestión de subastas tradicionales y a ciegas.
-- Sistema integrado de sorteos.
-- Almacenamiento seguro de archivos e imágenes en la nube (Cloudinary).
-- Lógica de negocio protegida con políticas CORS estrictas.
+**Características principales**
+- Subastas tradicionales y a ciegas.
+- Sorteos con puntos virtuales.
+- Gestión de perfiles, privacidad y estadísticas.
+- Valoraciones de expertos.
+- Almacenamiento de imágenes en Cloudinary.
 
----
+## Stack tecnológico
 
-## Tecnologías Utilizadas
+| Área | Tecnología |
+|---|---|
+| Frontend | Angular 21, TypeScript, CSS |
+| Backend | Java 25, Spring Boot 4 |
+| Persistencia | PostgreSQL, Spring Data JPA |
+| Seguridad | JWT, BCrypt, CORS |
+| Imágenes | Cloudinary |
+| Documentación API | OpenAPI / Swagger |
+| CI | GitHub Actions, CodeQL, Dependabot |
 
-### Frontend
-- **Framework:** Angular 21+ *(Standalone Components, `@if`/`@for` control flow)*
-- **Lenguaje:** TypeScript
-- **Estilos:** CSS3 Puro
-- **Entornos:** Gestión dinámica mediante `environment.ts` (Producción) y `environment.development.ts` (Local).
+## Requisitos
 
-### Backend
-- **Framework:** Java Spring Boot 3+ (Java 25+)
-- **Build Tool:** Maven
-- **Base de Datos:** PostgreSQL
-- **Gestión de Archivos:** Integración con **Cloudinary** para almacenamiento persistente en la nube.
+- Node.js 22 y npm.
+- JDK 25.
+- Maven (o Maven Wrapper).
+- PostgreSQL.
+- Credenciales de Cloudinary para las funciones de imágenes.
 
-### Documentación de la API (Swagger)
+## Puesta en marcha
 
-La API REST está completamente auto-documentada utilizando **OpenAPI 3.0**. 
-Puedes interactuar con los endpoints, ver los esquemas de datos requeridos y realizar peticiones de prueba directamente desde la interfaz gráfica alojada en producción:
-
-👉 **[Ver Documentación de la API en vivo](https://bidco-backend.onrender.com/swagger-ui.html)**
-
-*(Nota: Para probar rutas protegidas, primero haz login en `/api/usuarios/login`, copia el token JWT devuelto, y pégalo en el botón superior **Authorize**).*
-
----
-
-## Requisitos Previos
-
-Para levantar este proyecto desde cero en tu máquina local, asegúrate de tener instalado:
-
-* [Node.js y npm](https://nodejs.org/)
-* [Angular CLI](https://angular.io/cli) (`npm install -g @angular/cli`)
-* [Java Development Kit (JDK) 25+](https://jdk.java.net/)
-* [Maven](https://maven.apache.org/)
-* [Git](https://git-scm.com/)
-
----
-
-## Instalación y Ejecución Local
-
-Sigue estos pasos en orden para asegurar la correcta conexión entre el cliente y el servidor.
-
-### 1. Clonar el repositorio
-
-Abre tu terminal y ejecuta:
+### 1. Clonar
 
 ```bash
-git clone [https://github.com/imoroc/BidCo.git](https://github.com/imoroc/BidCo.git)
+git clone https://github.com/imoroc/BidCo.git
 cd BidCo
 ```
 
-### 2. Configurar y Levantar el Backend (Spring Boot)
+### 2. Backend
 
-El servidor debe estar corriendo antes que el frontend para que la base de datos y las APIs estén disponibles.
-Navega a la carpeta del backend:
+Configura las siguientes variables de entorno. El secreto JWT es obligatorio y debe contener al menos 32 bytes UTF-8. Genera uno nuevo para cada entorno; no reutilices el valor de ejemplo de la documentación.
+
+Linux/macOS:
+
+```bash
+export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/bidco"
+export SPRING_DATASOURCE_USERNAME="postgres"
+export SPRING_DATASOURCE_PASSWORD="tu-password"
+export JWT_SECRET="$(openssl rand -base64 48)"
+export CLOUDINARY_API_KEY="tu-api-key"
+export CLOUDINARY_API_SECRET="tu-api-secret"
+```
+
+PowerShell:
+
+```powershell
+$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/bidco"
+$env:SPRING_DATASOURCE_USERNAME="postgres"
+$env:SPRING_DATASOURCE_PASSWORD="tu-password"
+$env:JWT_SECRET=[Convert]::ToBase64String((1..48 | ForEach-Object { Get-Random -Maximum 256 }))
+$env:CLOUDINARY_API_KEY="tu-api-key"
+$env:CLOUDINARY_API_SECRET="tu-api-secret"
+```
+
+Arranca el backend:
 
 ```bash
 cd backend
+./mvnw spring-boot:run
 ```
 
-Abre el archivo de propiedades de Spring Boot (`src/main/resources/application.properties`) o configura las variables en tu entorno local. Asegúrate de que las credenciales apuntan a tu base de datos:
+En Windows utiliza `mvnw.cmd spring-boot:run`.
 
-```properties
-spring.datasource.url=jdbc:postgresql://[TU-URL-DE-BASE-DE-DATOS]
-spring.datasource.username=[TU-USUARIO]
-spring.datasource.password=[TU-CONTRASEÑA]
-```
-
-Instala las dependencias y compila el proyecto con Maven:
-
-```bash
-mvn clean install
-mvn spring-boot:run
-```
-
-*Nota: El backend arrancará en `http://localhost:8080`.*
-
-### 3. Configurar y Levantar el Frontend (Angular)
-
-Abre otra pestaña en tu terminal (deja el backend corriendo en la primera) y haz lo siguiente:
-
-Navega a la carpeta del frontend:
+### 3. Frontend
 
 ```bash
 cd frontend
+npm ci
+npm start
 ```
 
-Instala todas las dependencias del `package.json`:
+Angular estará disponible en `http://localhost:4200` y el backend en `http://localhost:8080`.
 
-```bash
-npm install
-```
+## Configuración de producción
 
-Arranca el servidor de desarrollo de Angular:
+Guarda las variables de entorno en el proveedor de despliegue (Render, por ejemplo), nunca en el repositorio. Mantén los logs de SQL y los mensajes internos desactivados en producción. Configura CORS únicamente con los orígenes reales del frontend.
 
-```bash
-ng serve
-```
+## Calidad y seguridad
 
-Abre tu navegador y entra en `http://localhost:4200`. ¡La aplicación ya está funcionando en local conectada a tu backend!
+- Los saldos y puntos iniciales se asignan en el backend.
+- Las rutas privadas requieren tokens JWT firmados con un secreto configurado.
+- Las operaciones sobre perfiles verifican que el usuario autenticado sea el propietario.
+- Las vistas públicas reciben un DTO reducido y no los datos de contacto o dirección.
+- GitHub Actions compila ambos proyectos y ejecuta las pruebas del backend.
+- CodeQL analiza Java y TypeScript; Dependabot mantiene las dependencias.
 
-**Original Authors**
+## Autores originales
 
--Iván Moro Cienfuegos y Gonzalo Sánchez Maroto
+- Iván Moro Cienfuegos
+- Gonzalo Sánchez Maroto

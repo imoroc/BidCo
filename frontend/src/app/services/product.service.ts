@@ -18,7 +18,6 @@ export interface SubastaResponseDto {
     privacidad_anonimo: boolean;
 }
 
-
 export interface SorteoResponseDto {
     sorteoID: number;
     nombreArticulo: string;
@@ -27,12 +26,12 @@ export interface SorteoResponseDto {
     fechaFin: string;
     puntosNecesarios: number;
     imagen: string;
-    ganador: number
+    ganador: number;
 }
 
-export interface UsuarioResponseDto {
-    usuarioID: number;
+export interface PerfilPublicoDto {
     nombreUsuario: string;
+    privacidadAnonimoPujas: boolean;
 }
 
 export interface PujaCreateDTO {
@@ -66,9 +65,7 @@ export interface PujaSorteoResponseDTO {
     pujadorID: number;
 }
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ProductoService {
     private subastaUrl = `${environment.apiUrl}/subastas`;
     private pujaSubastaUrl = `${environment.apiUrl}/pujas`;
@@ -86,12 +83,8 @@ export class ProductoService {
         return this.http.get(`${this.sorteoUrl}/${id}`);
     }
 
-    getUsuarioPorId(id: number): Observable<any> {
-        return this.http.get(`${this.usuarioUrl}/${id}`);
-    }
-
-    obtenerPrivacidad(id: number): Observable<any> {
-        return this.http.get(`${this.usuarioUrl}/${id}/privacidad`);
+    getPerfilPublicoPorId(id: number): Observable<PerfilPublicoDto> {
+        return this.http.get<PerfilPublicoDto>(`${this.usuarioUrl}/${id}/publico`);
     }
 
     crearPuja(puja: PujaCreateDTO): Observable<PujaResponseDTO> {
@@ -113,5 +106,4 @@ export class ProductoService {
     finalizarSorteo(id: number) {
         return this.http.put<SorteoResponseDto>(`${this.sorteoUrl}/final/${id}`, {});
     }
-      
 }
