@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -19,13 +19,14 @@ import { AuthExpertService } from '../../services/auth.expert.service';
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.css']
 })
-export class ProductComponent {
+export class ProductComponent implements OnDestroy {
     product: any;
     productId = 0;
     tipo = '';
     isBlindAuction = false;
     isRaffle = false;
     countdown = '';
+    private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
     user: any;
     isLoggedIn = false;
@@ -204,6 +205,7 @@ export class ProductComponent {
             endDate = new Date(year, month - 1, day + 1, 0, 0, 5).getTime();
         }
 
+        this.detenerCuentaAtras();
         const interval = setInterval(() => {
             const now = new Date().getTime();
             const distance = endDate - now;
@@ -227,7 +229,7 @@ export class ProductComponent {
                     }
                 }
                 if (this.product.ganador != null && this.tipo === 'sorteo') this.setGanadorSorteo();
-                clearInterval(interval);
+                this.detenerCuentaAtras();
                 return;
             }
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -236,6 +238,19 @@ export class ProductComponent {
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
             this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
         }, 1000);
+        this.countdownInterval = interval;
+    }
+
+    ngOnDestroy() {
+        // Sin esto, al salir de la ficha el intervalo seguiría vivo (y podría finalizar la subasta equivocada).
+        this.detenerCuentaAtras();
+    }
+
+    private detenerCuentaAtras() {
+        if (this.countdownInterval !== null) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
     }
 
     setGanadorSorteo() {
