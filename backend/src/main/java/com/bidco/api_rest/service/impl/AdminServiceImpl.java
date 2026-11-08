@@ -6,6 +6,7 @@ import com.bidco.api_rest.model.Sorteo;
 import com.bidco.api_rest.model.Trabajador;
 import com.bidco.api_rest.repository.SorteoRepository;
 import com.bidco.api_rest.repository.TrabajadorRepository;
+import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.service.contract.AdminService;
 import com.bidco.api_rest.service.contract.CloudinaryService;
 
@@ -21,7 +22,10 @@ public class AdminServiceImpl implements AdminService {
     private final TrabajadorRepository trabajadorRepo;
     private final SorteoRepository sorteoRepo;
     private final CloudinaryService cloudinaryService;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private static final String CREDENCIALES_INCORRECTAS = "Credenciales incorrectas";
+    private static final BCryptPasswordEncoder STATIC_ENCODER = new BCryptPasswordEncoder();
+    private static final String DUMMY_HASH = STATIC_ENCODER.encode("contraseña-inexistente");
+    private final BCryptPasswordEncoder passwordEncoder = STATIC_ENCODER;
 
     public AdminServiceImpl(
         TrabajadorRepository trabajadorRepo,
@@ -35,17 +39,19 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void login(AdminLoginDTO dto, HttpSession session) {
-        Trabajador admin = trabajadorRepo
-            .findByNombreUsuario(dto.getUsername())
-            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-
-        if (admin.isExperto() != dto.getRol()) {
-            throw new IllegalArgumentException("Acceso denegado: no es administrador");
+        if (dto == null || dto.getUsername() == null || dto.getPassword() == null) {
+            throw new AuthenticationFailedException(CREDENCIALES_INCORRECTAS);
         }
 
-        // Comparación segura con BCrypt
-        if (!passwordEncoder.matches(dto.getPassword(), admin.getContraseña())) {
-            throw new IllegalArgumentException("Contraseña incorrecta");
+        Trabajador admin = trabajadorRepo.findByNombreUsuario(dto.getUsername()).orElse(null);
+
+        // Se comprueba siempre una contraseña (aunque el usuario no exista) para que el
+        // tiempo de respuesta no revele qué cuentas existen, y se usa un único mensaje de error.
+        String hash = admin != null ? admin.getContraseña() : DUMMY_HASH;
+        boolean passwordOk = passwordEncoder.matches(dto.getPassword(), hash);
+
+        if (admin == null || !passwordOk || admin.isExperto() != dto.getRol()) {
+            throw new AuthenticationFailedException(CREDENCIALES_INCORRECTAS);
         }
 
         session.setAttribute("adminId", admin.getTrabajadorID());
@@ -80,6 +86,8 @@ public class AdminServiceImpl implements AdminService {
             try {
                 String urlImagen = cloudinaryService.uploadFile(img);
                 sorteo.setImagen(urlImagen);
+            } catch (IllegalArgumentException e) {
+                throw e;
             } catch (Exception e) {
                 throw new RuntimeException("Error al subir la imagen del sorteo a Cloudinary", e);
             }

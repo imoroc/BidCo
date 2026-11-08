@@ -1,5 +1,6 @@
 package com.bidco.api_rest.controller;
 
+import com.bidco.api_rest.config.LoginRateLimiter;
 import com.bidco.api_rest.dto.usuario.LoginDTO;
 import com.bidco.api_rest.dto.usuario.PerfilPublicoDTO;
 import com.bidco.api_rest.dto.usuario.PrivacidadDTO;
@@ -7,8 +8,10 @@ import com.bidco.api_rest.dto.usuario.StatsDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioCreateDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioResponseDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioUpdateDTO;
+import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.service.contract.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +26,12 @@ import java.util.Map;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final LoginRateLimiter loginRateLimiter;
 
     @Autowired
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, LoginRateLimiter loginRateLimiter) {
         this.usuarioService = usuarioService;
+        this.loginRateLimiter = loginRateLimiter;
     }
 
     @PostMapping
@@ -35,8 +40,17 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@Valid @RequestBody LoginDTO loginDTO) {
-        String token = usuarioService.login(loginDTO);
+    public Map<String, String> login(@Valid @RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+        String key = loginRateLimiter.key("user", loginDTO.getIdentificador(), request.getRemoteAddr());
+        loginRateLimiter.assertAllowed(key);
+        String token;
+        try {
+            token = usuarioService.login(loginDTO);
+        } catch (AuthenticationFailedException exception) {
+            loginRateLimiter.recordFailure(key);
+            throw exception;
+        }
+        loginRateLimiter.reset(key);
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
         return response;

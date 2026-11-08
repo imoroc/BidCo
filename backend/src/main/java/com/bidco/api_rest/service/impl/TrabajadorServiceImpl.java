@@ -7,6 +7,8 @@ import com.bidco.api_rest.dto.trabajador.TrabajadorResponseDTO;
 import com.bidco.api_rest.mapper.TrabajadorMapper;
 import com.bidco.api_rest.model.Trabajador;
 import com.bidco.api_rest.repository.TrabajadorRepository;
+import com.bidco.api_rest.exception.AuthenticationFailedException;
+import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.service.contract.TrabajadorService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,12 +41,17 @@ public class TrabajadorServiceImpl implements TrabajadorService {
     }
 
     @Override
-    public TrabajadorResponseDTO actualizarTrabajador(TrabajadorCreateDTO dto) {
+    public TrabajadorResponseDTO actualizarTrabajador(Long solicitanteId, TrabajadorCreateDTO dto) {
         if (dto == null) {
             throw new IllegalArgumentException("El trabajador no puede ser nulo");
         }
         Trabajador trabajador = trabajadorRepository.findByNombreUsuario(dto.getNombreUsuario())
                 .orElseThrow(() -> new EntityNotFoundException("Trabajador no encontrado"));
+
+        // Cada trabajador solo puede modificar su propia cuenta.
+        if (solicitanteId == null || !solicitanteId.equals(trabajador.getTrabajadorID())) {
+            throw new ForbiddenException("No puedes modificar los datos de otro trabajador");
+        }
 
         trabajador.setCorreoElectronico(dto.getCorreoElectronico());
         if (dto.getContraseña() != null && !dto.getContraseña().isBlank()) {
@@ -75,12 +82,12 @@ public class TrabajadorServiceImpl implements TrabajadorService {
             trabajadorOpt = trabajadorRepository.findByCorreoElectronico(dto.getIdentificador());
         }
         if (trabajadorOpt.isEmpty()) {
-            throw new IllegalArgumentException("Credenciales incorrectas");
+            throw new AuthenticationFailedException("Credenciales incorrectas");
         }
 
         Trabajador trabajador = trabajadorOpt.get();
         if (!passwordEncoder.matches(dto.getContraseña(), trabajador.getContraseña()) || trabajador.isExperto() != dto.getRol()) {
-            throw new IllegalArgumentException("Credenciales incorrectas");
+            throw new AuthenticationFailedException("Credenciales incorrectas");
         }
 
         String role = trabajador.isExperto() ? "EXPERT" : "WORKER";

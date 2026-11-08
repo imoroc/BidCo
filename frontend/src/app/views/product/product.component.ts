@@ -30,6 +30,9 @@ export class ProductComponent {
     user: any;
     isLoggedIn = false;
     cantidadPuja: number | null = null;
+    mensaje: { tipo: 'error' | 'exito'; texto: string } | null = null;
+    errorFormulario = '';
+    private elementoPrevioAlModal: HTMLElement | null = null;
     candidatoGanadorPuja: string | null = null;
     ganadorSorteo: string | null = null;
 
@@ -99,38 +102,56 @@ export class ProductComponent {
                 console.error('Tipo de producto no válido');
         }
 
-        this.productoService.obtenerPujaMaximaPorSubasta(this.productId).subscribe((puja) => {
-            if (!puja?.pujadorID) return;
-            this.productoService.getPerfilPublicoPorId(puja.pujadorID).subscribe((profile) => {
-                this.candidatoGanadorPuja = profile.privacidadAnonimoPujas ? 'Anónimo' : profile.nombreUsuario;
-            });
+        this.productoService.obtenerPujaMaximaPorSubasta(this.productId).subscribe({
+            next: (puja) => {
+                if (!puja?.pujadorID) return;
+                this.productoService.getPerfilPublicoPorId(puja.pujadorID).subscribe((profile) => {
+                    this.candidatoGanadorPuja = profile.privacidadAnonimoPujas ? 'Anónimo' : profile.nombreUsuario;
+                });
+            },
+            // Sin pujas, sorteo o subasta a ciegas en curso: no hay candidato que mostrar.
+            error: () => {},
         });
     }
 
+    private mostrarMensaje(tipo: 'error' | 'exito', texto: string) {
+        this.mensaje = { tipo, texto };
+    }
+
+    private textoDeError(err: any, porDefecto: string): string {
+        const texto = err?.error?.message;
+        return typeof texto === 'string' && texto.trim() ? texto : porDefecto;
+    }
+
+    limpiarMensaje() {
+        this.mensaje = null;
+    }
+
     onSubmit() {
+        this.mensaje = null;
         if (this.user.usuarioID == this.product.creadorId) {
-            alert('No puedes pujar en una subasta que has creado.');
+            this.mostrarMensaje('error', 'No puedes pujar en una subasta que has creado.');
             return;
         }
         if (this.cantidadPuja == null) {
-            alert('Debes ingresar una cantidad.');
+            this.mostrarMensaje('error', 'Debes ingresar una cantidad.');
             return;
         }
 
         if (this.isRaffle && this.product.puntosNecesarios > this.cantidadPuja) {
-            alert('La cantidad dada debe ser mayor a la mínima para participar.');
+            this.mostrarMensaje('error', 'La cantidad dada debe ser mayor a la mínima para participar.');
             return;
         } else if (this.isBlindAuction && this.product.precioInicial >= this.cantidadPuja) {
-            alert('La puja tiene que ser mayor que el precio base del producto.');
+            this.mostrarMensaje('error', 'La puja tiene que ser mayor que el precio base del producto.');
             return;
         } else if (!this.isBlindAuction && !this.isRaffle && this.product.precioFinal >= this.cantidadPuja) {
-            alert('La puja tiene que ser mayor que el precio actual del producto.');
+            this.mostrarMensaje('error', 'La puja tiene que ser mayor que el precio actual del producto.');
             return;
         } else if (this.isRaffle && this.cantidadPuja > this.user.puntos) {
-            alert('No tienes suficientes puntos para participar.');
+            this.mostrarMensaje('error', 'No tienes suficientes puntos para participar.');
             return;
         } else if (!this.isRaffle && this.cantidadPuja > this.user.saldo) {
-            alert('Saldo insuficiente.');
+            this.mostrarMensaje('error', 'Saldo insuficiente.');
             return;
         }
 
@@ -151,8 +172,9 @@ export class ProductComponent {
                         error: (err) => console.error('Error al actualizar el usuario:', err)
                     });
                     this.ngOnInit();
+                    this.mostrarMensaje('exito', 'Has entrado en el sorteo correctamente.');
                 },
-                error: () => alert('❌ Error al realizar la puja.')
+                error: (err) => this.mostrarMensaje('error', this.textoDeError(err, 'No se ha podido realizar la puja. Inténtalo de nuevo.'))
             });
         } else {
             const nuevaPuja: PujaCreateDTO = {
@@ -162,15 +184,25 @@ export class ProductComponent {
                 pujadorId: this.user.usuarioID
             };
             this.productoService.crearPuja(nuevaPuja).subscribe({
-                next: () => this.ngOnInit(),
-                error: () => alert('❌ Error al realizar la puja.')
+                next: () => {
+                    this.ngOnInit();
+                    this.mostrarMensaje('exito', 'Tu puja se ha registrado correctamente.');
+                },
+                error: (err) => this.mostrarMensaje('error', this.textoDeError(err, 'No se ha podido realizar la puja. Inténtalo de nuevo.'))
             });
         }
     }
 
     setupCountdown(endDateString: string) {
-        const fullDateString = endDateString.includes('T') ? endDateString : `${endDateString}T23:59:59`;
-        const endDate = new Date(fullDateString).getTime();
+        // La subasta/sorteo termina al acabar el último día; el servidor solo permite
+        // finalizarlo a partir del día siguiente, así que se espera unos segundos de margen.
+        let endDate: number;
+        if (endDateString.includes('T')) {
+            endDate = new Date(endDateString).getTime();
+        } else {
+            const [year, month, day] = endDateString.split('-').map(Number);
+            endDate = new Date(year, month - 1, day + 1, 0, 0, 5).getTime();
+        }
 
         const interval = setInterval(() => {
             const now = new Date().getTime();
@@ -212,24 +244,65 @@ export class ProductComponent {
         });
     }
 
-    openExpertForm() { this.showExpertForm = true; }
+    openExpertForm() {
+        this.showExpertForm = true;
+        this.enfocarModal();
+    }
 
     editExpertForm(comment: any) {
         this.editandoComentario = true;
         this.comentarioAEditar = comment;
         this.comentarioEditado = { comment: comment.comentario, estimated_price: comment.precioEstimado };
         this.showExpertForm = true;
+        this.enfocarModal();
     }
 
     closeExpertForm() {
         this.showExpertForm = false;
+        this.errorFormulario = '';
         this.editandoComentario = false;
         this.comentarioEditado = { comment: '', estimated_price: 0 };
+        // Devuelve el foco al elemento que abrió el modal.
+        this.elementoPrevioAlModal?.focus();
+        this.elementoPrevioAlModal = null;
+    }
+
+    // Al abrir el modal se guarda el elemento activo y se lleva el foco al primer campo.
+    private enfocarModal() {
+        this.elementoPrevioAlModal = document.activeElement as HTMLElement | null;
+        setTimeout(() => document.getElementById('review')?.focus());
+    }
+
+    // Escape cierra el modal y Tab/Shift+Tab se mantienen dentro de él.
+    onModalKeydown(event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            this.closeExpertForm();
+            return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const modal = (event.currentTarget as HTMLElement).querySelector('.modal-card');
+        const enfocables = Array.from(
+            modal?.querySelectorAll<HTMLElement>('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])') ?? []
+        ).filter((el) => !el.hasAttribute('disabled'));
+        if (enfocables.length === 0) return;
+
+        const primero = enfocables[0];
+        const ultimo = enfocables[enfocables.length - 1];
+        if (event.shiftKey && document.activeElement === primero) {
+            event.preventDefault();
+            ultimo.focus();
+        } else if (!event.shiftKey && document.activeElement === ultimo) {
+            event.preventDefault();
+            primero.focus();
+        }
     }
 
     handleFormSubmit() {
+        this.errorFormulario = '';
         if (!this.comentarioEditado.comment || this.comentarioEditado.estimated_price <= 0) {
-            alert('Debes completar todos los campos requeridos');
+            this.errorFormulario = 'Debes completar todos los campos requeridos.';
             return;
         }
         if (this.editandoComentario) this.saveEdit();
@@ -250,7 +323,10 @@ export class ProductComponent {
                 this.comments.push(res);
                 this.closeExpertForm();
             },
-            error: (err) => console.error('Error al crear comentario:', err)
+            error: (err) => {
+                console.error('Error al crear comentario:', err);
+                this.errorFormulario = this.textoDeError(err, 'No se ha podido publicar la valoración. Inténtalo de nuevo.');
+            }
         });
     }
 
@@ -269,7 +345,10 @@ export class ProductComponent {
                 this.closeExpertForm();
                 this.ngOnInit();
             },
-            error: (err) => console.error('Error al editar comentario:', err)
+            error: (err) => {
+                console.error('Error al editar comentario:', err);
+                this.errorFormulario = this.textoDeError(err, 'No se han podido guardar los cambios. Inténtalo de nuevo.');
+            }
         });
     }
 

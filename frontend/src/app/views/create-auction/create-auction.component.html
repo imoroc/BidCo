@@ -8,10 +8,17 @@
       <p>Sube una foto llamativa y completa los detalles para publicar tu artículo en BidCo.</p>
     </header>
 
-    @if (formularioInvalido) {
-      <div class="alert-error">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
-        <span><strong>Oops! Hay un problema.</strong> Asegúrate de rellenar todos los campos y de elegir una fecha de finalización futura.</span>
+    @if (errores.length > 0) {
+      <div class="alert-error" #resumenErrores role="alert" tabindex="-1">
+        <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+        <div>
+          <strong>No se ha podido publicar la subasta.</strong>
+          <ul class="error-list">
+            @for (error of errores; track error) {
+              <li>{{ error }}</li>
+            }
+          </ul>
+        </div>
       </div>
     }
 
@@ -21,20 +28,23 @@
         <div class="image-upload" [class.has-image]="imagenPreview">
           @if (!imagenPreview) {
             <div class="upload-placeholder">
-              <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48" fill="#dadce0"><path d="M260-160q-91 0-155.5-63T40-377q0-78 47-139t123-78q25-92 100-149t170-57q117 0 198.5 81.5T760-520q69 8 114.5 59.5T920-340q0 75-52.5 127.5T740-160H260Zm0-80h480q42 0 71-29t29-71q0-42-29-71t-71-29h-60v-80q0-83-58.5-141.5T480-700q-83 0-141.5 58.5T280-500h-20q-58 0-99 41t-41 99q0 58 41 99t99 41Zm220-140v-184l-64 64-56-56 160-160 160 160-56 56-64-64v184h-80Zm0-120Z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" height="48" viewBox="0 -960 960 960" width="48" fill="#80868b"><path d="M260-160q-91 0-155.5-63T40-377q0-78 47-139t123-78q25-92 100-149t170-57q117 0 198.5 81.5T760-520q69 8 114.5 59.5T920-340q0 75-52.5 127.5T740-160H260Zm0-80h480q42 0 71-29t29-71q0-42-29-71t-71-29h-60v-80q0-83-58.5-141.5T480-700q-83 0-141.5 58.5T280-500h-20q-58 0-99 41t-41 99q0 58 41 99t99 41Zm220-140v-184l-64 64-56-56 160-160 160 160-56 56-64-64v184h-80Zm0-120Z"/></svg>
               <span class="upload-text">Haz clic o arrastra tu imagen aquí</span>
-              <span class="upload-hint">Formatos soportados: JPG, PNG, WEBP</span>
+              <span class="upload-hint" id="imagen-ayuda">Formatos soportados: JPG, PNG, WEBP. Máximo 8 MB.</span>
             </div>
           }
-          <input type="file" id="imagen" name="imagen" (change)="onImgSelected($event)" accept="image/*" required>
+          <input type="file" id="imagen" name="imagen" (change)="onImgSelected($event)" accept="image/jpeg,image/png,image/webp" aria-label="Imagen del artículo" aria-describedby="imagen-ayuda">
 
           @if (imagenPreview) {
             <div class="image-preview">
-              <img [src]="imagenPreview" alt="Vista previa de la imagen" class="preview-img" />
+              <img [src]="imagenPreview" alt="Vista previa de la imagen seleccionada" class="preview-img" />
               <div class="image-overlay">Cambiar imagen</div>
             </div>
           }
         </div>
+        @if (errorImagen) {
+          <p class="field-error" role="alert">{{ errorImagen }}</p>
+        }
       </div>
 
       <div class="details-section">
@@ -56,21 +66,21 @@
         </div>
 
         <div class="form-row">
-          <div class="form-group">
-            <label>Modalidad de Subasta</label>
+          <fieldset class="form-group modalidad">
+            <legend>Modalidad de Subasta</legend>
             <div class="radio-group">
               <label class="radio-option">
-                <input type="radio" [(ngModel)]="subasta.subastaNormal" name="modalidad" [value]="true" checked>
-                <span class="custom-radio"></span>
+                <input type="radio" [(ngModel)]="subasta.subastaNormal" name="modalidad" [value]="true">
+                <span class="custom-radio" aria-hidden="true"></span>
                 Subasta Normal
               </label>
               <label class="radio-option">
                 <input type="radio" [(ngModel)]="subasta.subastaNormal" name="modalidad" [value]="false">
-                <span class="custom-radio"></span>
+                <span class="custom-radio" aria-hidden="true"></span>
                 A Ciegas
               </label>
             </div>
-          </div>
+          </fieldset>
 
           <div class="form-group">
             <label for="categoria">Categoría</label>
@@ -88,11 +98,11 @@
 
         <div class="form-group">
           <label for="fecha_fin">Fecha de Finalización</label>
-          <input type="date" id="fecha_fin" [(ngModel)]="subasta.fechaFinal" name="fechaFinal" required>
+          <input type="date" id="fecha_fin" [(ngModel)]="subasta.fechaFinal" name="fechaFinal" [min]="fechaMinima" required>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn-submit">Publicar Subasta</button>
+          <button type="submit" class="btn-submit" [disabled]="enviando" [attr.aria-busy]="enviando">{{ enviando ? 'Publicando…' : 'Publicar Subasta' }}</button>
         </div>
 
       </div>

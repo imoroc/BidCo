@@ -2,6 +2,7 @@ package com.bidco.api_rest.service.impl;
 
 import com.bidco.api_rest.dto.cometario.ComentarioCreateDTO;
 import com.bidco.api_rest.dto.cometario.ComentarioResponseDTO;
+import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.mapper.ComentarioMapper;
 import com.bidco.api_rest.model.Comentario;
 import com.bidco.api_rest.repository.ComentarioRepository;
@@ -25,10 +26,15 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
-    public ComentarioResponseDTO añadirComentario(ComentarioCreateDTO comentarioCreateDTO) {
+    public ComentarioResponseDTO añadirComentario(Long solicitanteId, ComentarioCreateDTO comentarioCreateDTO) {
         if(comentarioCreateDTO==null){
             throw new IllegalArgumentException("el comentario no puede ser nulo");
         }
+        if (solicitanteId == null) {
+            throw new ForbiddenException("Identidad no válida");
+        }
+        // El autor es siempre quien está autenticado, no el id que venga en el cuerpo.
+        comentarioCreateDTO.setTrabajadorId(solicitanteId);
         Comentario comentario = comentarioMapper.comentarioCreateDTOToComentario(comentarioCreateDTO);
         comentario = comentarioRepository.save(comentario);
         return comentarioMapper.comentarioToComentarioResponseDTO(comentario);
@@ -59,8 +65,18 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
-    public ComentarioResponseDTO editarComentarioPorId(Long id, ComentarioCreateDTO comentarioDTO) {
+    public ComentarioResponseDTO editarComentarioPorId(Long solicitanteId, Long id, ComentarioCreateDTO comentarioDTO) {
+        if (comentarioDTO == null) {
+            throw new IllegalArgumentException("el comentario no puede ser nulo");
+        }
         Comentario comentario = comentarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Comentario no encontrado con ID: " + id));
+
+        // Cada experto solo puede editar sus propios comentarios.
+        if (solicitanteId == null
+                || comentario.getTrabajador() == null
+                || !solicitanteId.equals(comentario.getTrabajador().getTrabajadorID())) {
+            throw new ForbiddenException("No puedes editar el comentario de otro trabajador");
+        }
         comentario.setComentario(comentarioDTO.getComentario());
         comentario.setPrecioEstimado(comentarioDTO.getPrecioEstimado());
 

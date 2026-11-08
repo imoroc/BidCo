@@ -33,8 +33,10 @@ public class PujaController {
     }
 
     @GetMapping("/{id}")
-    public PujaResponseDTO buscarPujaPorId(@PathVariable Long id) {
-        return pujaService.buscarPujaPorId(id);
+    public PujaResponseDTO buscarPujaPorId(
+            @PathVariable Long id,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        return pujaService.buscarPujaPorId(id, authenticatedUserId);
     }
 
     @GetMapping("/mayor/{subastaId}")

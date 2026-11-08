@@ -11,7 +11,7 @@ class ApiRestApplicationTests {
 
     @Test
     void jwtRoundTripPreservesSubjectAndRole() {
-        JwtUtil jwtUtil = new JwtUtil(VALID_SECRET);
+        JwtUtil jwtUtil = new JwtUtil(VALID_SECRET, 3600000L);
         String token = jwtUtil.generateToken("42", "USER");
 
         assertEquals("42", jwtUtil.getClaims(token).getSubject());
@@ -20,14 +20,28 @@ class ApiRestApplicationTests {
 
     @Test
     void jwtSecretMustHaveAtLeastThirtyTwoBytes() {
-        assertThrows(IllegalStateException.class, () -> new JwtUtil("too-short"));
+        assertThrows(IllegalStateException.class, () -> new JwtUtil("too-short", 3600000L));
     }
 
     @Test
     void jwtRejectsTamperedTokens() {
-        JwtUtil jwtUtil = new JwtUtil(VALID_SECRET);
+        JwtUtil jwtUtil = new JwtUtil(VALID_SECRET, 3600000L);
         String token = jwtUtil.generateToken("42", "USER");
 
         assertThrows(Exception.class, () -> jwtUtil.getClaims(token + "tampered"));
+    }
+
+    @Test
+    void jwtRejectsExpiredTokens() throws InterruptedException {
+        JwtUtil jwtUtil = new JwtUtil(VALID_SECRET, 1L);
+        String token = jwtUtil.generateToken("42", "USER");
+        Thread.sleep(20);
+
+        assertThrows(Exception.class, () -> jwtUtil.getClaims(token));
+    }
+
+    @Test
+    void jwtExpirationMustBePositive() {
+        assertThrows(IllegalStateException.class, () -> new JwtUtil(VALID_SECRET, 0L));
     }
 }

@@ -13,10 +13,16 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final long EXPIRATION_MILLIS = 86_400_000L;
+    private static final String ISSUER = "bidco-api";
+    private final long expirationMillis;
     private final SecretKey signingKey;
 
-    public JwtUtil(@Value("${jwt.secret}") String secret) {
+    public JwtUtil(@Value("${jwt.secret}") String secret,
+                   @Value("${jwt.expiration:86400000}") long expirationMillis) {
+        if (expirationMillis <= 0) {
+            throw new IllegalStateException("jwt.expiration debe ser mayor que 0");
+        }
+        this.expirationMillis = expirationMillis;
         if (secret == null || secret.isBlank()) {
             throw new IllegalStateException("JWT_SECRET debe configurarse antes de iniciar la aplicación");
         }
@@ -31,10 +37,11 @@ public class JwtUtil {
 
     public String generateToken(String subject, String role) {
         return Jwts.builder()
+                .issuer(ISSUER)
                 .subject(subject)
                 .claim("role", role)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MILLIS))
+                .expiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(signingKey)
                 .compact();
     }
@@ -42,6 +49,7 @@ public class JwtUtil {
     public Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(signingKey)
+                .requireIssuer(ISSUER)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
