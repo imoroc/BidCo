@@ -6,8 +6,8 @@ name: Keep Alive
  
 on:
   schedule:
-    # Cada 20 minutos (ajusta a tu necesidad)
-    - cron: "*/20 * * * *"
+    # Cada 10 minutos: Render duerme el servicio tras 15 min sin tráfico
+    - cron: "*/10 * * * *"
   workflow_dispatch:
  
 # Mínimo privilegio: solo lectura del contenido
@@ -26,6 +26,6 @@ jobs:
       - name: Ping
         run: |
           curl -sf "${{ secrets.RENDER_BACKEND_URL }}/api/ping" \
-            --max-time 10 \
+            --max-time 60 \
             --retry 2 \
             || echo "Backend no responde (normal si está arrancando)"
