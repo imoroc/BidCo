@@ -123,6 +123,8 @@ public class SubastaServiceImpl implements SubastaService {
         user.setPuntos(user.getPuntos() + (subasta.isSubastaNormal() ? 100 : 200));
         puja.setGanadora(true);
         subasta.setGanador(user.getUsuarioID());
+        // En subastas a ciegas el precio definitivo se publica ahora, al cerrarse.
+        subasta.setPrecioFinal(puja.getImporte());
 
         subastaRepository.save(subasta);
         pujaRepository.save(puja);

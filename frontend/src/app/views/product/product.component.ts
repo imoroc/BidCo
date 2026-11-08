@@ -99,11 +99,15 @@ export class ProductComponent {
                 console.error('Tipo de producto no válido');
         }
 
-        this.productoService.obtenerPujaMaximaPorSubasta(this.productId).subscribe((puja) => {
-            if (!puja?.pujadorID) return;
-            this.productoService.getPerfilPublicoPorId(puja.pujadorID).subscribe((profile) => {
-                this.candidatoGanadorPuja = profile.privacidadAnonimoPujas ? 'Anónimo' : profile.nombreUsuario;
-            });
+        this.productoService.obtenerPujaMaximaPorSubasta(this.productId).subscribe({
+            next: (puja) => {
+                if (!puja?.pujadorID) return;
+                this.productoService.getPerfilPublicoPorId(puja.pujadorID).subscribe((profile) => {
+                    this.candidatoGanadorPuja = profile.privacidadAnonimoPujas ? 'Anónimo' : profile.nombreUsuario;
+                });
+            },
+            // Sin pujas, sorteo o subasta a ciegas en curso: no hay candidato que mostrar.
+            error: () => {},
         });
     }
 

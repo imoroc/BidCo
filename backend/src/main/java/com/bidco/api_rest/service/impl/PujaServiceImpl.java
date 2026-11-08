@@ -89,8 +89,12 @@ public class PujaServiceImpl implements PujaService {
 
         if (lidera) {
             retenerSaldo(pujadorId, pujaAnterior, importe);
-            subasta.setPrecioFinal(importe);
-            subastaRepository.save(subasta);
+            // En subastas a ciegas el precio no se actualiza hasta el cierre: si no,
+            // el listado público revelaría la puja máxima.
+            if (subasta.isSubastaNormal()) {
+                subasta.setPrecioFinal(importe);
+                subastaRepository.save(subasta);
+            }
         }
         // Una puja a ciegas que no supera a la máxima no puede ganar: se registra sin retener saldo.
 
@@ -141,16 +145,33 @@ public class PujaServiceImpl implements PujaService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
     }
 
+    /** En una subasta a ciegas las pujas no se muestran hasta que termina el plazo. */
+    private void comprobarPujasVisibles(Subasta subasta) {
+        if (!subasta.isSubastaNormal() && !LocalDate.now(clock).isAfter(subasta.getFechaFinal())) {
+            throw new ForbiddenException("Las pujas de una subasta a ciegas no son visibles hasta que termina");
+        }
+    }
+
     @Override
-    public PujaResponseDTO buscarPujaPorId(Long id) {
+    public PujaResponseDTO buscarPujaPorId(Long id, Long usuarioId) {
         Puja puja = pujaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Puja no encontrada"));
+
+        // Las pujas de una subasta a ciegas en curso solo las ve quien las hizo.
+        boolean esPropia = puja.getPujador() != null && puja.getPujador().getUsuarioID().equals(usuarioId);
+        if (!esPropia) {
+            comprobarPujasVisibles(puja.getSubasta());
+        }
 
         return pujaMapper.pujaToPujaResponseDTO(puja);
     }
 
     @Override
     public PujaResponseDTO obtenerPujaMasAlta(Long subastaId) {
+        Subasta subasta = subastaRepository.findById(subastaId)
+                .orElseThrow(() -> new EntityNotFoundException("La subasta no existe"));
+        comprobarPujasVisibles(subasta);
+
         Puja pujaMaxima = pujaRepository.findTopBySubastaIdOrderByImporteDesc(subastaId);
         if (pujaMaxima == null) {
             throw new EntityNotFoundException("No hay pujas para esta subasta");
