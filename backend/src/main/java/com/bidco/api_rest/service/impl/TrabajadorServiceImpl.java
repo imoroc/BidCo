@@ -7,6 +7,7 @@ import com.bidco.api_rest.dto.trabajador.TrabajadorResponseDTO;
 import com.bidco.api_rest.mapper.TrabajadorMapper;
 import com.bidco.api_rest.model.Trabajador;
 import com.bidco.api_rest.repository.TrabajadorRepository;
+import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.service.contract.TrabajadorService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -75,12 +76,12 @@ public class TrabajadorServiceImpl implements TrabajadorService {
             trabajadorOpt = trabajadorRepository.findByCorreoElectronico(dto.getIdentificador());
         }
         if (trabajadorOpt.isEmpty()) {
-            throw new IllegalArgumentException("Credenciales incorrectas");
+            throw new AuthenticationFailedException("Credenciales incorrectas");
         }
 
         Trabajador trabajador = trabajadorOpt.get();
         if (!passwordEncoder.matches(dto.getContraseña(), trabajador.getContraseña()) || trabajador.isExperto() != dto.getRol()) {
-            throw new IllegalArgumentException("Credenciales incorrectas");
+            throw new AuthenticationFailedException("Credenciales incorrectas");
         }
 
         String role = trabajador.isExperto() ? "EXPERT" : "WORKER";

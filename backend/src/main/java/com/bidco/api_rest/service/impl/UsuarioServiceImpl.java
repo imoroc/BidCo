@@ -15,6 +15,7 @@ import com.bidco.api_rest.repository.PujaSorteoRepository;
 import com.bidco.api_rest.repository.SorteoRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
+import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.service.contract.UsuarioService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -123,12 +124,12 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuarioOpt = usuarioRepository.findByCorreoElectronico(loginDTO.getIdentificador());
         }
         if (usuarioOpt.isEmpty()) {
-            throw new IllegalArgumentException("Credenciales incorrectas");
+            throw new AuthenticationFailedException("Credenciales incorrectas");
         }
 
         Usuario usuario = usuarioOpt.get();
         if (!passwordEncoder.matches(loginDTO.getContrasena(), usuario.getContrasena())) {
-            throw new IllegalArgumentException("Credenciales incorrectas");
+            throw new AuthenticationFailedException("Credenciales incorrectas");
         }
         return jwtUtil.generateToken(usuario.getUsuarioID().toString(), "USER");
     }
