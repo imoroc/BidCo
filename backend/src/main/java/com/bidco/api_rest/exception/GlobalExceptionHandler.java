@@ -3,6 +3,7 @@ package com.bidco.api_rest.exception;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -47,6 +48,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.warn("Violación de integridad de datos", ex);
+        return buildResponse(HttpStatus.CONFLICT, "Los datos enviados entran en conflicto con otro registro existente.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
