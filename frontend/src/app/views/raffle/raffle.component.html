@@ -20,16 +20,16 @@
       }
     </header>
 
-    @if (cargando) {
+    @if (listado.cargando) {
       <p class="estado-listado" role="status">Cargando…</p>
-    } @else if (errorCarga) {
+    } @else if (listado.errorCarga) {
       <p class="estado-listado estado-error" role="alert">No se han podido cargar los productos. Inténtalo de nuevo en unos instantes.</p>
-    } @else if (products.length === 0) {
+    } @else if (listado.items.length === 0) {
       <p class="estado-listado" role="status">No hay sorteos que coincidan con los filtros.</p>
     }
 
     <section class="products-grid">
-      @for (product of products; track product.sorteoID) {
+      @for (product of listado.items; track product.sorteoID) {
         <article class="product-wrapper">
           <a [routerLink]="['/raffle/product', product.sorteoID]" class="product-link">
             <app-product-item [product]="product"></app-product-item>
