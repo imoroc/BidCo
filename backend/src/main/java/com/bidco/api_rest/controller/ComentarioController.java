@@ -3,6 +3,7 @@ package com.bidco.api_rest.controller;
 import com.bidco.api_rest.dto.cometario.ComentarioCreateDTO;
 import com.bidco.api_rest.dto.cometario.ComentarioResponseDTO;
 import com.bidco.api_rest.service.contract.ComentarioService;
+import com.bidco.api_rest.exception.ForbiddenException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,10 @@ public class ComentarioController {
 
     @PostMapping("/nuevo")
     @ResponseStatus(HttpStatus.CREATED)
-    public ComentarioResponseDTO añadirComentario(@Valid @RequestBody ComentarioCreateDTO comentarioCreateDTO) {
-        return comentarioService.añadirComentario(comentarioCreateDTO);
+    public ComentarioResponseDTO añadirComentario(
+            @Valid @RequestBody ComentarioCreateDTO comentarioCreateDTO,
+            @RequestAttribute("authenticatedSubject") String authenticatedSubject) {
+        return comentarioService.añadirComentario(solicitanteId(authenticatedSubject), comentarioCreateDTO);
     }
 
     @GetMapping("/{id}")
@@ -44,7 +47,18 @@ public class ComentarioController {
     }
 
     @PutMapping("editar/{id}")
-    public ComentarioResponseDTO editarComentarioPorId(@PathVariable Long id, @RequestBody ComentarioCreateDTO comentario) {
-        return comentarioService.editarComentarioPorId(id, comentario);
+    public ComentarioResponseDTO editarComentarioPorId(
+            @PathVariable Long id,
+            @Valid @RequestBody ComentarioCreateDTO comentario,
+            @RequestAttribute("authenticatedSubject") String authenticatedSubject) {
+        return comentarioService.editarComentarioPorId(solicitanteId(authenticatedSubject), id, comentario);
+    }
+
+    private Long solicitanteId(String authenticatedSubject) {
+        try {
+            return Long.valueOf(authenticatedSubject);
+        } catch (NumberFormatException exception) {
+            throw new ForbiddenException("Identidad no válida");
+        }
     }
 }

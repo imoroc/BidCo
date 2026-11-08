@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface ComentarioService {
 
-    ComentarioResponseDTO añadirComentario(ComentarioCreateDTO comentarioCreateDTO);
+    ComentarioResponseDTO añadirComentario(Long solicitanteId, ComentarioCreateDTO comentarioCreateDTO);
     ComentarioResponseDTO buscarComentarioPorId(Long id);
     List<ComentarioResponseDTO> buscarComentariosPorSubastaId(Long id);
-    ComentarioResponseDTO editarComentarioPorId(Long id, ComentarioCreateDTO comentario);
+    ComentarioResponseDTO editarComentarioPorId(Long solicitanteId, Long id, ComentarioCreateDTO comentario);
 }
