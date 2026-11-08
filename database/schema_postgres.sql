@@ -3,8 +3,11 @@
 --
 -- ATENCIÓN: este script es solo para desarrollo y demos. Elimina todas las tablas
 -- y recrea los datos de ejemplo, así que NO debe ejecutarse sobre una base con datos reales.
--- Las cuentas de ejemplo usan contraseñas de demostración (guardadas con BCrypt):
+-- Las cuentas de ejemplo usan contraseñas de demostración (se guardan con BCrypt mediante pgcrypto):
 -- cámbialas o elimina estos usuarios antes de exponer la base a internet.
+
+-- pgcrypto genera hashes BCrypt ($2a$) compatibles con BCryptPasswordEncoder de Spring
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 1. LIMPIEZA DE TABLAS (Orden inverso de dependencia)
 DROP TABLE IF EXISTS puja_sorteo;
@@ -109,14 +112,14 @@ CREATE TABLE puja_sorteo (
 
 -- 3. INSERCIÓN DE DATOS (Usuarios y Trabajadores)
 INSERT INTO usuario (nombre_usuario, correo_electronico, password, saldo, puntos, pais, ciudad, codigo_postal, calle, numero_piso, letra_piso) VALUES 
-('juanperez', 'juan@example.com', '$2a$10$9e28FQK4cgC53cgB59yF3.0Z91G5nHdGDqJ27A4C37xQK5EKKbbgu', 1500.00, 50000, 'España', 'Madrid', '28001', 'Calle Falsa', 1, 'A'),
-('anagarcia', 'ana@example.com', '$2a$10$9e28FQK4cgC53cgB59yF3.0Z91G5nHdGDqJ27A4C37xQK5EKKbbgu', 2500.00, 12000, 'España', 'Sevilla', '41001', 'Calle Real', 2, 'B'),
-('carlos88', 'carlos@example.com', '$2a$10$9e28FQK4cgC53cgB59yF3.0Z91G5nHdGDqJ27A4C37xQK5EKKbbgu', 500.00, 3000, 'España', 'Barcelona', '08001', 'Gran Via', 5, 'C');
+('juanperez', 'juan@example.com', crypt('password123', gen_salt('bf', 10)), 1500.00, 50000, 'España', 'Madrid', '28001', 'Calle Falsa', 1, 'A'),
+('anagarcia', 'ana@example.com', crypt('password123', gen_salt('bf', 10)), 2500.00, 12000, 'España', 'Sevilla', '41001', 'Calle Real', 2, 'B'),
+('carlos88', 'carlos@example.com', crypt('password123', gen_salt('bf', 10)), 500.00, 3000, 'España', 'Barcelona', '08001', 'Gran Via', 5, 'C');
 
 INSERT INTO trabajador (nombre_usuario, correo_electronico, password, rol_trabajador) VALUES 
-('admin_master', 'admin@bidco.com', '$2a$10$0YQP3Y5yxnQr9bKFex9r0eVfos1AeMESFI/1ZxX78KlGv8aAEBxuK', FALSE),
-('pedro_mod', 'pedro@bidco.com', '$2a$10$neBf4AL4UsnqWZqT3Aa9nuEEZI6NBk0njpsW7lpTm.zrn942wN7ya', TRUE),
-('jose_experto', 'jose@bidco.com', '$2a$10$neBf4AL4UsnqWZqT3Aa9nuEEZI6NBk0njpsW7lpTm.zrn942wN7ya', TRUE);
+('admin_master', 'admin@bidco.com', crypt('adminpassword', gen_salt('bf', 10)), FALSE),
+('pedro_mod', 'pedro@bidco.com', crypt('modpassword', gen_salt('bf', 10)), TRUE),
+('jose_experto', 'jose@bidco.com', crypt('modpassword', gen_salt('bf', 10)), TRUE);
 
 -- 4. CARGA MASIVA DE SUBASTAS (Usando tus imágenes)
 INSERT INTO subasta (fecha_inicial, fecha_final, precio_inicial, precio_final, subasta_normal, nombre_articulo, descripcion, creador_id, imagen, categoria) VALUES 
