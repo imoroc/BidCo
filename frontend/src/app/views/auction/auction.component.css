@@ -1,15 +1,17 @@
 /* --- ESTRUCTURA PRINCIPAL --- */
 .page-layout {
   display: flex;
-  min-height: 85vh;
+  flex: 1;
+  flex-wrap: wrap;
   /* Un fondo casi blanco (gris muuuy claro) hace que las tarjetas blancas resalten mucho más */
   background-color: #f8f9fa; 
 }
 
 /* El contenedor deja hueco al filtro fijo de la izquierda */
 .main-content {
-  margin-left: 18%; /* El espacio exacto que ocupa tu app-filter */
-  width: 82%; 
+  flex: 1 1 600px;
+  min-width: 0;
+  margin: 0;
   padding: 40px;
   box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;

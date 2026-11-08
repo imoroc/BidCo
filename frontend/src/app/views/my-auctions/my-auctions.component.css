@@ -1,14 +1,16 @@
 /* --- ESTRUCTURA PRINCIPAL --- */
 .page-layout {
   display: flex;
-  min-height: 85vh;
+  flex: 1;
+  flex-wrap: wrap;
   background-color: #f8f9fa; /* Fondo gris claro para destacar las tarjetas blancas */
 }
 
 /* Espacio reservado para el filtro de la izquierda (18%) */
 .main-content {
-  margin-left: 18%; 
-  width: 82%; 
+  flex: 1 1 600px;
+  min-width: 0;
+  margin: 0;
   padding: 40px;
   box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
