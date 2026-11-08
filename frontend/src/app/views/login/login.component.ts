@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
@@ -21,7 +21,7 @@ export class LoginComponent {
   loginError: string = '';
   enviando = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router, private route: ActivatedRoute) {}
 
   login() {
     // Evita envíos repetidos: cada intento fallido cuenta para el límite del servidor.
@@ -41,13 +41,19 @@ export class LoginComponent {
         }
         // Decodificamos el token y cargamos el perfil completo
         this.auth.setUserFromToken(data.token);
-        this.router.navigateByUrl('/auction');
+        this.router.navigateByUrl(this.destinoTrasLogin());
       },
       error: (err) => {
         this.enviando = false;
         this.loginError = this.mensajeDeError(err);
       }
     });
+  }
+
+  /** Ruta a la que volver tras iniciar sesión; solo rutas internas, nunca URLs externas. */
+  private destinoTrasLogin(): string {
+    const destino = this.route.snapshot.queryParamMap.get('returnUrl');
+    return destino && destino.startsWith('/') && !destino.startsWith('//') ? destino : '/auction';
   }
 
   private mensajeDeError(err: any): string {
