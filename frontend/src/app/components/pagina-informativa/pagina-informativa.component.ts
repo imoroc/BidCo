@@ -14,7 +14,9 @@ import { FooterComponent } from '../footer/footer.component';
     <main class="pagina-info">
       <article class="pagina-info-contenido">
         <h1>{{ titulo }}</h1>
-        <p class="pagina-info-fecha">Última actualización: {{ actualizacion }}</p>
+        @if (actualizacion) {
+          <p class="pagina-info-fecha">Última actualización: {{ actualizacion }}</p>
+        }
         <ng-content></ng-content>
       </article>
     </main>
@@ -75,5 +77,5 @@ import { FooterComponent } from '../footer/footer.component';
 })
 export class PaginaInformativaComponent {
   @Input({ required: true }) titulo = '';
-  @Input({ required: true }) actualizacion = '';
+  @Input() actualizacion = '';
 }
