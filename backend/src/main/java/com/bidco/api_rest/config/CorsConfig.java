@@ -17,10 +17,15 @@ public class CorsConfig implements WebMvcConfigurer {
     @Value("${app.cors.allowed-origins}")
     private String[] allowedOrigins;
 
+    /** Patrones adicionales (p. ej. los previews de Vercel, cuyo dominio cambia en cada despliegue). */
+    @Value("${app.cors.allowed-origin-patterns:}")
+    private String[] allowedOriginPatterns;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(allowedOrigins)
+                .allowedOriginPatterns(allowedOriginPatterns)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("Content-Type", "Authorization", "Accept", JwtFilter.ADMIN_CSRF_HEADER)
                 .allowCredentials(true)
