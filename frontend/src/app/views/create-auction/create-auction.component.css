@@ -32,6 +32,27 @@
   margin: 0;
 }
 
+/* --- FOCO VISIBLE --- */
+.alert-error:focus,
+.btn-submit:focus-visible,
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible {
+  outline: 3px solid #0d0063;
+  outline-offset: 2px;
+}
+
+.image-upload:focus-within {
+  border-color: #0d0063;
+  outline: 3px solid #0d0063;
+  outline-offset: 2px;
+}
+
+.radio-option input[type="radio"]:focus-visible + .custom-radio {
+  outline: 3px solid #0d0063;
+  outline-offset: 2px;
+}
+
 /* --- ALERTA DE ERROR --- */
 .alert-error {
   display: flex;
@@ -48,6 +69,42 @@
 
 .alert-error svg {
   flex-shrink: 0;
+}
+
+.error-list {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.field-error {
+  color: #c5221f;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 8px 0 0;
+}
+
+.modalidad {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.modalidad legend {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.btn-submit:disabled {
+  background-color: #5f6368;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* --- TARJETA DEL FORMULARIO --- */
@@ -113,7 +170,7 @@
 }
 
 .upload-hint {
-  color: #9aa0a6;
+  color: #5f6368;
   font-size: 0.8rem;
 }
 
@@ -182,7 +239,8 @@
   flex: 1;
 }
 
-.form-group label {
+.form-group label,
+.modalidad legend {
   font-size: 0.8rem;
   font-weight: 700;
   color: #5f6368;
@@ -216,15 +274,14 @@
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: #9aa0a6;
+  color: #6b7075;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   border-color: #0d0063;
-  box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.15); /* Aro Focus de Google */
-  outline: none;
+  box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.15);
 }
 
 /* Quitar flechas inputs numéricos */
@@ -251,8 +308,18 @@ input[type="number"]::-webkit-outer-spin-button {
   gap: 8px;
 }
 
+.radio-option {
+  position: relative;
+}
+
+/* El radio nativo sigue en el DOM para que funcione con teclado y lectores de pantalla */
 .radio-option input[type="radio"] {
-  display: none; /* Ocultamos el nativo */
+  position: absolute;
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
 }
 
 .custom-radio {
