@@ -60,14 +60,27 @@
                       id="cantidad"
                       name="cantidad"
                       placeholder="{{ isRaffle ? 'Nº de puntos a usar' : 'Introduce tu puja' }}"
-                      [(ngModel)]="cantidadPuja"
-                      [min]="isRaffle ? product.puntosNecesarios : product.precioFinal" 
+                      [ngModel]="cantidadPuja"
+                      (ngModelChange)="cantidadPuja = $event; limpiarMensaje()"
+                      [min]="isRaffle ? product.puntosNecesarios : product.precioFinal"
+                      [attr.aria-invalid]="mensaje?.tipo === 'error' ? 'true' : null"
+                      [attr.aria-describedby]="mensaje ? 'mensaje-puja' : null"
                       required
                     >
                   </div>
                   <button type="submit" class="btn-primary btn-large">
                     {{ isRaffle ? 'Participar en Sorteo' : 'Realizar Puja' }}
                   </button>
+                  @if (mensaje) {
+                    <p
+                      id="mensaje-puja"
+                      class="form-message"
+                      [class.form-message-error]="mensaje.tipo === 'error'"
+                      [class.form-message-exito]="mensaje.tipo === 'exito'"
+                      [attr.role]="mensaje.tipo === 'error' ? 'alert' : 'status'">
+                      {{ mensaje.texto }}
+                    </p>
+                  }
                 </form>
               }
             }
@@ -119,6 +132,10 @@
           <h3>{{ editandoComentario ? 'Editar Valoración' : 'Nueva Valoración de Experto' }}</h3>
           <button type="button" class="btn-close" (click)="closeExpertForm()" aria-label="Cerrar">×</button>
         </header>
+
+        @if (errorFormulario) {
+          <p class="form-message form-message-error" role="alert">{{ errorFormulario }}</p>
+        }
 
         <div class="form-group">
           <label for="review">Tu análisis detallado:</label>

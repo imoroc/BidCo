@@ -134,6 +134,26 @@
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;
 }
 
+/* Mensajes de estado del formulario (sustituyen a los alert) */
+.form-message {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.form-message-error {
+  background-color: #fce8e6;
+  color: #c5221f;
+}
+
+.form-message-exito {
+  background-color: #e6f4ea;
+  color: #137333;
+}
+
 .input-wrapper input {
   width: 100%;
   padding: 16px;
