@@ -1,6 +1,7 @@
 package com.bidco.api_rest.service;
 
 import com.bidco.api_rest.dto.pujasorteo.PujaSorteoCreateDTO;
+import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.mapper.PujaSorteoMapper;
 import com.bidco.api_rest.model.PujaSorteo;
 import com.bidco.api_rest.model.Sorteo;
@@ -178,5 +179,26 @@ class PujaSorteoServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> service.crearPujaSorteo(dto("40")));
         assertEquals(10, u.getPuntos());
         verify(pujaSorteoRepository, times(1)).save(any());
+    }
+
+    @Test
+    void consultarLaParticipacionDeOtroUsuarioSeRechaza() {
+        PujaSorteo ajena = new PujaSorteo();
+        ajena.setPujador(usuario(0)); // usuario con id 5
+        when(pujaSorteoRepository.findById(9L)).thenReturn(Optional.of(ajena));
+
+        assertThrows(ForbiddenException.class, () -> service.buscarPujaSorteoId(9L, 6L));
+        verify(pujaSorteoMapper, never()).pujaSorteoToPujaSorteoResponseDTO(any());
+    }
+
+    @Test
+    void consultarLaPropiaParticipacionEsCorrecto() {
+        PujaSorteo propia = new PujaSorteo();
+        propia.setPujador(usuario(0));
+        when(pujaSorteoRepository.findById(9L)).thenReturn(Optional.of(propia));
+
+        service.buscarPujaSorteoId(9L, 5L);
+
+        verify(pujaSorteoMapper).pujaSorteoToPujaSorteoResponseDTO(propia);
     }
 }

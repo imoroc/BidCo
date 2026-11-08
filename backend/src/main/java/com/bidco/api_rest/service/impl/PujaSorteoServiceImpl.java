@@ -3,6 +3,7 @@ package com.bidco.api_rest.service.impl;
 
 import com.bidco.api_rest.dto.pujasorteo.PujaSorteoCreateDTO;
 import com.bidco.api_rest.dto.pujasorteo.PujaSorteoResponseDTO;
+import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.mapper.PujaSorteoMapper;
 import com.bidco.api_rest.model.PujaSorteo;
 import com.bidco.api_rest.model.Sorteo;
@@ -87,9 +88,14 @@ public class PujaSorteoServiceImpl implements PujaSorteoService {
     }
 
     @Override
-    public PujaSorteoResponseDTO buscarPujaSorteoId(Long id) {
+    public PujaSorteoResponseDTO buscarPujaSorteoId(Long id, Long usuarioId) {
         PujaSorteo pujaSorteo = pujaSorteoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Puja del sorteo no encontrada"));
+
+        // Una participación solo la puede consultar quien la hizo.
+        if (pujaSorteo.getPujador() == null || !pujaSorteo.getPujador().getUsuarioID().equals(usuarioId)) {
+            throw new ForbiddenException("No puedes consultar la participación de otro usuario");
+        }
 
         return pujaSorteoMapper.pujaSorteoToPujaSorteoResponseDTO(pujaSorteo);
     }

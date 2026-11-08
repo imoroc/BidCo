@@ -28,7 +28,9 @@ public class PujaSorteoController {
     }
 
     @GetMapping("/{id}")
-    public PujaSorteoResponseDTO buscarPujaSorteoPorId(@PathVariable Long id) {
-        return pujaSorteoService.buscarPujaSorteoId(id);
+    public PujaSorteoResponseDTO buscarPujaSorteoPorId(
+            @PathVariable Long id,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        return pujaSorteoService.buscarPujaSorteoId(id, authenticatedUserId);
     }
 }
