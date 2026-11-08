@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular" />
     <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
     <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white" alt="Spring Boot" />
-    <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
     <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
     <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render" />
     <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white" alt="Cloudinary" />
@@ -46,7 +46,7 @@ Este proyecto fue creado para la asignatura Servicios y Sistemas Web, asignatura
 ### Backend
 - **Framework:** Java Spring Boot 3+ (Java 25+)
 - **Build Tool:** Maven
-- **Base de Datos:** MySQL
+- **Base de Datos:** PostgreSQL
 - **Gestión de Archivos:** Integración con **Cloudinary** para almacenamiento persistente en la nube.
 
 ### Documentación de la API (Swagger)
@@ -97,7 +97,7 @@ cd backend
 Abre el archivo de propiedades de Spring Boot (`src/main/resources/application.properties`) o configura las variables en tu entorno local. Asegúrate de que las credenciales apuntan a tu base de datos:
 
 ```properties
-spring.datasource.url=jdbc:mysql://[TU-URL-DE-BASE-DE-DATOS]
+spring.datasource.url=jdbc:postgresql://[TU-URL-DE-BASE-DE-DATOS]
 spring.datasource.username=[TU-USUARIO]
 spring.datasource.password=[TU-CONTRASEÑA]
 ```

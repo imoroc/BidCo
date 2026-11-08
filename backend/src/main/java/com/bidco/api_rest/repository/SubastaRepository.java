@@ -14,10 +14,10 @@ import java.util.List;
 @Repository
 public interface SubastaRepository extends JpaRepository<Subasta, Long> {
 
-    @Query(value = "select P.* from puja P inner join subasta S on P.subasta_id=S.subasta_id where S.subasta_id = ?1 and P.importe >= ALL ( select P1.importe from puja P1 inner join subasta S1 on P1.subasta_id=S1.subasta_id where P.importe and S1.subasta_id = ?1)",nativeQuery = true )
+    @Query(value = "select P.* from puja P inner join subasta S on P.subasta_id=S.subasta_id where S.subasta_id = ?1 and P.importe >= ALL ( select P1.importe from puja P1 inner join subasta S1 on P1.subasta_id=S1.subasta_id where S1.subasta_id = ?1)",nativeQuery = true )
     Optional<Puja> findGanadorSubastaBySubastaId(Long id);
 
-    @Query(value = "select P.importe from puja P inner join subasta S on P.subasta_id=S.subasta_id where S.subasta_id = ?1 and P.importe >= ALL ( select P1.importe from puja P1 inner join subasta S1 on P1.subasta_id=S1.subasta_id where P.importe and S1.subasta_id = ?1)",nativeQuery = true )
+    @Query(value = "select P.importe from puja P inner join subasta S on P.subasta_id=S.subasta_id where S.subasta_id = ?1 and P.importe >= ALL ( select P1.importe from puja P1 inner join subasta S1 on P1.subasta_id=S1.subasta_id where S1.subasta_id = ?1)",nativeQuery = true )
     Optional<BigDecimal> findImporteMayorBySubastaId(Long id);
 
     List<Subasta> findBySubastaNormalOrderByFechaInicialDesc(boolean subastaNormal);
