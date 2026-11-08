@@ -5,6 +5,7 @@ import com.bidco.api_rest.dto.trabajador.LoginTrabajadorDTO;
 import com.bidco.api_rest.dto.trabajador.TrabajadorCreateDTO;
 import com.bidco.api_rest.dto.trabajador.TrabajadorResponseDTO;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
+import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.service.contract.TrabajadorService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -36,8 +37,16 @@ public class TrabajadorController {
 
     // Actualizar trabajador (PUT)
     @PutMapping
-    public TrabajadorResponseDTO actualizarTrabajador(@Valid @RequestBody TrabajadorCreateDTO trabajadorCreateDTO) {
-        return trabajadorService.actualizarTrabajador(trabajadorCreateDTO);
+    public TrabajadorResponseDTO actualizarTrabajador(
+            @Valid @RequestBody TrabajadorCreateDTO trabajadorCreateDTO,
+            @RequestAttribute("authenticatedSubject") String authenticatedSubject) {
+        Long solicitanteId;
+        try {
+            solicitanteId = Long.valueOf(authenticatedSubject);
+        } catch (NumberFormatException exception) {
+            throw new ForbiddenException("Identidad no válida");
+        }
+        return trabajadorService.actualizarTrabajador(solicitanteId, trabajadorCreateDTO);
     }
 
     // Buscar trabajador por ID (GET)

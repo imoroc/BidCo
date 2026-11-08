@@ -9,7 +9,7 @@ import com.bidco.api_rest.dto.usuario.UsuarioResponseDTO;
 public interface TrabajadorService {
 
     TrabajadorResponseDTO registrarTrabajador(TrabajadorCreateDTO trabajadorCreateDTO);
-    TrabajadorResponseDTO actualizarTrabajador(TrabajadorCreateDTO trabajadorCreateDTO);
+    TrabajadorResponseDTO actualizarTrabajador(Long solicitanteId, TrabajadorCreateDTO trabajadorCreateDTO);
     TrabajadorResponseDTO buscarTrabajadorPorId(Long id);
     TrabajadorResponseDTO buscarTrabajadorPorNombreUsuario(String nomreUsuario);
     String login(LoginTrabajadorDTO loginDTO);

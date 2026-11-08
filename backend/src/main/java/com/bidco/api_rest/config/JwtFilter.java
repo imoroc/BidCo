@@ -70,6 +70,12 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        // Solo el área administrativa (con sesión) puede dar de alta trabajadores o expertos.
+        if ("POST".equalsIgnoreCase(method) && "/api/trabajadores".equals(path)) {
+            sendError(response, HttpServletResponse.SC_FORBIDDEN, "No tienes permisos para acceder a este recurso");
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ") || authHeader.length() <= 7) {
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Token no proporcionado");
