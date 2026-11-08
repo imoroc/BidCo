@@ -32,7 +32,7 @@ BidCo es una aplicación universitaria desarrollada para la asignatura Servicios
 | Seguridad | JWT, BCrypt, CORS |
 | Imágenes | Cloudinary |
 | Documentación API | OpenAPI / Swagger |
-| CI | GitHub Actions, CodeQL, Dependabot |
+| CI | GitHub Actions, CodeQL (configuración predeterminada), Dependabot |
 
 ## Requisitos
 

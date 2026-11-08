@@ -20,7 +20,7 @@ Incluye:
 ## Controles del proyecto
 
 - Dependabot para actualizaciones de dependencias.
-- CodeQL para análisis estático de Java y TypeScript.
+- Análisis de código mediante la configuración predeterminada de CodeQL de GitHub.
 - Secretos de ejecución suministrados mediante variables de entorno.
 - CORS con orígenes permitidos explícitos.
 - JWT firmado con una clave externa al repositorio y con longitud mínima.
