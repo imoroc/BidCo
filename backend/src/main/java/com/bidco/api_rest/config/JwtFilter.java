@@ -15,6 +15,15 @@ import java.util.List;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
+    /**
+     * La sesión de administración viaja en una cookie (SameSite=None por estar el frontend en otro
+     * origen). Para evitar CSRF, las peticiones que modifican datos deben llevar esta cabecera:
+     * un formulario de otro sitio no puede añadirla y una petición cruzada con ella exige un
+     * preflight de CORS, que solo se concede a los orígenes permitidos.
+     */
+    public static final String ADMIN_CSRF_HEADER = "X-Requested-With";
+    private static final String ADMIN_CSRF_VALUE = "BidCo";
+
     private final JwtUtil jwtUtil;
 
     private static final List<String> PUBLIC_ROUTES = List.of(
@@ -60,12 +69,20 @@ public class JwtFilter extends OncePerRequestFilter {
                 sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Sesión administrativa no válida");
                 return;
             }
+            if (!hasAdminCsrfHeader(request, method)) {
+                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Falta la cabecera de protección CSRF");
+                return;
+            }
             chain.doFilter(request, response);
             return;
         }
 
         // El registro de trabajadores se realiza desde el área administrativa con sesión.
         if ("POST".equalsIgnoreCase(method) && "/api/trabajadores".equals(path) && hasAdminSession(request)) {
+            if (!hasAdminCsrfHeader(request, method)) {
+                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Falta la cabecera de protección CSRF");
+                return;
+            }
             chain.doFilter(request, response);
             return;
         }
@@ -168,6 +185,13 @@ public class JwtFilter extends OncePerRequestFilter {
                 || path.startsWith("/v3/api-docs/")
                 || path.equals("/swagger-ui")
                 || path.startsWith("/swagger-ui/");
+    }
+
+    private boolean hasAdminCsrfHeader(HttpServletRequest request, String method) {
+        if ("GET".equalsIgnoreCase(method) || "HEAD".equalsIgnoreCase(method)) {
+            return true;
+        }
+        return ADMIN_CSRF_VALUE.equals(request.getHeader(ADMIN_CSRF_HEADER));
     }
 
     private boolean hasAdminSession(HttpServletRequest request) {

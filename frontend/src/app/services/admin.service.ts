@@ -32,6 +32,9 @@ export interface ExpertDTO {
 export class AdminService {
   private api = `${environment.apiUrl}/admin`;
 
+  // Cabecera exigida por el backend en las peticiones de administración (protección CSRF).
+  private readonly adminHeaders = new HttpHeaders({ 'X-Requested-With': 'BidCo' });
+
   constructor(private http: HttpClient) {}
 
   loginAdmin(dto: AdminLoginDTO): Observable<void> {
@@ -59,7 +62,7 @@ export class AdminService {
       formData.append('imagen', imagen, imagen.name);
     }
 
-    return this.http.post<void>(`${this.api}/sorteos`, formData, { withCredentials: true });
+    return this.http.post<void>(`${this.api}/sorteos`, formData, { withCredentials: true, headers: this.adminHeaders });
   }
   
 
@@ -67,7 +70,7 @@ export class AdminService {
     return this.http.post<void>(
       `${environment.apiUrl}/trabajadores`, // Corregido: antes era relativo
       dto,
-      { withCredentials: true }
+      { withCredentials: true, headers: this.adminHeaders }
     );
   }
 }
