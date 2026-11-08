@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
-import { HttpParams } from '@angular/common/http';
+import { ListadoFiltrado } from '../../utils/listado-filtrado';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FilterComponent } from '../../components/filter/filter.component';
+import { EstadoListadoComponent } from '../../components/estado-listado/estado-listado.component';
 import { ProductItemComponent } from '../../components/product-item/product-item.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 
@@ -21,6 +22,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
     HeaderComponent,
     FilterComponent,
     ProductItemComponent,
+    EstadoListadoComponent,
     FooterComponent
 ],
   templateUrl: './auction.component.html',
@@ -28,7 +30,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 })
 
 export class AuctionComponent {
-    products: SubastaResponseDTO[] = [];
+    listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasNormal(params), inject(DestroyRef));
     isLoggedIn = false;
     isExpert = false;
     saldoUser = 0;
@@ -36,11 +38,6 @@ export class AuctionComponent {
     constructor(private authService: AuthService, private expertAuthService: AuthExpertService, private subastaService: SubastaService, private activatedRoute: ActivatedRoute) {}
 
     ngOnInit() {
-        this.subastaService.getSubastasPorTipo(true).subscribe({
-            next: data => this.products = data,
-            error: err => console.error('Error al obtener las subastas normales: ', err)
-        });
-        
         //Comprobamos si un usuario tiene la sesion iniciada
         this.authService.isLoggedIn$.subscribe((estado) => {
             this.isLoggedIn = estado;
@@ -60,17 +57,6 @@ export class AuctionComponent {
     }
 
     handleFilterApplied(filtro: Filtro) {
-        var camposFiltro = new HttpParams()
-        camposFiltro = camposFiltro.append("minPrice", filtro.minPrice);
-        camposFiltro = camposFiltro.append("maxPrice", filtro.maxPrice);
-        filtro.categories.forEach(categoria => {
-            camposFiltro = camposFiltro.append("categorias", categoria);
-        })
-        camposFiltro = camposFiltro.append("dateOrder", filtro.dateOrder)
-        
-        this.subastaService.getSubastasFiltradasNormal(camposFiltro).subscribe({
-            next: data => this.products = data,
-            error: err => console.error("Error al obtener subastas filtradas: ", err)
-        });
+        this.listado.cargar(filtro);
     }
 }

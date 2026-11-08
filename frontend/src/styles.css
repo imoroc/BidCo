@@ -9,7 +9,18 @@
     font-family: Arial, sans-serif;
     background: #f4f4f4;
     color: #333;
-    padding-bottom: 60px; /* Evita solapamiento con el footer */
+  }
+
+  /* La vista enrutada ocupa al menos toda la altura de la ventana: el pie queda abajo sin tapar nada */
+  router-outlet + * {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  app-footer {
+    display: block;
+    margin-top: auto;
   }
 
   /* Contenido principal */
@@ -84,9 +95,6 @@
     color: #fff;
     text-align: center;
     padding: 10px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
   }
 
 /* Ajustes globales para imágenes */

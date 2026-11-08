@@ -7,5 +7,5 @@ import com.bidco.api_rest.dto.pujasorteo.PujaSorteoResponseDTO;
 
 public interface PujaSorteoService {
     PujaSorteoResponseDTO crearPujaSorteo(PujaSorteoCreateDTO pujaCreateDTO);
-    PujaSorteoResponseDTO buscarPujaSorteoId(Long id);
+    PujaSorteoResponseDTO buscarPujaSorteoId(Long id, Long usuarioId);
 }

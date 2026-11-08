@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { HttpParams } from '@angular/common/http';
+import { ListadoFiltrado } from '../../utils/listado-filtrado';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FilterComponent } from '../../components/filter/filter.component';
+import { EstadoListadoComponent } from '../../components/estado-listado/estado-listado.component';
 import { ProductItemComponent } from '../../components/product-item/product-item.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 
@@ -19,13 +20,14 @@ import { AuthExpertService } from '../../services/auth.expert.service';
     HeaderComponent,
     FilterComponent,
     ProductItemComponent,
+    EstadoListadoComponent,
     FooterComponent
 ],
   templateUrl: './raffle.component.html',
   styleUrl: './raffle.component.css'
 })
 export class RaffleComponent {
-    products: SorteoResponseDto[] = [];
+    listado = new ListadoFiltrado<SorteoResponseDto>(params => this.sorteoService.getSorteosPorFiltro(params), inject(DestroyRef));
     isLoggedIn = false;
     isExpert = false;
     userPoints = 0;
@@ -34,11 +36,6 @@ export class RaffleComponent {
 
     ngOnInit() {
         var storedUser;
-        this.sorteoService.getSorteos().subscribe({
-            next: data => this.products = data,
-            error: err => console.error('Error al obtener los sorteos: ', err)
-        });
-
         this.authService.isLoggedIn$.subscribe((estado) => {
             this.isLoggedIn = estado;
             if(estado) storedUser = localStorage.getItem('authUser');
@@ -60,17 +57,6 @@ export class RaffleComponent {
     }
 
     handleFilterApplied(filtro: Filtro) {
-        var camposFiltro = new HttpParams()
-        camposFiltro = camposFiltro.append("minPrice", filtro.minPrice);
-        camposFiltro = camposFiltro.append("maxPrice", filtro.maxPrice);
-        filtro.categories.forEach(categoria => {
-            camposFiltro = camposFiltro.append("categorias", categoria);
-        })
-        camposFiltro = camposFiltro.append("dateOrder", filtro.dateOrder)
-        
-        this.sorteoService.getSorteosPorFiltro(camposFiltro).subscribe({
-            next: data => this.products = data,
-            error: err => console.error("Error al obtener sorteos filtrados: ", err)
-        });
+        this.listado.cargar(filtro);
     }
 }

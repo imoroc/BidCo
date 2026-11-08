@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { HttpParams } from '@angular/common/http';
+import { ListadoFiltrado } from '../../utils/listado-filtrado';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FilterComponent } from '../../components/filter/filter.component';
+import { EstadoListadoComponent } from '../../components/estado-listado/estado-listado.component';
 import { ProductItemComponent } from '../../components/product-item/product-item.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 
@@ -19,13 +20,14 @@ import { AuthExpertService } from '../../services/auth.expert.service';
     HeaderComponent,
     FilterComponent,
     ProductItemComponent,
+    EstadoListadoComponent,
     FooterComponent
 ],
   templateUrl: './blind-auction.component.html',
   styleUrl: './blind-auction.component.css'
 })
 export class BlindAuctionComponent {
-    products: SubastaResponseDTO[] = [];
+    listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasCiega(params), inject(DestroyRef));
     isLoggedIn = false;
     isExpert = false;
     saldoUser = 0;
@@ -33,11 +35,6 @@ export class BlindAuctionComponent {
     constructor(private authService: AuthService, private expertAuthService: AuthExpertService, private subastaService: SubastaService) {}
 
     ngOnInit() {
-        this.subastaService.getSubastasPorTipo(false).subscribe({
-            next: data => this.products = data,
-            error: err => console.error('Error al obtener las subastas normales: ', err)
-        });
-        
         this.authService.isLoggedIn$.subscribe((estado) => {
             this.isLoggedIn = estado;
         });
@@ -56,17 +53,6 @@ export class BlindAuctionComponent {
     }
 
     handleFilterApplied(filtro: Filtro) {
-        var camposFiltro = new HttpParams()
-        camposFiltro = camposFiltro.append("minPrice", filtro.minPrice);
-        camposFiltro = camposFiltro.append("maxPrice", filtro.maxPrice);
-        filtro.categories.forEach(categoria => {
-            camposFiltro = camposFiltro.append("categorias", categoria);
-        })
-        camposFiltro = camposFiltro.append("dateOrder", filtro.dateOrder)
-        
-        this.subastaService.getSubastasFiltradasCiega(camposFiltro).subscribe({
-            next: data => this.products = data,
-            error: err => console.error("Error al obtener subastas filtradas: ", err)
-        });
+        this.listado.cargar(filtro);
     }
 }
