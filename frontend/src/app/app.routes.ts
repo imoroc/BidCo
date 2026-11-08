@@ -68,5 +68,20 @@ export const routes: Routes = [
       { path: 'estadisticas', component: ProfileEstadisticasComponent }
     ]
   },
+  {
+    path: 'contacto',
+    title: 'Contacto · BidCo',
+    loadComponent: () => import('./views/contacto/contacto.component').then(m => m.ContactoComponent)
+  },
+  {
+    path: 'terminos',
+    title: 'Términos de uso · BidCo',
+    loadComponent: () => import('./views/terminos/terminos.component').then(m => m.TerminosComponent)
+  },
+  {
+    path: 'privacidad',
+    title: 'Política de privacidad · BidCo',
+    loadComponent: () => import('./views/privacidad/privacidad.component').then(m => m.PrivacidadComponent)
+  },
   { path: '**', redirectTo: '/auction' }
 ];
