@@ -20,6 +20,7 @@ import com.bidco.api_rest.service.contract.UsuarioService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -60,6 +61,12 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (dto == null) {
             throw new IllegalArgumentException("El usuario no puede ser nulo");
         }
+        if (usuarioRepository.findByNombreUsuario(dto.getNombreUsuario()).isPresent()) {
+            throw new IllegalStateException("El nombre de usuario ya está en uso");
+        }
+        if (usuarioRepository.findByCorreoElectronico(dto.getCorreoElectronico()).isPresent()) {
+            throw new IllegalStateException("El correo electrónico ya está registrado");
+        }
 
         Usuario usuario = usuarioMapper.usuarioCreateDTOToUsuario(dto);
         usuario.setContrasena(passwordEncoder.encode(dto.getContraseña()));
@@ -73,6 +80,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponseDTO actualizarUsuario(Long id, UsuarioUpdateDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        usuarioRepository.findByNombreUsuario(dto.getNombreUsuario())
+                .filter(otro -> !otro.getUsuarioID().equals(id))
+                .ifPresent(otro -> { throw new IllegalStateException("El nombre de usuario ya está en uso"); });
+        usuarioRepository.findByCorreoElectronico(dto.getCorreoElectronico())
+                .filter(otro -> !otro.getUsuarioID().equals(id))
+                .ifPresent(otro -> { throw new IllegalStateException("El correo electrónico ya está registrado"); });
 
         usuario.setNombreUsuario(dto.getNombreUsuario());
         usuario.setCorreoElectronico(dto.getCorreoElectronico());
@@ -184,6 +198,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional
     public BigDecimal recargarSaldo(Long usuarioId, BigDecimal cantidad) {
         if (cantidad == null || cantidad.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor que cero");
@@ -192,7 +207,8 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new IllegalArgumentException("La cantidad máxima por recarga es 10.000€");
         }
 
-        Usuario usuario = usuarioRepository.findById(usuarioId)
+        // Con bloqueo de fila para no perder recargas frente a pujas u otras recargas simultáneas.
+        Usuario usuario = usuarioRepository.findByIdForUpdate(usuarioId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         usuario.setSaldo(usuario.getSaldo().add(cantidad));
         usuarioRepository.save(usuario);
