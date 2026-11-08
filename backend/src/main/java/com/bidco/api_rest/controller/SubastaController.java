@@ -6,9 +6,9 @@ import com.bidco.api_rest.dto.FiltroDTO;
 import com.bidco.api_rest.service.contract.SubastaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -25,8 +25,11 @@ public class SubastaController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public SubastaResponseDTO crearSubasta(
-                @RequestPart("subasta") @Valid SubastaCreateDTO subastaCreateDTO,
-                @RequestPart("imagen") MultipartFile imagen) {
+            @RequestPart("subasta") @Valid SubastaCreateDTO subastaCreateDTO,
+            @RequestPart("imagen") MultipartFile imagen,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        // El creador se determina desde el JWT y no desde el formulario.
+        subastaCreateDTO.setCreador(authenticatedUserId);
         return subastaService.crearSubasta(subastaCreateDTO, imagen);
     }
 
@@ -46,8 +49,9 @@ public class SubastaController {
     }
 
     @GetMapping("/filtrar-creador")
-    public List<SubastaResponseDTO> filtrarPorCreador(@RequestParam Long id) {
-        return subastaService.listarSubastasPorCreador(id);
+    public List<SubastaResponseDTO> filtrarPorCreador(
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        return subastaService.listarSubastasPorCreador(authenticatedUserId);
     }
 
     @GetMapping("/filtro-normal")
@@ -61,13 +65,17 @@ public class SubastaController {
     }
 
     @GetMapping("/filtro-mis-subastas")
-    public List<SubastaResponseDTO> buscarPorFiltroMisSubastas(FiltroDTO filtro, int id) {
-        return subastaService.buscarPorFiltroMisSubastas(filtro, id);
+    public List<SubastaResponseDTO> buscarPorFiltroMisSubastas(
+            FiltroDTO filtro,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        return subastaService.buscarPorFiltroMisSubastas(filtro, authenticatedUserId.intValue());
     }
 
     @GetMapping("/filtro-mis-pujas")
-    public List<SubastaResponseDTO> buscarPorFiltroMisPujas(FiltroDTO filtro, int id) {
-        return subastaService.buscarPorFiltroMisPujas(filtro, id);
+    public List<SubastaResponseDTO> buscarPorFiltroMisPujas(
+            FiltroDTO filtro,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        return subastaService.buscarPorFiltroMisPujas(filtro, authenticatedUserId.intValue());
     }
 
     @GetMapping("/filtro-nombre")
