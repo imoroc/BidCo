@@ -30,6 +30,6 @@ public interface SorteoRepository extends JpaRepository<Sorteo, Long> {
     @Query("SELECT COUNT(s) FROM Sorteo s WHERE s.ganador = :usuarioID")
     int countWonDrawsByUsuarioId(Long usuarioID);
 
-    @Query("SELECT s FROM Sorteo s WHERE s.puntosNecesarios >= :minPrice AND s.puntosNecesarios <= :maxPrice AND s.categoria in :categorias ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFin END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFin END DESC, s.fechaInicio DESC")
-    List<Sorteo> findByFiltro(int minPrice, int maxPrice, String[] categorias, String dateOrder);
+    @Query("SELECT s FROM Sorteo s WHERE s.puntosNecesarios >= :minPrice AND s.puntosNecesarios <= :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFin END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFin END DESC, s.fechaInicio DESC")
+    List<Sorteo> findByFiltro(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder);
 }

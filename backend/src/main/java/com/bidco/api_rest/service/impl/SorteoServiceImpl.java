@@ -126,11 +126,9 @@ public class SorteoServiceImpl implements SorteoService {
 
     @Override
     public List<SorteoResponseDTO> buscarPorFiltro(FiltroDTO filtro) {
-        String[] listaCategorias = {"Tecnología", "Hogar", "Moda", "Deportes", "Juguetes", "Otros"};
-        String[] queryCategorias = (filtro.getCategorias() == null || filtro.getCategorias().length == 0) 
-                                    ? listaCategorias : filtro.getCategorias();
+        String[] queryCategorias = filtro.categoriasNormalizadas();
 
-        List<Sorteo> sorteo = sorteoRepository.findByFiltro(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.getDateOrder());
+        List<Sorteo> sorteo = sorteoRepository.findByFiltro(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder());
         return sorteo.stream()
                 .map(sorteoMapper::sorteoToSorteoResponseDTO)
                 .toList();
