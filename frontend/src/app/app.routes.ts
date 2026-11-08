@@ -46,6 +46,7 @@ export const routes: Routes = [
       { path: 'estadisticas', loadComponent: () => import('./views/profile/profile-estadisticas/profile-estadisticas.component').then(m => m.ProfileEstadisticasComponent) }
     ]
   },
+  { path: 'ayuda', title: 'Ayuda · BidCo', loadComponent: () => import('./views/ayuda/ayuda.component').then(m => m.AyudaComponent) },
   { path: 'contacto', title: 'Contacto · BidCo', loadComponent: () => import('./views/contacto/contacto.component').then(m => m.ContactoComponent) },
   { path: 'terminos', title: 'Términos de uso · BidCo', loadComponent: () => import('./views/terminos/terminos.component').then(m => m.TerminosComponent) },
   { path: 'privacidad', title: 'Política de privacidad · BidCo', loadComponent: () => import('./views/privacidad/privacidad.component').then(m => m.PrivacidadComponent) },
