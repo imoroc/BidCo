@@ -122,3 +122,15 @@ img {
 
   
   
+
+  /* Estados de los listados (cargando, vacío, error) */
+  .estado-listado {
+    padding: 48px 16px;
+    text-align: center;
+    color: #5f6368;
+    font-size: 1rem;
+  }
+
+  .estado-listado.estado-error {
+    color: #b3261e;
+  }
