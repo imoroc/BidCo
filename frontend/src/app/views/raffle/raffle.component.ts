@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, catchError, of, switchMap, tap } from 'rxjs';
 import { RouterLink } from '@angular/router';
 
 import { HttpParams } from '@angular/common/http';
@@ -26,6 +28,10 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 })
 export class RaffleComponent {
     products: SorteoResponseDto[] = [];
+    cargando = true;
+    errorCarga = false;
+    private filtros$ = new Subject<HttpParams>();
+    private destroyRef = inject(DestroyRef);
     isLoggedIn = false;
     isExpert = false;
     userPoints = 0;
@@ -34,9 +40,21 @@ export class RaffleComponent {
 
     ngOnInit() {
         var storedUser;
-        this.sorteoService.getSorteos().subscribe({
-            next: data => this.products = data,
-            error: err => console.error('Error al obtener los sorteos: ', err)
+        // Todas las cargas pasan por un único flujo: la petición nueva cancela a la anterior
+        // y nunca se muestra un resultado desfasado.
+        this.filtros$.pipe(
+            tap(() => { this.cargando = true; this.errorCarga = false; }),
+            switchMap(params => this.sorteoService.getSorteosPorFiltro(params).pipe(
+                catchError(err => {
+                    console.error('Error al obtener el listado: ', err);
+                    this.errorCarga = true;
+                    return of([] as SorteoResponseDto[]);
+                })
+            )),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(data => {
+            this.products = data;
+            this.cargando = false;
         });
 
         this.authService.isLoggedIn$.subscribe((estado) => {
@@ -68,9 +86,6 @@ export class RaffleComponent {
         })
         camposFiltro = camposFiltro.append("dateOrder", filtro.dateOrder)
         
-        this.sorteoService.getSorteosPorFiltro(camposFiltro).subscribe({
-            next: data => this.products = data,
-            error: err => console.error("Error al obtener sorteos filtrados: ", err)
-        });
+        this.filtros$.next(camposFiltro);
     }
 }

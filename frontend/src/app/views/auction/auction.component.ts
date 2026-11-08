@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, catchError, of, switchMap, tap } from 'rxjs';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
 import { HttpParams } from '@angular/common/http';
@@ -29,6 +31,10 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 
 export class AuctionComponent {
     products: SubastaResponseDTO[] = [];
+    cargando = true;
+    errorCarga = false;
+    private filtros$ = new Subject<HttpParams>();
+    private destroyRef = inject(DestroyRef);
     isLoggedIn = false;
     isExpert = false;
     saldoUser = 0;
@@ -36,11 +42,23 @@ export class AuctionComponent {
     constructor(private authService: AuthService, private expertAuthService: AuthExpertService, private subastaService: SubastaService, private activatedRoute: ActivatedRoute) {}
 
     ngOnInit() {
-        this.subastaService.getSubastasPorTipo(true).subscribe({
-            next: data => this.products = data,
-            error: err => console.error('Error al obtener las subastas normales: ', err)
+        // Todas las cargas pasan por un único flujo: la petición nueva cancela a la anterior
+        // y nunca se muestra un resultado desfasado.
+        this.filtros$.pipe(
+            tap(() => { this.cargando = true; this.errorCarga = false; }),
+            switchMap(params => this.subastaService.getSubastasFiltradasNormal(params).pipe(
+                catchError(err => {
+                    console.error('Error al obtener el listado: ', err);
+                    this.errorCarga = true;
+                    return of([] as SubastaResponseDTO[]);
+                })
+            )),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(data => {
+            this.products = data;
+            this.cargando = false;
         });
-        
+
         //Comprobamos si un usuario tiene la sesion iniciada
         this.authService.isLoggedIn$.subscribe((estado) => {
             this.isLoggedIn = estado;
@@ -68,9 +86,6 @@ export class AuctionComponent {
         })
         camposFiltro = camposFiltro.append("dateOrder", filtro.dateOrder)
         
-        this.subastaService.getSubastasFiltradasNormal(camposFiltro).subscribe({
-            next: data => this.products = data,
-            error: err => console.error("Error al obtener subastas filtradas: ", err)
-        });
+        this.filtros$.next(camposFiltro);
     }
 }
