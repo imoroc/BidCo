@@ -60,6 +60,8 @@ public class SorteoServiceImpl implements SorteoService {
                 // Subimos la imagen a la nube y guardamos la URL
                 String urlImagen = cloudinaryService.uploadFile(sorteoCreateDTO.getImagen());
                 sorteo.setImagen(urlImagen);
+            } catch (IllegalArgumentException e) {
+                throw e;
             } catch (Exception e) {
                 throw new RuntimeException("Error al subir la imagen del sorteo a Cloudinary", e);
             }

@@ -72,6 +72,10 @@ public class SubastaServiceImpl implements SubastaService {
                 // 2. Guardamos esa URL en nuestra base de datos
                 subasta.setImagen(urlImagenNube);
                 
+            } catch (IllegalArgumentException e) {
+                
+                throw e;
+                
             } catch (Exception e) {
                 throw new RuntimeException("Error al subir la imagen a la nube", e);
             }

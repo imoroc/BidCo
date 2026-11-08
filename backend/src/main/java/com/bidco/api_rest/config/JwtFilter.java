@@ -135,7 +135,10 @@ public class JwtFilter extends OncePerRequestFilter {
             return "GET".equalsIgnoreCase(method) || "USER".equals(role);
         }
         if (path.equals("/api/sorteos") || path.startsWith("/api/sorteos/")) {
-            return "GET".equalsIgnoreCase(method) || "USER".equals(role);
+            // Los sorteos se crean desde el área administrativa; los usuarios solo pueden consultarlos
+            // y desencadenar el cierre de uno ya terminado.
+            return "GET".equalsIgnoreCase(method)
+                    || ("PUT".equalsIgnoreCase(method) && path.matches("/api/sorteos/final/\\d+") && "USER".equals(role));
         }
         return true;
     }
