@@ -32,6 +32,7 @@ export class ProductComponent {
     cantidadPuja: number | null = null;
     mensaje: { tipo: 'error' | 'exito'; texto: string } | null = null;
     errorFormulario = '';
+    private elementoPrevioAlModal: HTMLElement | null = null;
     candidatoGanadorPuja: string | null = null;
     ganadorSorteo: string | null = null;
 
@@ -243,13 +244,17 @@ export class ProductComponent {
         });
     }
 
-    openExpertForm() { this.showExpertForm = true; }
+    openExpertForm() {
+        this.showExpertForm = true;
+        this.enfocarModal();
+    }
 
     editExpertForm(comment: any) {
         this.editandoComentario = true;
         this.comentarioAEditar = comment;
         this.comentarioEditado = { comment: comment.comentario, estimated_price: comment.precioEstimado };
         this.showExpertForm = true;
+        this.enfocarModal();
     }
 
     closeExpertForm() {
@@ -257,6 +262,41 @@ export class ProductComponent {
         this.errorFormulario = '';
         this.editandoComentario = false;
         this.comentarioEditado = { comment: '', estimated_price: 0 };
+        // Devuelve el foco al elemento que abrió el modal.
+        this.elementoPrevioAlModal?.focus();
+        this.elementoPrevioAlModal = null;
+    }
+
+    // Al abrir el modal se guarda el elemento activo y se lleva el foco al primer campo.
+    private enfocarModal() {
+        this.elementoPrevioAlModal = document.activeElement as HTMLElement | null;
+        setTimeout(() => document.getElementById('review')?.focus());
+    }
+
+    // Escape cierra el modal y Tab/Shift+Tab se mantienen dentro de él.
+    onModalKeydown(event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            this.closeExpertForm();
+            return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const modal = (event.currentTarget as HTMLElement).querySelector('.modal-card');
+        const enfocables = Array.from(
+            modal?.querySelectorAll<HTMLElement>('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])') ?? []
+        ).filter((el) => !el.hasAttribute('disabled'));
+        if (enfocables.length === 0) return;
+
+        const primero = enfocables[0];
+        const ultimo = enfocables[enfocables.length - 1];
+        if (event.shiftKey && document.activeElement === primero) {
+            event.preventDefault();
+            ultimo.focus();
+        } else if (!event.shiftKey && document.activeElement === ultimo) {
+            event.preventDefault();
+            primero.focus();
+        }
     }
 
     handleFormSubmit() {
