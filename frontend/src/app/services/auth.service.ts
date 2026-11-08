@@ -97,6 +97,11 @@ export class AuthService {
     this.userRole.next(role);
   }
 
+  /** Lectura síncrona de la sesión de usuario (usada por userGuard). */
+  isLoggedIn(): boolean {
+    return this.loggedIn.getValue();
+  }
+
   // Método público para leer el rol de forma síncrona (usado por AdminGuard)
   getCurrentRole(): string | null {
     return this.userRole.getValue();
