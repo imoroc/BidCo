@@ -15,12 +15,13 @@ import com.bidco.api_rest.repository.UsuarioRepository;
 import com.bidco.api_rest.service.contract.CloudinaryService;
 import com.bidco.api_rest.service.contract.SubastaService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -29,26 +30,27 @@ public class SubastaServiceImpl implements SubastaService {
     private final SubastaRepository subastaRepository;
     private final SubastaMapper subastaMapper;
     private final UsuarioMapper usuarioMapper;
-    private final UsuarioRepository userRepository;
     private final UsuarioRepository usuarioRepository;
     private final PujaRepository pujaRepository;
     private final PujaMapper pujaMapper;
+    private final CloudinaryService cloudinaryService;
+    private final Clock clock;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
-
-    public SubastaServiceImpl(SubastaRepository subastaRepository, SubastaMapper subastaMapper, UsuarioMapper usuarioMapper, 
-                UsuarioRepository userRepository, UsuarioRepository usuarioRepository, PujaRepository pujaRepository, PujaMapper pujaMapper) {
+    public SubastaServiceImpl(SubastaRepository subastaRepository, SubastaMapper subastaMapper, UsuarioMapper usuarioMapper,
+                UsuarioRepository usuarioRepository, PujaRepository pujaRepository, PujaMapper pujaMapper,
+                CloudinaryService cloudinaryService, Clock clock) {
         this.subastaRepository = subastaRepository;
         this.subastaMapper = subastaMapper;
         this.usuarioMapper = usuarioMapper;
-        this.userRepository = userRepository;
         this.usuarioRepository = usuarioRepository;
         this.pujaRepository = pujaRepository;
         this.pujaMapper = pujaMapper;
+        this.cloudinaryService = cloudinaryService;
+        this.clock = clock;
     }
 
     @Override
+    @Transactional
     public SubastaResponseDTO crearSubasta(SubastaCreateDTO subastaCreateDTO, MultipartFile imagen) {
         if(subastaCreateDTO == null){
             throw new IllegalArgumentException("La subasta no puede ser nula");
@@ -57,8 +59,8 @@ public class SubastaServiceImpl implements SubastaService {
         Subasta subasta = subastaMapper.subastaCreateDTOToSubasta(subastaCreateDTO);
         subasta.setPrecioFinal(subasta.getPrecioInicial());
 
-        Usuario user = userRepository.findById(subasta.getCreador().getUsuarioID())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Usuario user = usuarioRepository.findById(subasta.getCreador().getUsuarioID())
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         
         user.setPuntos(user.getPuntos() + 50);
 
@@ -92,10 +94,18 @@ public class SubastaServiceImpl implements SubastaService {
     @Override
     @Transactional
     public void asignarGanadorYActualizarPrecioFinal(Long id) {
-        // Verificamos que la subasta exista
-        Subasta subasta = subastaRepository.findById(id)
+        // Bloqueo de fila: dos peticiones simultáneas no pueden repartir los puntos dos veces.
+        Subasta subasta = subastaRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró la subasta con ID: " + id));
-        System.out.print("Se encuentra subasta");
+
+        // Operación idempotente: si ya tiene ganador no se vuelve a puntuar.
+        if (subasta.getGanador() != null) {
+            return;
+        }
+
+        if (!LocalDate.now(clock).isAfter(subasta.getFechaFinal())) {
+            throw new IllegalStateException("La subasta todavía no ha finalizado");
+        }
 
         Puja puja = pujaRepository.findTopBySubastaIdOrderByImporteDesc(id);
 
@@ -103,15 +113,10 @@ public class SubastaServiceImpl implements SubastaService {
             throw new IllegalStateException("No hubo ninguna puja en la subasta.");
         }
 
-        Usuario user = userRepository.findById(puja.getPujador().getUsuarioID())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Usuario user = usuarioRepository.findById(puja.getPujador().getUsuarioID())
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
-        
-        if (subasta.isSubastaNormal()) {
-            user.setPuntos(user.getPuntos() + 100);
-        } else {
-            user.setPuntos(user.getPuntos() + 200);
-        }
+        user.setPuntos(user.getPuntos() + (subasta.isSubastaNormal() ? 100 : 200));
         puja.setGanadora(true);
         subasta.setGanador(user.getUsuarioID());
 
