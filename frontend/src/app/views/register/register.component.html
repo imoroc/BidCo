@@ -2,7 +2,6 @@
 
 <div class="auth-page-background">
   <main class="auth-container">
-    
     <div class="auth-card">
       <nav class="auth-tabs">
         <a routerLink="/login" class="auth-tab">Iniciar Sesión</a>
@@ -15,41 +14,40 @@
       </header>
 
       @if (formError) {
-        <div class="alert-error">
-          <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+        <div class="alert-error" role="alert" aria-live="polite">
+          <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor" aria-hidden="true"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17-17-28.5-28.5T440-320q0-17 11.5-28.5T480-360q17 0 28.5 11.5T520-320q0 17-11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
           <span>{{ formError }}</span>
         </div>
       }
 
       <form id="registrationForm" (ngSubmit)="register(regForm)" #regForm="ngForm" novalidate>
-        
         <div class="form-section">
           <h3>Datos de Acceso</h3>
           <div class="form-row">
             <div class="input-group">
               <label for="username">Usuario</label>
-              <input type="text" id="username" name="username" required minlength="3" [(ngModel)]="username"
+              <input type="text" id="username" name="username" required minlength="3" maxlength="100" autocomplete="username" [(ngModel)]="username"
                 [class.invalid-input]="regForm.controls['username']?.invalid && (regForm.controls['username']?.touched || regForm.submitted)">
             </div>
 
             <div class="input-group">
               <label for="email">Email</label>
-              <input type="email" id="email" name="email" required [(ngModel)]="email"
+              <input type="email" id="email" name="email" required maxlength="254" autocomplete="email" [(ngModel)]="email"
                 [class.invalid-input]="regForm.controls['email']?.invalid && (regForm.controls['email']?.touched || regForm.submitted)">
             </div>
           </div>
 
           <div class="form-row">
             <div class="input-group">
-              <label for="password">Contraseña</label>
-              <input type="password" id="password" name="password" required minlength="6" [(ngModel)]="password"
+              <label for="password">Contraseña (mínimo 10 caracteres)</label>
+              <input type="password" id="password" name="password" required minlength="10" maxlength="100" autocomplete="new-password" [(ngModel)]="password"
                 [class.invalid-input]="regForm.controls['password']?.invalid && (regForm.controls['password']?.touched || regForm.submitted)">
             </div>
 
             <div class="input-group">
-              <label for="repeat-password">Repetir</label>
-              <input type="password" id="repeat-password" name="repeatPassword" required minlength="6" [(ngModel)]="repeatPassword"
-                [class.invalid-input]="(regForm.controls['repeatPassword']?.touched || regForm.submitted) && (password !== repeatPassword)">
+              <label for="repeat-password">Repetir contraseña</label>
+              <input type="password" id="repeat-password" name="repeatPassword" required minlength="10" maxlength="100" autocomplete="new-password" [(ngModel)]="repeatPassword"
+                [class.invalid-input]="regForm.controls['repeatPassword']?.invalid && (regForm.controls['repeatPassword']?.touched || regForm.submitted)">
             </div>
           </div>
         </div>
@@ -59,13 +57,13 @@
           <div class="form-row">
             <div class="input-group">
               <label for="city">Ciudad</label>
-              <input type="text" id="city" name="city" required [(ngModel)]="city"
+              <input type="text" id="city" name="city" required maxlength="100" autocomplete="address-level2" [(ngModel)]="city"
                 [class.invalid-input]="regForm.controls['city']?.invalid && (regForm.controls['city']?.touched || regForm.submitted)">
             </div>
 
             <div class="input-group">
               <label for="postal-code">C.P.</label>
-              <input type="text" id="postal-code" name="postalCode" required pattern="^[0-9]{5}$" placeholder="28001" [(ngModel)]="postalCode"
+              <input type="text" id="postal-code" name="postalCode" required pattern="^[0-9]{5}$" maxlength="5" inputmode="numeric" autocomplete="postal-code" placeholder="28001" [(ngModel)]="postalCode"
                 [class.invalid-input]="regForm.controls['postalCode']?.invalid && (regForm.controls['postalCode']?.touched || regForm.submitted)">
             </div>
           </div>
@@ -73,26 +71,25 @@
           <div class="form-row address-grid">
             <div class="input-group">
               <label for="calle">Calle</label>
-              <input type="text" id="calle" name="calle" required [(ngModel)]="calle"
+              <input type="text" id="calle" name="calle" required maxlength="255" autocomplete="street-address" [(ngModel)]="calle"
                 [class.invalid-input]="regForm.controls['calle']?.invalid && (regForm.controls['calle']?.touched || regForm.submitted)">
             </div>
 
             <div class="input-group small-input">
               <label for="numeroPiso">Nº</label>
-              <input type="text" id="numeroPiso" name="numeroPiso" required [(ngModel)]="numeroPiso"
+              <input type="number" id="numeroPiso" name="numeroPiso" required min="0" step="1" [(ngModel)]="numeroPiso"
                 [class.invalid-input]="regForm.controls['numeroPiso']?.invalid && (regForm.controls['numeroPiso']?.touched || regForm.submitted)">
             </div>
 
             <div class="input-group small-input">
               <label for="letraPiso">Letra</label>
-              <input type="text" id="letraPiso" name="letraPiso" [(ngModel)]="letraPiso">
+              <input type="text" id="letraPiso" name="letraPiso" maxlength="10" [(ngModel)]="letraPiso">
             </div>
           </div>
         </div>
 
         <button class="btn-primary" type="submit">Finalizar Registro</button>
       </form>
-
     </div>
   </main>
 </div>

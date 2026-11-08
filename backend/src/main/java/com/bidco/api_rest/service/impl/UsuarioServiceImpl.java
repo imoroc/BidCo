@@ -1,6 +1,8 @@
 package com.bidco.api_rest.service.impl;
 
+import com.bidco.api_rest.config.JwtUtil;
 import com.bidco.api_rest.dto.usuario.LoginDTO;
+import com.bidco.api_rest.dto.usuario.PerfilPublicoDTO;
 import com.bidco.api_rest.dto.usuario.PrivacidadDTO;
 import com.bidco.api_rest.dto.usuario.StatsDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioCreateDTO;
@@ -14,9 +16,7 @@ import com.bidco.api_rest.repository.SorteoRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
 import com.bidco.api_rest.service.contract.UsuarioService;
-import com.bidco.api_rest.config.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,53 +34,54 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final PujaSorteoRepository pujaSorteoRepository;
     private final UsuarioMapper usuarioMapper;
     private final SorteoRepository sorteoRepository;
-    private final JwtUtil jwtUtil = new JwtUtil();
+    private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @Autowired
     public UsuarioServiceImpl(
             UsuarioRepository usuarioRepository,
             UsuarioMapper usuarioMapper,
             PujaRepository pujaRepository,
             SubastaRepository subastaRepository,
             PujaSorteoRepository pujaSorteoRepository,
-            SorteoRepository sorteoRepository) {
+            SorteoRepository sorteoRepository,
+            JwtUtil jwtUtil) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
         this.pujaRepository = pujaRepository;
         this.subastaRepository = subastaRepository;
         this.pujaSorteoRepository = pujaSorteoRepository;
         this.sorteoRepository = sorteoRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public UsuarioResponseDTO registrarUsuario(UsuarioCreateDTO usuarioCreateDTO) {
-        if (usuarioCreateDTO == null) {
+    public UsuarioResponseDTO registrarUsuario(UsuarioCreateDTO dto) {
+        if (dto == null) {
             throw new IllegalArgumentException("El usuario no puede ser nulo");
         }
-        Usuario usuario = usuarioMapper.usuarioCreateDTOToUsuario(usuarioCreateDTO);
-        // Hashear contraseña antes de guardar
-        usuario.setContrasena(passwordEncoder.encode(usuarioCreateDTO.getContraseña()));
+
+        Usuario usuario = usuarioMapper.usuarioCreateDTOToUsuario(dto);
+        usuario.setContrasena(passwordEncoder.encode(dto.getContraseña()));
+        // El saldo y los puntos iniciales son reglas del servidor, nunca datos del cliente.
+        usuario.setSaldo(BigDecimal.ZERO);
         usuario.setPuntos(10);
-        usuarioRepository.save(usuario);
-        return usuarioMapper.usuarioToUsuarioResponseDTO(usuario);
+        return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioRepository.save(usuario));
     }
 
     @Override
-    public UsuarioResponseDTO actualizarUsuario(Long id, UsuarioUpdateDTO usuarioUpdateDTO) {
+    public UsuarioResponseDTO actualizarUsuario(Long id, UsuarioUpdateDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
-        usuario.setNombreUsuario(usuarioUpdateDTO.getNombreUsuario());
-        usuario.setCorreoElectronico(usuarioUpdateDTO.getCorreoElectronico());
-        usuario.setCiudad(usuarioUpdateDTO.getCiudad());
-        usuario.setCodigoPostal(usuarioUpdateDTO.getCodigoPostal());
-        usuario.setCalle(usuarioUpdateDTO.getCalle());
-        usuario.setNumeroPiso(usuarioUpdateDTO.getNumeroPiso());
-        usuario.setLetraPiso(usuarioUpdateDTO.getLetraPiso());
+        usuario.setNombreUsuario(dto.getNombreUsuario());
+        usuario.setCorreoElectronico(dto.getCorreoElectronico());
+        usuario.setCiudad(dto.getCiudad());
+        usuario.setCodigoPostal(dto.getCodigoPostal());
+        usuario.setCalle(dto.getCalle());
+        usuario.setNumeroPiso(dto.getNumeroPiso());
+        usuario.setLetraPiso(dto.getLetraPiso());
 
-        usuarioRepository.save(usuario);
-        return usuarioMapper.usuarioToUsuarioResponseDTO(usuario);
+        return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioRepository.save(usuario));
     }
 
     @Override
@@ -93,39 +94,55 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioResponseDTO buscarUsuarioPorNombreUsuario(String nombreUsuario) {
         Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario con nombre de usuario " + nombreUsuario + " no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         return usuarioMapper.usuarioToUsuarioResponseDTO(usuario);
+    }
+
+    @Override
+    public PerfilPublicoDTO obtenerPerfilPublico(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        return toPublicProfile(usuario);
+    }
+
+    @Override
+    public PerfilPublicoDTO buscarPerfilPublicoPorNombreUsuario(String nombreUsuario) {
+        Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        return toPublicProfile(usuario);
+    }
+
+    private PerfilPublicoDTO toPublicProfile(Usuario usuario) {
+        return new PerfilPublicoDTO(usuario.getNombreUsuario(), Boolean.TRUE.equals(usuario.getPrivacidadAnonimoPujas()));
     }
 
     @Override
     public String login(LoginDTO loginDTO) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByNombreUsuario(loginDTO.getIdentificador());
-        if (!usuarioOpt.isPresent()) {
+        if (usuarioOpt.isEmpty()) {
             usuarioOpt = usuarioRepository.findByCorreoElectronico(loginDTO.getIdentificador());
         }
-        if (!usuarioOpt.isPresent()) {
-            throw new EntityNotFoundException("Credenciales incorrectas");
-        }
-        Usuario usuario = usuarioOpt.get();
-
-        // Comparación segura con BCrypt
-        if (!passwordEncoder.matches(loginDTO.getContrasena(), usuario.getContrasena())) {
+        if (usuarioOpt.isEmpty()) {
             throw new IllegalArgumentException("Credenciales incorrectas");
         }
 
-        return jwtUtil.generateToken(usuario.getUsuarioID().toString());
+        Usuario usuario = usuarioOpt.get();
+        if (!passwordEncoder.matches(loginDTO.getContrasena(), usuario.getContrasena())) {
+            throw new IllegalArgumentException("Credenciales incorrectas");
+        }
+        return jwtUtil.generateToken(usuario.getUsuarioID().toString(), "USER");
     }
 
+    @Override
     public void updatePassword(Long id, String currentPassword, String newPassword) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
-        if (!passwordEncoder.matches(currentPassword, usuario.getContrasena())) {
+        if (currentPassword == null || !passwordEncoder.matches(currentPassword, usuario.getContrasena())) {
             throw new IllegalArgumentException("Contraseña actual incorrecta");
         }
-
-        if (newPassword == null || newPassword.length() < 6) {
-            throw new IllegalArgumentException("La nueva contraseña debe tener al menos 6 caracteres");
+        if (newPassword == null || newPassword.length() < 10 || newPassword.length() > 100) {
+            throw new IllegalArgumentException("La nueva contraseña debe tener entre 10 y 100 caracteres");
         }
 
         usuario.setContrasena(passwordEncoder.encode(newPassword));
@@ -135,7 +152,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public PrivacidadDTO getPrivacidad(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         PrivacidadDTO dto = new PrivacidadDTO();
         dto.setPrivacidadAnonimoPujas(usuario.getPrivacidadAnonimoPujas());
         dto.setPrivacidadEstadisticas(usuario.getPrivacidadEstadisticas());
@@ -143,26 +160,25 @@ public class UsuarioServiceImpl implements UsuarioService {
         return dto;
     }
 
-    public UsuarioResponseDTO actualizarPrivacidad(Long id, PrivacidadDTO privacidadUpdateDTO) {
+    @Override
+    public UsuarioResponseDTO actualizarPrivacidad(Long id, PrivacidadDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
-
-        usuario.setPrivacidadAnonimoPujas(privacidadUpdateDTO.getPrivacidadAnonimoPujas());
-        usuario.setPrivacidadEstadisticas(privacidadUpdateDTO.getPrivacidadEstadisticas());
-        usuario.setPrivacidadPerfilVisible(privacidadUpdateDTO.getPrivacidadPerfilVisible());
-
-        usuarioRepository.save(usuario);
-        return usuarioMapper.usuarioToUsuarioResponseDTO(usuario);
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        usuario.setPrivacidadAnonimoPujas(dto.getPrivacidadAnonimoPujas());
+        usuario.setPrivacidadEstadisticas(dto.getPrivacidadEstadisticas());
+        usuario.setPrivacidadPerfilVisible(dto.getPrivacidadPerfilVisible());
+        return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioRepository.save(usuario));
     }
 
+    @Override
     public StatsDTO getStats(Long usuarioId) {
         return new StatsDTO(
-            pujaRepository.countParticipatedBidsByUsuarioId(usuarioId),
-            pujaRepository.countWonBidsByUsuarioId(usuarioId),
-            subastaRepository.countCreatedBidsByUsuarioId(usuarioId),
-            pujaSorteoRepository.countParticipatedDrawsByUsuarioId(usuarioId),
-            sorteoRepository.countWonDrawsByUsuarioId(usuarioId),
-            0
+                pujaRepository.countParticipatedBidsByUsuarioId(usuarioId),
+                pujaRepository.countWonBidsByUsuarioId(usuarioId),
+                subastaRepository.countCreatedBidsByUsuarioId(usuarioId),
+                pujaSorteoRepository.countParticipatedDrawsByUsuarioId(usuarioId),
+                sorteoRepository.countWonDrawsByUsuarioId(usuarioId),
+                0
         );
     }
 
@@ -174,8 +190,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (cantidad.compareTo(MAX_RECARGA) > 0) {
             throw new IllegalArgumentException("La cantidad máxima por recarga es 10.000€");
         }
+
         Usuario usuario = usuarioRepository.findById(usuarioId)
-            .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         usuario.setSaldo(usuario.getSaldo().add(cantidad));
         usuarioRepository.save(usuario);
         return usuario.getSaldo();

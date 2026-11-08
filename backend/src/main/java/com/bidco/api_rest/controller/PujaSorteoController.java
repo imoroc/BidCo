@@ -17,14 +17,16 @@ public class PujaSorteoController {
         this.pujaSorteoService = pujaSorteoService;
     }
 
-    // Endpoint para crear una nueva puja en un sorteo
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PujaSorteoResponseDTO crearPujaSorteo(@Valid @RequestBody PujaSorteoCreateDTO pujaSorteoCreateDTO) {
+    public PujaSorteoResponseDTO crearPujaSorteo(
+            @Valid @RequestBody PujaSorteoCreateDTO pujaSorteoCreateDTO,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        // El participante se toma del token para impedir suplantación de identidad.
+        pujaSorteoCreateDTO.setPujadorId(authenticatedUserId);
         return pujaSorteoService.crearPujaSorteo(pujaSorteoCreateDTO);
     }
 
-    // Endpoint para buscar una puja de sorteo por ID
     @GetMapping("/{id}")
     public PujaSorteoResponseDTO buscarPujaSorteoPorId(@PathVariable Long id) {
         return pujaSorteoService.buscarPujaSorteoId(id);

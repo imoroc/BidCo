@@ -1,9 +1,11 @@
 package com.bidco.api_rest.config;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -13,38 +15,26 @@ import java.util.List;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil = new JwtUtil();
+    private final JwtUtil jwtUtil;
 
-    // Rutas públicas: no requieren token
-    // Formato: "MÉTODO:/ruta" o "*:/ruta" para cualquier método
-    private static final List<String> PUBLIC_PATHS = List.of(
-            "POST:/api/usuarios",          // registro usuario
+    private static final List<String> PUBLIC_ROUTES = List.of(
+            "POST:/api/usuarios",
             "POST:/api/usuarios/login",
             "POST:/api/trabajadores/login",
             "POST:/api/admin/login",
             "GET:/api/ping",
-            "GET:/api/subastas",           // listado público
+            "GET:/api/subastas",
             "GET:/api/subastas/filtrar",
             "GET:/api/subastas/filtro-normal",
             "GET:/api/subastas/filtro-ciega",
             "GET:/api/subastas/filtro-nombre",
-            "GET:/api/sorteos",            // listado sorteos
-            "GET:/api/sorteos/filtro",
-            
-            // --- AÑADIDO PARA DESBLOQUEAR SWAGGER EN RENDER ---
-            "*:/v3/api-docs",
-            "*:/v3/api-docs/swagger-config",
-            "*:/swagger-ui",
-            "*:/swagger-ui.html",
-            "GET:/swagger-ui/index.html",
-            "GET:/swagger-ui/swagger-ui.css",
-            "GET:/swagger-ui/index.css",
-            "GET:/swagger-ui/swagger-ui-bundle.js",
-            "GET:/swagger-ui/swagger-ui-standalone-preset.js",
-            "GET:/swagger-ui/swagger-initializer.js",
-            "GET:/swagger-ui/favicon-32x32.png",
-            "GET:/swagger-ui/favicon-16x16.png"
+            "GET:/api/sorteos",
+            "GET:/api/sorteos/filtro"
     );
+
+    public JwtFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -55,58 +45,131 @@ public class JwtFilter extends OncePerRequestFilter {
         String method = request.getMethod();
         String path = request.getRequestURI();
 
-        // Siempre permitir preflight de CORS
-        if ("OPTIONS".equalsIgnoreCase(method)) {
+        if ("OPTIONS".equalsIgnoreCase(method) || isPublic(method, path)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Permitir rutas públicas
-        if (isPublic(method, path)) {
+        if (isPublicResource(method, path)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Las rutas de admin usan sesión, no JWT
         if (path.startsWith("/api/admin/")) {
+            if (!hasAdminSession(request)) {
+                sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Sesión administrativa no válida");
+                return;
+            }
             chain.doFilter(request, response);
             return;
         }
 
-        // Validar token Bearer
+        // El registro de trabajadores se realiza desde el área administrativa con sesión.
+        if ("POST".equalsIgnoreCase(method) && "/api/trabajadores".equals(path) && hasAdminSession(request)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendUnauthorized(response, "Token no proporcionado");
+        if (authHeader == null || !authHeader.startsWith("Bearer ") || authHeader.length() <= 7) {
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Token no proporcionado");
             return;
         }
 
+        final Claims claims;
         try {
-            String token = authHeader.substring(7);
-            jwtUtil.getClaims(token); // lanza excepción si el token es inválido o caducado
-            chain.doFilter(request, response);
-        } catch (Exception e) {
-            sendUnauthorized(response, "Token inválido o caducado");
+            claims = jwtUtil.getClaims(authHeader.substring(7));
+        } catch (Exception exception) {
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o caducado");
+            return;
         }
+
+        String subject = claims.getSubject();
+        String role = claims.get("role", String.class);
+        if (subject == null || subject.isBlank() || role == null || role.isBlank()) {
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "El token no contiene una identidad o rol válido");
+            return;
+        }
+
+        if (!hasRequiredRole(path, method, role)) {
+            sendError(response, HttpServletResponse.SC_FORBIDDEN, "No tienes permisos para acceder a este recurso");
+            return;
+        }
+
+        request.setAttribute("authenticatedSubject", subject);
+        if ("USER".equals(role)) {
+            try {
+                request.setAttribute("authenticatedUserId", Long.valueOf(subject));
+            } catch (NumberFormatException exception) {
+                sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Identidad de usuario inválida");
+                return;
+            }
+        }
+
+        // No incluir la ejecución del controlador dentro del try de validación JWT:
+        // los errores de negocio no deben convertirse en respuestas 401.
+        chain.doFilter(request, response);
+    }
+
+    private boolean hasRequiredRole(String path, String method, String role) {
+        if (path.equals("/api/usuarios") || path.startsWith("/api/usuarios/")) {
+            return "USER".equals(role);
+        }
+        if (path.equals("/api/pujas") || path.startsWith("/api/pujas/")
+                || path.equals("/api/pujas-sorteo") || path.startsWith("/api/pujas-sorteo/")) {
+            return "USER".equals(role);
+        }
+        if (path.equals("/api/trabajadores") || path.startsWith("/api/trabajadores/")) {
+            return "WORKER".equals(role) || "EXPERT".equals(role);
+        }
+        if (path.equals("/api/comentarios") || path.startsWith("/api/comentarios/")) {
+            return "GET".equalsIgnoreCase(method) || "EXPERT".equals(role);
+        }
+        if (path.equals("/api/subastas") || path.startsWith("/api/subastas/")) {
+            return "GET".equalsIgnoreCase(method) || "USER".equals(role);
+        }
+        if (path.equals("/api/sorteos") || path.startsWith("/api/sorteos/")) {
+            return "GET".equalsIgnoreCase(method) || "USER".equals(role);
+        }
+        return true;
     }
 
     private boolean isPublic(String method, String path) {
-        for (String rule : PUBLIC_PATHS) {
-            String[] parts = rule.split(":", 2);
-            String ruleMethod = parts[0];
-            String rulePath = parts[1];
-
-            boolean methodMatch = "*".equals(ruleMethod) || ruleMethod.equalsIgnoreCase(method);
-            boolean pathMatch = path.equals(rulePath) || path.startsWith(rulePath + "/");
-
-            if (methodMatch && pathMatch) return true;
+        for (String route : PUBLIC_ROUTES) {
+            String[] parts = route.split(":", 2);
+            if (parts[0].equalsIgnoreCase(method) && parts[1].equals(path)) {
+                return true;
+            }
         }
         return false;
     }
 
-    private void sendUnauthorized(HttpServletResponse response, String mensaje) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    private boolean isPublicResource(String method, String path) {
+        if (!"GET".equalsIgnoreCase(method)) {
+            return false;
+        }
+        return path.matches("/api/usuarios/\\d+/publico")
+                || path.matches("/api/subastas/\\d+")
+                || path.matches("/api/sorteos/\\d+")
+                || path.matches("/api/pujas/mayor/\\d+")
+                || path.matches("/api/comentarios/\\d+")
+                || path.matches("/api/comentarios/subasta/\\d+")
+                || path.equals("/swagger-ui.html")
+                || path.equals("/v3/api-docs")
+                || path.startsWith("/v3/api-docs/")
+                || path.equals("/swagger-ui")
+                || path.startsWith("/swagger-ui/");
+    }
+
+    private boolean hasAdminSession(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        return session != null && session.getAttribute("adminId") != null;
+    }
+
+    private void sendError(HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"error\": \"" + mensaje + "\"}");
+        response.getWriter().write("{\"status\":" + status + ",\"message\":\"" + message + "\"}");
     }
 }

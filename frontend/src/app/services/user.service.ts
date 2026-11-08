@@ -7,7 +7,6 @@ export interface UsuarioResponse {
   usuarioID: number;
   nombreUsuario: string;
   correoElectronico: string;
-  contraseña?: string;
   ciudad: string;
   codigoPostal: string;
   calle: string;
@@ -22,8 +21,6 @@ export interface UsuarioCreate {
   nombreUsuario: string;
   correoElectronico: string;
   contraseña: string;
-  saldo: number;
-  puntos: number;
   pais: string;
   ciudad: string;
   codigoPostal: string;
@@ -57,53 +54,35 @@ export interface Stats {
   createdDraws: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
-  private apiUrl: string = `${environment.apiUrl}/usuarios`;
+  private apiUrl = `${environment.apiUrl}/usuarios`;
 
   constructor(private http: HttpClient) {}
 
-  // Actualiza el usuario (PUT)
   updateUser(id: number, usuario: UsuarioUpdate): Observable<UsuarioResponse> {
     const token = localStorage.getItem('authToken');
-    return this.http.put<UsuarioResponse>(
-      `${this.apiUrl}/${id}`, 
-      usuario,
-      {
-        headers: new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        })
-      }
-    );
+    return this.http.put<UsuarioResponse>(`${this.apiUrl}/${id}`, usuario, {
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
+    });
   }
 
   updatePassword(id: number, passwords: { currentPassword: string, newPassword: string }): Observable<void> {
     const token = localStorage.getItem('authToken');
-    return this.http.patch<void>(
-      `${this.apiUrl}/${id}/password`,
-      passwords,
-      {
-        headers: new HttpHeaders({
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json' // Asegurar el tipo de contenido
-        })
-      }
-    ).pipe(
-      catchError((error) => {
-        // Lanzar error con mensaje específico del backend
-        throw new Error(error.error?.message || 'Error desconocido');
+    return this.http.patch<void>(`${this.apiUrl}/${id}/password`, passwords, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
       })
-    );
+    }).pipe(catchError(error => {
+      throw new Error(error.error?.message || 'Error desconocido');
+    }));
   }
 
-  // Registro (POST)
   registerUser(usuario: UsuarioCreate): Observable<UsuarioResponse> {
     return this.http.post<UsuarioResponse>(this.apiUrl, usuario);
   }
 
-  // Obtiene los datos del usuario por ID (GET)
   getUserById(id: number): Observable<UsuarioResponse> {
     return this.http.get<UsuarioResponse>(`${this.apiUrl}/${id}`);
   }
@@ -113,7 +92,7 @@ export class UserService {
   }
 
   updatePrivacidad(id: number, privacidad: Privacidad): Observable<UsuarioResponse> {
-    return this.http.put<UsuarioResponse>(`${this.apiUrl}/${id}/privacidad`,privacidad);
+    return this.http.put<UsuarioResponse>(`${this.apiUrl}/${id}/privacidad`, privacidad);
   }
 
   getUserStats(id: number): Observable<Stats> {
@@ -121,6 +100,6 @@ export class UserService {
   }
 
   recargarSaldo(usuarioID: number, cantidad: number): Observable<number> {
-    return this.http.patch<number>(`${environment.apiUrl}/usuarios/${usuarioID}/recargar-saldo`, { cantidad });
+    return this.http.patch<number>(`${this.apiUrl}/${usuarioID}/recargar-saldo`, { cantidad });
   }
 }
