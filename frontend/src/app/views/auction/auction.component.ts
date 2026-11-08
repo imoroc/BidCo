@@ -5,6 +5,7 @@ import { ListadoFiltrado } from '../../utils/listado-filtrado';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FilterComponent } from '../../components/filter/filter.component';
+import { EstadoListadoComponent } from '../../components/estado-listado/estado-listado.component';
 import { ProductItemComponent } from '../../components/product-item/product-item.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 
@@ -21,6 +22,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
     HeaderComponent,
     FilterComponent,
     ProductItemComponent,
+    EstadoListadoComponent,
     FooterComponent
 ],
   templateUrl: './auction.component.html',
