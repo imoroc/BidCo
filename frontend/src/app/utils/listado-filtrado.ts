@@ -1,7 +1,7 @@
 import { DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpParams } from '@angular/common/http';
-import { Observable, Subject, catchError, of, switchMap, tap } from 'rxjs';
+import { Observable, Subject, catchError, of, retry, switchMap, tap, throwError, timer } from 'rxjs';
 
 import { Filtro } from '../services/auction.service';
 
@@ -14,6 +14,20 @@ export function filtroAParams(filtro: Filtro): HttpParams {
         params = params.append('categorias', categoria);
     });
     return params.append('dateOrder', filtro.dateOrder);
+}
+
+/** Errores que suelen deberse a que el servidor aún está arrancando (plan gratuito de Render). */
+const ESTADOS_TRANSITORIOS = [0, 502, 503, 504];
+const REINTENTOS = 4;
+
+/** Reintenta con espera creciente solo los errores transitorios; el resto se propaga de inmediato. */
+function reintentarSiArranca<T>() {
+    return retry<T>({
+        count: REINTENTOS,
+        delay: (error, intento) => ESTADOS_TRANSITORIOS.includes(error?.status)
+            ? timer(Math.min(intento * 2000, 8000))
+            : throwError(() => error)
+    });
 }
 
 /**
@@ -35,6 +49,7 @@ export class ListadoFiltrado<T> {
                 this.errorCarga = false;
             }),
             switchMap(params => cargador(params).pipe(
+                reintentarSiArranca<T[]>(),
                 catchError(err => {
                     console.error('Error al obtener el listado: ', err);
                     this.errorCarga = true;
