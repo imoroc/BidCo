@@ -1,87 +1,53 @@
 import { Routes } from '@angular/router';
 
-import { RegisterComponent } from './views/register/register.component';
-import { LoginComponent } from './views/login/login.component';
-import { ProductComponent } from './views/product/product.component';
-import { CreateAuctionComponent } from './views/create-auction/create-auction.component';
-import { MyBidsComponent } from './views/my-bids/my-bids.component';
-import { MyAuctionsComponent } from './views/my-auctions/my-auctions.component';
-import { ProfileComponent } from './views/profile/profile.component';
-import { BlindAuctionComponent } from './views/blind-auction/blind-auction.component';
-import { ProfileDatosComponent } from './views/profile/profile-datos/profile-datos.component';
-import { ProfilePrivacidadComponent } from './views/profile/profile-privacidad/profile-privacidad.component';
-import { ProfileEstadisticasComponent } from './views/profile/profile-estadisticas/profile-estadisticas.component';
-import { AuctionComponent } from './views/auction/auction.component';
-import { RaffleComponent } from './views/raffle/raffle.component';
-import { AdminLoginComponent } from './views/admin/admin-login/admin-login.component';
-import { AdminDashboardComponent } from './views/admin/admin-dashboard/admin-dashboard.component';
 import { AdminGuard } from './services/admin.guard';
-import { AdminSorteoComponent } from './views/admin/admin-sorteo/admin-sorteo.component';
-import { AdminExpertComponent } from './views/admin/admin-expert/admin-expert.component';
-import { SearchComponent } from './views/search/search.component';
-import { ExpertLoginComponent } from './views/expert-login/expert-login.component';
-import { ForgotPasswordComponent } from './components/forgot-password/forgot-password';
+import { userGuard } from './services/user.guard';
+
+// Todas las vistas se cargan bajo demanda para reducir el paquete inicial.
+const cargarProducto = () => import('./views/product/product.component').then(m => m.ProductComponent);
 
 export const routes: Routes = [
   { path: '', redirectTo: '/auction', pathMatch: 'full' },
-  { path: 'auction', component: AuctionComponent },
-  { path: 'blind-auctions', component: BlindAuctionComponent },
-  { path: 'raffle', component: RaffleComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'expert', component: ExpertLoginComponent },
-  { path: 'auction/product/:id', component: ProductComponent, data: { tipo: 'subasta' } },
-  { path: 'blind-auctions/product/:id', component: ProductComponent, data: { tipo: 'subasta' } },
-  { path: 'raffle/product/:id', component: ProductComponent, data: { tipo: 'sorteo' } },
-  { path: 'create-auction', component: CreateAuctionComponent },
-  { path: 'my-bids', component: MyBidsComponent },
-  { path: 'my-auctions', component: MyAuctionsComponent},
-  { path: 'search', component: SearchComponent },
-  { path: 'search/product/:id', component: ProductComponent, data: { tipo: 'subasta' } },
-  { path: 'admin/login', component: AdminLoginComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'auction', title: 'Subastas · BidCo', loadComponent: () => import('./views/auction/auction.component').then(m => m.AuctionComponent) },
+  { path: 'blind-auctions', title: 'Subastas a ciegas · BidCo', loadComponent: () => import('./views/blind-auction/blind-auction.component').then(m => m.BlindAuctionComponent) },
+  { path: 'raffle', title: 'Sorteos · BidCo', loadComponent: () => import('./views/raffle/raffle.component').then(m => m.RaffleComponent) },
+  { path: 'register', title: 'Crear cuenta · BidCo', loadComponent: () => import('./views/register/register.component').then(m => m.RegisterComponent) },
+  { path: 'login', title: 'Iniciar sesión · BidCo', loadComponent: () => import('./views/login/login.component').then(m => m.LoginComponent) },
+  { path: 'expert', title: 'Acceso de expertos · BidCo', loadComponent: () => import('./views/expert-login/expert-login.component').then(m => m.ExpertLoginComponent) },
+  { path: 'auction/product/:id', title: 'Producto · BidCo', loadComponent: cargarProducto, data: { tipo: 'subasta' } },
+  { path: 'blind-auctions/product/:id', title: 'Producto · BidCo', loadComponent: cargarProducto, data: { tipo: 'subasta' } },
+  { path: 'raffle/product/:id', title: 'Producto · BidCo', loadComponent: cargarProducto, data: { tipo: 'sorteo' } },
+  { path: 'search/product/:id', title: 'Producto · BidCo', loadComponent: cargarProducto, data: { tipo: 'subasta' } },
+  { path: 'search', title: 'Búsqueda · BidCo', loadComponent: () => import('./views/search/search.component').then(m => m.SearchComponent) },
+  { path: 'create-auction', title: 'Crear subasta · BidCo', canActivate: [userGuard], loadComponent: () => import('./views/create-auction/create-auction.component').then(m => m.CreateAuctionComponent) },
+  { path: 'my-bids', title: 'Mis pujas · BidCo', canActivate: [userGuard], loadComponent: () => import('./views/my-bids/my-bids.component').then(m => m.MyBidsComponent) },
+  { path: 'my-auctions', title: 'Mis subastas · BidCo', canActivate: [userGuard], loadComponent: () => import('./views/my-auctions/my-auctions.component').then(m => m.MyAuctionsComponent) },
+  { path: 'forgot-password', title: 'Recuperar contraseña · BidCo', loadComponent: () => import('./components/forgot-password/forgot-password').then(m => m.ForgotPasswordComponent) },
+  { path: 'admin/login', title: 'Acceso de administración · BidCo', loadComponent: () => import('./views/admin/admin-login/admin-login.component').then(m => m.AdminLoginComponent) },
   {
     path: 'admin',
-    component: AdminDashboardComponent,
+    title: 'Administración · BidCo',
     canActivate: [AdminGuard],
+    loadComponent: () => import('./views/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
     children: [
-      // Cuando navegues a /admin/sorteo carga AdminSorteoComponent
-      { path: 'sorteo',  component: AdminSorteoComponent },
-      // Cuando navegues a /admin/expertos carga AdminExpertComponent
-      { path: 'expertos', component: AdminExpertComponent }
+      { path: 'sorteo', loadComponent: () => import('./views/admin/admin-sorteo/admin-sorteo.component').then(m => m.AdminSorteoComponent) },
+      { path: 'expertos', loadComponent: () => import('./views/admin/admin-expert/admin-expert.component').then(m => m.AdminExpertComponent) }
     ]
   },
   {
     path: 'profile',
-    component: ProfileComponent,
+    title: 'Mi perfil · BidCo',
+    canActivate: [userGuard],
+    loadComponent: () => import('./views/profile/profile.component').then(m => m.ProfileComponent),
     children: [
-      // Cuando entras a /profile, redirige a /profile/mis-datos
       { path: '', redirectTo: 'mis-datos', pathMatch: 'full' },
-
-      // /profile/mis-datos -> carga ProfileDatosComponent
-      { path: 'mis-datos', component: ProfileDatosComponent },
-
-      // /profile/privacidad -> carga ProfilePrivacidadComponent
-      { path: 'privacidad', component: ProfilePrivacidadComponent },
-
-      // /profile/estadisticas -> carga ProfileEstadisticasComponent
-      { path: 'estadisticas', component: ProfileEstadisticasComponent }
+      { path: 'mis-datos', loadComponent: () => import('./views/profile/profile-datos/profile-datos.component').then(m => m.ProfileDatosComponent) },
+      { path: 'privacidad', loadComponent: () => import('./views/profile/profile-privacidad/profile-privacidad.component').then(m => m.ProfilePrivacidadComponent) },
+      { path: 'estadisticas', loadComponent: () => import('./views/profile/profile-estadisticas/profile-estadisticas.component').then(m => m.ProfileEstadisticasComponent) }
     ]
   },
-  {
-    path: 'contacto',
-    title: 'Contacto · BidCo',
-    loadComponent: () => import('./views/contacto/contacto.component').then(m => m.ContactoComponent)
-  },
-  {
-    path: 'terminos',
-    title: 'Términos de uso · BidCo',
-    loadComponent: () => import('./views/terminos/terminos.component').then(m => m.TerminosComponent)
-  },
-  {
-    path: 'privacidad',
-    title: 'Política de privacidad · BidCo',
-    loadComponent: () => import('./views/privacidad/privacidad.component').then(m => m.PrivacidadComponent)
-  },
-  { path: '**', redirectTo: '/auction' }
+  { path: 'contacto', title: 'Contacto · BidCo', loadComponent: () => import('./views/contacto/contacto.component').then(m => m.ContactoComponent) },
+  { path: 'terminos', title: 'Términos de uso · BidCo', loadComponent: () => import('./views/terminos/terminos.component').then(m => m.TerminosComponent) },
+  { path: 'privacidad', title: 'Política de privacidad · BidCo', loadComponent: () => import('./views/privacidad/privacidad.component').then(m => m.PrivacidadComponent) },
+  { path: '**', title: 'Página no encontrada · BidCo', loadComponent: () => import('./views/no-encontrada/no-encontrada.component').then(m => m.NoEncontradaComponent) }
 ];
