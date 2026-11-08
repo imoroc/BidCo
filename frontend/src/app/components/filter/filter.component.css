@@ -1,39 +1,54 @@
 /* =========================================
-   FILTRO PREMIUM (AUTO-ESCALABLE SIN SCROLL)
+   PANEL DE FILTROS: columna lateral integrada en la página
    ========================================= */
 
-.filter-container {
-  position: fixed;
-  top: 12vh; /* Se ajusta a la altura de la pantalla */
-  left: 0;
-  width: 18%; 
-  height: 85vh; /* Ocupa el 85% de la pantalla, dejando margen abajo */
+:host {
+  display: block;
+  flex: 0 0 280px;
+  width: 280px;
   background-color: #ffffff;
-  border-right: 1px solid #e8eaed; 
-  padding: 3vh 1.5vw; /* Padding proporcional */
-  overflow: hidden;
-  font-family: 'Montserrat', sans-serif;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  border-right: 1px solid #e8eaed;
 }
 
-/* --- CABECERA --- */
+/* Se queda pegado bajo la cabecera mientras se recorre el listado */
+.filter-container {
+  position: sticky;
+  top: var(--header-height, 74px);
+  max-height: calc(100vh - var(--header-height, 74px));
+  overflow-y: auto;
+  padding: 24px;
+  font-family: 'Montserrat', sans-serif;
+  box-sizing: border-box;
+}
+
 .filter-container h2 {
-  margin: 0 0 2vh 0; /* Margen proporcional */
-  font-size: clamp(1.1rem, 1.5vw, 1.4rem); /* La fuente se hace pequeña si la pantalla es enana */
+  margin: 0 0 20px 0;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #0d0063; 
-  border-bottom: 2px solid #f8f9fa;
-  padding-bottom: 1.5vh;
-  flex-shrink: 0; /* Evita que el título se aplaste */
+  color: #0d0063;
+  border-bottom: 1px solid #e8eaed;
+  padding-bottom: 12px;
 }
 
 .filter-container form {
   display: flex;
   flex-direction: column;
-  gap: 3vh; /* El espacio entre bloques se encoge mágicamente */
-  height: 100%;
+  gap: 24px;
+}
+
+/* En pantallas estrechas el panel pasa a ocupar todo el ancho, encima del listado */
+@media (max-width: 880px) {
+  :host {
+    flex: 1 1 100%;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e8eaed;
+  }
+
+  .filter-container {
+    position: static;
+    max-height: none;
+  }
 }
 
 /* --- FIELDSETS Y LEYENDAS --- */
@@ -45,7 +60,7 @@
 
 .filter-container legend {
   font-size: clamp(0.75rem, 1vw, 0.85rem);
-  margin-bottom: 1.5vh;
+  margin-bottom: 12px;
   color: #202124; 
   font-weight: 700;
   text-transform: uppercase;
@@ -55,13 +70,13 @@
 /* --- INPUTS DE PRECIO Y SELECT --- */
 .price-filter {
   display: flex;
-  gap: 0.8vw;
+  gap: 6px;
 }
 
 .filter-container input[type="number"],
 .filter-container select {
   width: 100%;
-  padding: 1.2vh 0.8vw; /* Padding elástico */
+  padding: 10px 6px; /* Padding elástico */
   border: 1px solid #dadce0;
   border-radius: 6px;
   font-size: clamp(0.85rem, 1vw, 0.95rem);
@@ -90,7 +105,7 @@ input[type="number"]::-webkit-outer-spin-button {
   position: relative;
   width: 100%;
   height: 30px; 
-  margin-top: 1.5vh;
+  margin-top: 12px;
 }
 
 .slider {
@@ -159,7 +174,7 @@ input[type="range"].thumb::-moz-range-thumb {
 .category-filter {
   display: flex;
   flex-direction: column;
-  gap: 1.5vh; /* Se encogen si no hay espacio */
+  gap: 12px; /* Se encogen si no hay espacio */
 }
 
 .checkbox-group {
@@ -175,7 +190,7 @@ input[type="range"].thumb::-moz-range-thumb {
   height: 20px;
   border: 2px solid #dadce0;
   border-radius: 4px;
-  margin-right: 0.8vw;
+  margin-right: 6px;
   margin-left: 0;
   margin-top: 0;
   cursor: pointer;

@@ -1,14 +1,16 @@
 /* --- ESTRUCTURA PRINCIPAL --- */
 .page-layout {
   display: flex;
-  min-height: 85vh;
+  flex: 1;
+  flex-wrap: wrap;
   background-color: #f8f9fa; /* Fondo premium para destacar las tarjetas */
 }
 
 /* Espacio exacto para que el filtro fijo (18%) no pise el contenido */
 .main-content {
-  margin-left: 18%; 
-  width: 82%; 
+  flex: 1 1 600px;
+  min-width: 0;
+  margin: 0;
   padding: 40px;
   box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
