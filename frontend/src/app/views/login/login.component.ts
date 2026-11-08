@@ -19,10 +19,15 @@ export class LoginComponent {
   password: string = '';
   remember: boolean = false;
   loginError: string = '';
+  enviando = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   login() {
+    // Evita envíos repetidos: cada intento fallido cuenta para el límite del servidor.
+    if (this.enviando) return;
+    this.enviando = true;
+    this.loginError = '';
     const loginData = {
       identificador: this.email,
       contrasena: this.password
@@ -39,9 +44,23 @@ export class LoginComponent {
         this.router.navigateByUrl('/auction');
       },
       error: (err) => {
-        console.error("Error en login:", err);
-        this.loginError = "Credenciales incorrectas. Revisa tu identificador y contraseña.";
+        this.enviando = false;
+        this.loginError = this.mensajeDeError(err);
       }
     });
+  }
+
+  private mensajeDeError(err: any): string {
+    if (err?.status === 429) {
+      // El servidor indica cuándo se podrá volver a intentar.
+      return err.error?.message || 'Demasiados intentos. Inténtalo de nuevo más tarde.';
+    }
+    if (err?.status === 0) {
+      return 'No se ha podido conectar con el servidor. Comprueba tu conexión.';
+    }
+    if (err?.status === 401) {
+      return 'Credenciales incorrectas. Revisa tu identificador y contraseña.';
+    }
+    return 'No se ha podido iniciar sesión. Inténtalo de nuevo.';
   }
 }
