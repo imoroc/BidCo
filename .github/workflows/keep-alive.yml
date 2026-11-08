@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Ping
         run: |
-          curl -sf "${{ secrets.RENDER_BACKEND_URL }}/actuator/health" \
+          curl -sf "${{ secrets.RENDER_BACKEND_URL }}/api/ping" \
             --max-time 10 \
             --retry 2 \
             || echo "Backend no responde (normal si está arrancando)"

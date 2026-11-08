@@ -1,16 +1,14 @@
-# Etapa 1: Construcción (Build)
+# Etapa 1: construcción
 FROM eclipse-temurin:25-jdk-alpine AS build
 WORKDIR /app
 COPY . .
+RUN chmod +x mvnw && ./mvnw -B -q clean package -DskipTests
 
-# --- ESTA ES LA LÍNEA MÁGICA ---
-RUN chmod +x mvnw
-
-RUN ./mvnw clean install -DskipTests
-
-# Etapa 2: Ejecución (Runtime)
+# Etapa 2: ejecución (sin privilegios de root)
 FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+RUN addgroup -S app && adduser -S app -G app
+COPY --from=build --chown=app:app /app/target/*.jar app.jar
+USER app
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "app.jar"]
