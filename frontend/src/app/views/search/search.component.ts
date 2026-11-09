@@ -7,6 +7,7 @@ import { HttpParams } from '@angular/common/http';
 import { map, distinctUntilChanged, tap } from 'rxjs/operators';
 
 import { HeaderComponent } from '../../components/header/header.component';
+import { EstadoListadoComponent } from '../../components/estado-listado/estado-listado.component';
 import { FilterComponent } from '../../components/filter/filter.component';
 import { ProductItemComponent } from '../../components/product-item/product-item.component';
 import { FooterComponent } from "../../components/footer/footer.component";
@@ -27,6 +28,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
     HeaderComponent,
     FilterComponent,
     ProductItemComponent,
+    EstadoListadoComponent,
     FooterComponent
 ],
   templateUrl: './search.component.html',
