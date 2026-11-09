@@ -95,6 +95,51 @@
     --transicion: 150ms ease-out;
 }
 
+/* Modo oscuro: solo se redefinen los tokens; ningun componente usa colores literales */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --color-marca: #aab8ff;
+        --color-marca-hover: #c7d0ff;
+        --color-acento: #2b3566;
+        --color-fondo: #121317;
+        --color-superficie: #1b1c21;
+        --color-superficie-suave: #16171b;
+        --color-superficie-alt: #26272d;
+        --color-borde: #3c3f46;
+        --color-borde-suave: #2c2e34;
+        --color-borde-fuerte: #8d9199;
+        --color-texto: #d4d6db;
+        --color-texto-fuerte: #f1f2f4;
+        --color-texto-suave: #a3a7af;
+        --color-texto-medio: #c4c7ce;
+        --color-exito: #81c995;
+        --color-exito-fuerte: #a8dab5;
+        --color-exito-fondo: #17301f;
+        --color-exito-borde: #2d5a3a;
+        --color-error: #f28b82;
+        --color-error-fuerte: #f6aea9;
+        --color-error-fondo: #3a1c1a;
+        --color-error-borde: #7a3b37;
+        --color-error-fondo-hover: #4a2522;
+        --color-aviso: #fdd663;
+        --color-destacado-texto: #fdd663;
+        --color-info-fondo: #1f2745;
+        --color-realce: #1f2236;
+        --color-sobre-marca: #0b0a2e;
+        --color-marca-halo: rgba(170, 184, 255, 0.22);
+        --color-velo: rgba(0, 0, 0, 0.7);
+        --color-cabecera: rgba(27, 28, 33, 0.92);
+        --color-scroll: #4a4d55;
+        --color-scroll-hover: #6b6f78;
+        --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.6), 0 1px 3px 1px rgba(0, 0, 0, 0.4);
+        --sombra-2: 0 1px 3px rgba(0, 0, 0, 0.6), 0 4px 8px 3px rgba(0, 0, 0, 0.4);
+        --sombra-marca: 0 4px 12px rgba(0, 0, 0, 0.5);
+        --sombra-marca-alta: 0 8px 20px rgba(0, 0, 0, 0.55);
+        --sombra-tarjeta: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+}
+
 /* Foco visible solo con teclado */
 :focus-visible {
     outline: var(--anillo-foco);
