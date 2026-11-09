@@ -24,7 +24,7 @@
   width: 100%;
   /* FORZAMOS UN CUADRADO PERFECTO. Así todas las tarjetas miden lo mismo */
   aspect-ratio: 1 / 1; 
-  background-color: var(--color-superficie-suave); 
+  background-color: var(--color-foto-fondo); 
   border-bottom: 1px solid var(--color-superficie-alt); /* Fina línea que separa foto de texto */
   display: flex;
   align-items: center;
@@ -62,8 +62,8 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.badge-blind { background-color: var(--color-texto-fuerte); color: #fff; }
-.badge-raffle { background-color: #fbbc04; color: var(--color-marca); }
+.badge-blind { background-color: var(--color-texto-fuerte); color: var(--color-superficie); }
+.badge-raffle { background-color: var(--color-destacado); color: var(--color-sobre-destacado); }
 
 /* --- ZONA DE CONTENIDO (TEXTOS) --- */
 .card-content {

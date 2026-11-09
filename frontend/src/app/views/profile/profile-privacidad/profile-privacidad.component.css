@@ -37,7 +37,7 @@
   position: absolute; content: "";
   height: 22px; width: 22px;
   left: 3px; bottom: 3px;
-  background-color: white;
+  background-color: var(--color-sobre-oscuro);
   border-radius: 50%;
   transition: .3s cubic-bezier(0.2, 0, 0, 1);
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);

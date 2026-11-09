@@ -1,4 +1,4 @@
-.admin-layout { background-color: #f0f2f5; min-height: 85vh; font-family: 'Montserrat', sans-serif; padding-bottom: 40px;}
+.admin-layout { background-color: var(--color-superficie-suave); min-height: 85vh; font-family: 'Montserrat', sans-serif; padding-bottom: 40px;}
 
 .admin-topbar { background: var(--color-superficie); padding: 16px 40px; border-bottom: 1px solid var(--color-borde-suave); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 .admin-title h2 { margin: 0; font-size: 1.4rem; color: var(--color-texto-fuerte); font-weight: 700; }
@@ -6,8 +6,8 @@
 .admin-actions { display: flex; gap: 12px; }
 .btn-nav { background: var(--color-superficie-alt); color: var(--color-texto-fuerte); border: 1px solid var(--color-borde); padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem;}
 .btn-nav:hover { background: var(--color-borde-suave); }
-.btn-danger { color: var(--color-error); background: var(--color-error-fondo); border-color: #fad2cf; }
-.btn-danger:hover { background: #fad2cf; }
+.btn-danger { color: var(--color-error); background: var(--color-error-fondo); border-color: var(--color-error-fondo-hover); }
+.btn-danger:hover { background: var(--color-error-fondo-hover); }
 
 .admin-content { max-width: 1000px; margin: 40px auto; padding: 0 24px; }
 

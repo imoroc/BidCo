@@ -54,7 +54,7 @@
 
 /* Le damos un toque distintivo a la caja de puntos vs la de dinero */
 .badge-points {
-  border-left: 4px solid #fbbc04; /* Borde izquierdo amarillo Google para identificar sorteos */
+  border-left: 4px solid var(--color-destacado); /* Borde izquierdo amarillo Google para identificar sorteos */
 }
 
 .balance-label {

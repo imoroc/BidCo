@@ -127,3 +127,4 @@
   .content-header { flex-direction: column; align-items: flex-start; gap: 24px; }
   .user-actions { width: 100%; justify-content: space-between; }
 }
+.empty-icon { color: var(--color-borde); }

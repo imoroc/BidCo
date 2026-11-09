@@ -56,7 +56,7 @@
 
 /* Estado Activo: Franja corporativa */
 .sidebar-nav a.active {
-  background-color: #e8f0fe; /* Fondo azul clarito de Google */
+  background-color: var(--color-info-fondo); /* Fondo azul clarito de Google */
   color: var(--color-marca);
   font-weight: 700;
 }

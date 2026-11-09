@@ -55,6 +55,8 @@
     --color-realce: #f0f4ff;
     --color-marca-halo: rgba(13, 0, 99, 0.12);
     --color-sobre-oscuro: #ffffff;
+    --color-sobre-destacado: #202124;
+    --color-foto-fondo: #ffffff;
     --color-velo: rgba(32, 33, 36, 0.6);
     --color-cabecera: rgba(255, 255, 255, 0.92);
     --sombra-marca: 0 4px 12px rgba(13, 0, 99, 0.15);
