@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment'; // Añade la importación
+import { finDeDiaMs } from '../../utils/fechas';
 
 @Component({
   selector: 'app-product-item',
@@ -43,11 +44,7 @@ export class ProductItemComponent implements OnInit, OnDestroy {
     }
 
     setupCountdown(endDateString: string) {
-        const fullDateString = endDateString.includes('T')
-            ? endDateString
-            : `${endDateString}T23:59:59`;
-
-        const endDate = new Date(fullDateString).getTime();
+        const endDate = finDeDiaMs(endDateString);
 
         const actualizar = () => {
             const distance = endDate - new Date().getTime();
