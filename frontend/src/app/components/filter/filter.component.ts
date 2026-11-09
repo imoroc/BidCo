@@ -24,6 +24,12 @@ export class FilterComponent {
 
     /** Solo los listados públicos ofrecen ver los vencidos; los historiales ya los muestran. */
     @Input() permiteVencidas: boolean = false;
+    /** Solo afecta a pantallas estrechas: en escritorio el panel está siempre visible. */
+    abierto = false;
+
+    get filtrosActivos(): number {
+        return this.selectedCategories.length + (this.dateOrder ? 1 : 0) + (this.mostrarVencidas ? 1 : 0);
+    }
 
     constructor(private subastaService: SubastaService) {}
 
