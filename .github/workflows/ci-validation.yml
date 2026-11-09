@@ -35,6 +35,8 @@ jobs:
         run: npm audit --omit=dev --audit-level=high
       - name: Unit tests
         run: npm test -- --watch=false --browsers=ChromeHeadlessCI
+      - name: Contraste de los tokens de color
+        run: npm run test:contraste
       - name: Production build
         run: npm run build -- --configuration production
 
