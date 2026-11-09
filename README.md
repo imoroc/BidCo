@@ -74,79 +74,17 @@ Usuario y experto se identifican con un token JWT y tienen su propio acceso (`/l
 
 | Área | Tecnología |
 |---|---|
-| Frontend | Angular 22, TypeScript 6, CSS |
+| Frontend | Angular 22.2, TypeScript 6.0, CSS, Chart.js 4 |
 | Backend | Java 25, Spring Boot 4.1 |
 | Persistencia | PostgreSQL, Spring Data JPA |
-| Seguridad | JWT, BCrypt, CORS |
+| Seguridad | JWT (JJWT 0.13), BCrypt, CORS |
+| Mapeo | MapStruct 1.6 |
 | Imágenes | Cloudinary |
-| Documentación API | OpenAPI / Swagger |
-| CI | GitHub Actions, CodeQL (configuración predeterminada), Dependabot |
-
-## Requisitos
-
-- Node.js 22 y npm.
-- JDK 25.
-- Maven (o Maven Wrapper).
-- PostgreSQL.
-- Credenciales de Cloudinary para las funciones de imágenes.
-
-## Puesta en marcha
-
-### 1. Clonar
-
-```bash
-git clone https://github.com/imoroc/BidCo.git
-cd BidCo
-```
-
-### 2. Backend
-
-Configura las siguientes variables de entorno. El secreto JWT es obligatorio y debe contener al menos 32 bytes UTF-8. Genera uno nuevo para cada entorno; no reutilices el valor de ejemplo de la documentación.
-
-Linux/macOS:
-
-```bash
-export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/bidco"
-export SPRING_DATASOURCE_USERNAME="postgres"
-export SPRING_DATASOURCE_PASSWORD="tu-password"
-export JWT_SECRET="$(openssl rand -base64 48)"
-export CLOUDINARY_API_KEY="tu-api-key"
-export CLOUDINARY_API_SECRET="tu-api-secret"
-```
-
-PowerShell:
-
-```powershell
-$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/bidco"
-$env:SPRING_DATASOURCE_USERNAME="postgres"
-$env:SPRING_DATASOURCE_PASSWORD="tu-password"
-$env:JWT_SECRET=[Convert]::ToBase64String((1..48 | ForEach-Object { Get-Random -Maximum 256 }))
-$env:CLOUDINARY_API_KEY="tu-api-key"
-$env:CLOUDINARY_API_SECRET="tu-api-secret"
-```
-
-Arranca el backend:
-
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-
-En Windows utiliza `mvnw.cmd spring-boot:run`.
-
-### 3. Frontend
-
-```bash
-cd frontend
-npm ci
-npm start
-```
-
-Angular estará disponible en `http://localhost:4200` y el backend en `http://localhost:8080`.
-
-## Configuración de producción
-
-Guarda las variables de entorno en el proveedor de despliegue (Render, por ejemplo), nunca en el repositorio. Mantén los logs de SQL y los mensajes internos desactivados en producción. Configura CORS únicamente con los orígenes reales del frontend.
+| Correo | Brevo (API HTTPS) |
+| Documentación API | OpenAPI / Swagger (springdoc 3.2) |
+| Pruebas | JUnit y Mockito (backend), Jasmine y Karma (frontend) |
+| CI y calidad | GitHub Actions, CodeQL, SonarCloud, GitGuardian, Dependabot |
+| Despliegue | Vercel (frontend), Render (backend), Aiven (PostgreSQL) |
 
 ## Arquitectura
 
@@ -264,7 +202,164 @@ Todas las rutas cuelgan de `/api`. Con `SWAGGER_ENABLED=true` la documentación 
 
 **Limitaciones conocidas.** El token JWT se guarda en `localStorage` del navegador, y el límite de intentos de login no se comparte entre instancias.
 
-## Autores originales
+## Puesta en marcha
+
+### Requisitos
+
+- Node.js 22 y npm.
+- JDK 25 (el repositorio incluye Maven Wrapper).
+- PostgreSQL.
+- Credenciales de Cloudinary para subir imágenes.
+- Opcional: cuenta de Brevo para el correo de recuperación de contraseña.
+
+### 1. Clonar
+
+```bash
+git clone https://github.com/imoroc/BidCo.git
+cd BidCo
+git checkout deploy
+```
+
+### 2. Base de datos
+
+Crea una base de datos PostgreSQL. Con `DDL_AUTO=update` (valor por defecto) Hibernate crea las tablas al arrancar. Si prefieres partir de datos de ejemplo, ejecuta [`database/schema_postgres.sql`](database/schema_postgres.sql); necesita la extensión `pgcrypto` y **borra las tablas existentes**, así que no lo uses con datos reales.
+
+### 3. Backend
+
+Configura las variables de entorno. El secreto JWT es obligatorio y debe tener al menos 32 bytes; genera uno nuevo para cada entorno. En [`.env.example`](.env.example) tienes la lista completa.
+
+Linux/macOS:
+
+```bash
+export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/bidco"
+export SPRING_DATASOURCE_USERNAME="postgres"
+export SPRING_DATASOURCE_PASSWORD="tu-password"
+export JWT_SECRET="$(openssl rand -base64 48)"
+export CLOUDINARY_API_KEY="tu-api-key"
+export CLOUDINARY_API_SECRET="tu-api-secret"
+# Solo en local, sin HTTPS:
+export SESSION_COOKIE_SECURE="false"
+export SESSION_COOKIE_SAME_SITE="lax"
+```
+
+PowerShell:
+
+```powershell
+$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/bidco"
+$env:SPRING_DATASOURCE_USERNAME="postgres"
+$env:SPRING_DATASOURCE_PASSWORD="tu-password"
+$env:JWT_SECRET=[Convert]::ToBase64String((1..48 | ForEach-Object { Get-Random -Maximum 256 }))
+$env:CLOUDINARY_API_KEY="tu-api-key"
+$env:CLOUDINARY_API_SECRET="tu-api-secret"
+$env:SESSION_COOKIE_SECURE="false"
+$env:SESSION_COOKIE_SAME_SITE="lax"
+```
+
+Arranca el backend:
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+En Windows utiliza `mvnw.cmd spring-boot:run`. La API queda en `http://localhost:8080`.
+
+### 4. Frontend
+
+```bash
+cd frontend
+npm ci
+npm start
+```
+
+Angular queda en `http://localhost:4200` y apunta al backend local (`src/environments/environment.development.ts`).
+
+### Recuperación de contraseña por correo
+
+El flujo es: el usuario pide el enlace en `/forgot-password`, la API genera un token aleatorio, guarda solo su hash (válido 30 minutos) y envía por Brevo un enlace a `/reset-password` con ese token; al usarlo, el token queda invalidado. Para activarlo define:
+
+| Variable | Descripción |
+|---|---|
+| `BREVO_API_KEY` | Clave de la API de Brevo. |
+| `MAIL_FROM` | Remitente verificado en Brevo. |
+| `MAIL_FROM_NAME` | Nombre del remitente (por defecto `BidCo`). |
+| `FRONTEND_URL` | URL pública del frontend, base del enlace del correo. |
+
+Sin `BREVO_API_KEY` y `MAIL_FROM` la función queda desactivada y la API responde 503 en lugar de simular el envío.
+
+## Pruebas y CI
+
+```bash
+# Backend (compila y ejecuta las pruebas)
+cd backend && ./mvnw clean verify
+
+# Frontend
+cd frontend && npm test
+```
+
+El workflow [`CI Validation`](.github/workflows/ci-validation.yml) se ejecuta en cada PR hacia `deploy` y en cada push a `deploy` y `master`:
+
+- **Frontend:** `npm ci`, `npm audit --omit=dev`, pruebas con Chrome headless y build de producción.
+- **Backend:** `mvn clean verify` con Java 25.
+- **Revisión de dependencias** en las PR.
+
+Además, CodeQL analiza el código, SonarCloud mide calidad y duplicación, GitGuardian busca secretos y Vercel genera un despliegue de previsualización por PR. Dependabot propone actualizaciones semanales de npm, Maven y GitHub Actions, y las de tipo patch o minor se fusionan solas cuando el CI pasa.
+
+## Despliegue
+
+| Pieza | Plataforma | Notas |
+|---|---|---|
+| Frontend | Vercel | `vercel.json` reescribe las rutas a `index.html` para el enrutado de Angular. |
+| Backend | Render | El repositorio incluye un [`backend/Dockerfile`](backend/Dockerfile) (Java 25). Variables de entorno en el panel, nunca en el repositorio. |
+| Base de datos | Aiven for PostgreSQL | Conexión con `sslmode=require`. |
+| Imágenes | Cloudinary | |
+
+En producción conviene `DDL_AUTO=validate`, los logs de SQL desactivados, Swagger apagado y CORS limitado a los orígenes reales del frontend.
+
+## Estructura del repositorio
+
+```
+BidCo/
+├── backend/     API Spring Boot (config, controller, service, repository, model, dto, mapper)
+├── frontend/    Aplicación Angular (components, views, services, interceptors, utils)
+├── database/    Esquema de referencia para PostgreSQL
+├── docs/        Decisiones técnicas
+└── .github/     Workflows de CI, Dependabot y plantilla de PR
+```
+
+## Solución de problemas
+
+| Síntoma | Causa y solución |
+|---|---|
+| El navegador bloquea las peticiones por CORS | El origen del frontend no está permitido. Añádelo a `CORS_ALLOWED_ORIGINS` (o un patrón a `CORS_ALLOWED_ORIGIN_PATTERNS`). |
+| El backend no arranca: `JWT_SECRET debe contener al menos 32 bytes` | El secreto es demasiado corto o falta. Genera uno con `openssl rand -base64 48`. |
+| El script SQL falla por `pgcrypto` | La base necesita permiso para `CREATE EXTENSION pgcrypto`. |
+| `Port 8080 was already in use` o `4200` ocupado | Cierra el proceso que usa el puerto o cambia el puerto con `server.port` / `ng serve --port`. |
+| La primera petición tarda mucho en producción | Render duerme el servicio gratuito; la primera llamada lo despierta. |
+| La recuperación de contraseña responde 503 | Faltan `BREVO_API_KEY` o `MAIL_FROM`. |
+| `git status` muestra `backend/mvnw.cmd` modificado | Es solo un cambio de saltos de línea; no lo añadas al commit. |
+| Las cookies de administración no se guardan en local | Usa `SESSION_COOKIE_SECURE=false` y `SESSION_COOKIE_SAME_SITE=lax` sin HTTPS. |
+
+## Hoja de ruta
+
+- [ ] `docker compose` con PostgreSQL, backend y frontend.
+- [ ] Pruebas de integración de los repositorios y pruebas end-to-end en el CI.
+- [ ] Paginación de listados y orden y filtros reflejados en la URL.
+- [ ] Favoritos y aviso al terminar una subasta.
+- [ ] Cabeceras de seguridad y CSP también en el frontend.
+- [ ] Limitador de peticiones general y compartido entre instancias.
+- [ ] Endpoint de salud con Actuator y logs estructurados.
+- [ ] Interfaz en varios idiomas.
+
+## Contribuir
+
+Las contribuciones son bienvenidas. Lee [`CONTRIBUTING.md`](CONTRIBUTING.md) para ver el flujo de trabajo, las convenciones de commits y la lista de comprobación de una PR.
+
+## Licencia
+
+Distribuido bajo la licencia MIT. Consulta [`LICENSE`](LICENSE).
+
+## Autores
 
 - Iván Moro Cienfuegos
 - Gonzalo Sánchez Maroto
