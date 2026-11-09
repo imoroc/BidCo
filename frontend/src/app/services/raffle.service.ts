@@ -13,12 +13,7 @@ export interface SorteoResponseDto {
     creadorId: number; 
 }
 
-export interface Filtro {
-    minPrice: number, 
-    maxPrice: number, 
-    categories: string[], 
-    dateOrder: string 
-}
+export type { Filtro } from './auction.service';
 
 @Injectable({
     providedIn: 'root'
@@ -27,10 +22,6 @@ export class SorteoService {
     private apiUrl = `${environment.apiUrl}/sorteos`;
 
     constructor(private http: HttpClient) {}
-
-    getSorteos(): Observable<SorteoResponseDto[]> {
-        return this.http.get<SorteoResponseDto[]>(this.apiUrl);
-    }
 
     getSorteosPorFiltro(filtro: HttpParams): Observable<SorteoResponseDto[]> {
         return this.http.get<SorteoResponseDto[]>(`${this.apiUrl}/filtro`, {params: filtro});

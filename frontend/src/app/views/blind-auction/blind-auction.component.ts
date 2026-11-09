@@ -27,7 +27,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
   styleUrl: './blind-auction.component.css'
 })
 export class BlindAuctionComponent {
-    listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasCiega(params), inject(DestroyRef));
+    listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasCiega(params), inject(DestroyRef), s => s.fechaFinal);
     isLoggedIn = false;
     isExpert = false;
     saldoUser = 0;

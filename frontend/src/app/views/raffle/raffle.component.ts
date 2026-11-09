@@ -27,7 +27,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
   styleUrl: './raffle.component.css'
 })
 export class RaffleComponent {
-    listado = new ListadoFiltrado<SorteoResponseDto>(params => this.sorteoService.getSorteosPorFiltro(params), inject(DestroyRef));
+    listado = new ListadoFiltrado<SorteoResponseDto>(params => this.sorteoService.getSorteosPorFiltro(params), inject(DestroyRef), s => s.fechaFin);
     isLoggedIn = false;
     isExpert = false;
     userPoints = 0;

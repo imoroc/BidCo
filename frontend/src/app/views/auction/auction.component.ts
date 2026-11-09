@@ -30,7 +30,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 })
 
 export class AuctionComponent {
-    listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasNormal(params), inject(DestroyRef));
+    listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasNormal(params), inject(DestroyRef), s => s.fechaFinal);
     isLoggedIn = false;
     isExpert = false;
     saldoUser = 0;

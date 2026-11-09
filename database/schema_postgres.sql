@@ -144,13 +144,16 @@ INSERT INTO subasta (fecha_inicial, fecha_final, precio_inicial, precio_final, s
 ('2025-03-10 08:30:00', '2026-08-12 22:00:00', 40.00, 0.00, FALSE, 'Flexo de Diseño Cádiz', 'Lámpara de escritorio ajustable. Estilo industrial acabado en negro mate.', 2, 'flexo-cadiz.jpg', 'hogar'),
 ('2025-03-15 11:00:00', '2026-09-12 15:00:00', 55.00, 0.00, TRUE, 'Mochila Antirrobo Viaje', 'Cremalleras ocultas y puerto USB de carga. Material repelente al agua.', 3, 'f1b3eac6-4d43-4f6f-9109-8304d187b43a_mochila antirrobo.png', 'moda');
 
+-- El precio final parte del inicial, igual que cuando se crea una subasta desde la aplicación.
+UPDATE subasta SET precio_final = precio_inicial WHERE precio_final = 0.00;
+
 -- 5. CARGA DE SORTEOS (Usando tus imágenes)
 INSERT INTO sorteo (nombre_articulo, descripcion, fecha_inicio, fecha_fin, puntos_necesarios, trabajador_id, imagen, categoria) VALUES
 ('LEGO McLaren F1 Team', 'Modelo técnico detallado con motor V6 de pistones móviles. 1432 piezas.', '2025-03-01 00:00:00', '2026-06-15 23:59:00', 3500, 1, '77251_boxprod_v39_en-gb.png', 'juguetes'),
 ('Balón Oficial LaLiga', 'El mismo balón que golpean las estrellas. Sello FIFA Quality Pro.', '2025-03-01 00:00:00', '2026-06-01 20:00:00', 1500, 2, '5d1d0bb1-6f25-4a11-963f-59308e7ea062_Balon LaLiga.png', 'deportes'),
 ('Mountain Bike Carbono', 'Cuadro ultraligero, frenos de disco hidráulicos y cambio de 12 velocidades.', '2025-03-10 00:00:00', '2026-08-30 20:00:00', 5000, 2, 'a9a19784-fda4-4fd9-aa7f-738cf7d388c5_mountain bike.png', 'deportes'),
-('Smartbox Mil Noches', 'Cena gourmet y estancia en hoteles de 5 estrellas para dos personas.', '2025-03-15 00:00:00', '2026-04-10 12:00:00', 2500, 1, '1748506473406_smartbox.png', 'ocio'),
-('Tarjeta Regalo Amazon 100€', 'Canjeable por millones de productos en la tienda Amazon.', '2025-03-01 00:00:00', '2026-12-31 23:59:59', 1000, 1, '1748513056567_tarjeta amazon.png', 'ocio'),
+('Smartbox Mil Noches', 'Cena gourmet y estancia en hoteles de 5 estrellas para dos personas.', '2025-03-15 00:00:00', '2026-04-10 12:00:00', 2500, 1, '1748506473406_smartbox.png', 'otros'),
+('Tarjeta Regalo Amazon 100€', 'Canjeable por millones de productos en la tienda Amazon.', '2025-03-01 00:00:00', '2026-12-31 23:59:59', 1000, 1, '1748513056567_tarjeta amazon.png', 'otros'),
 ('Samsung Galaxy S24 Ultra', 'Pantalla Dynamic AMOLED 2X, cámara de 200MP y S-Pen integrado.', '2025-03-10 00:00:00', '2026-07-15 23:59:00', 4500, 1, 'movil.jpg', 'tecnologia'),
 ('Smart TV OLED 55"', 'Negros perfectos y contraste infinito. Procesador de imagen IA.', '2025-03-05 00:00:00', '2026-05-15 23:59:00', 3800, 1, 'tele.jpg', 'tecnologia');
 

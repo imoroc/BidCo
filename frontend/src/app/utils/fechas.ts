@@ -68,3 +68,24 @@ export function finDeDiaMs(fechaFinal: string): number {
     const medianocheUtc = Date.UTC(year, month - 1, day + 1, 0, 0, 0);
     return medianocheUtc - desfaseZona(medianocheUtc) + MARGEN_CIERRE_MS;
 }
+
+/**
+ * Indica si una subasta o un sorteo está vencido: el día actual es posterior a su fecha final.
+ * El propio día de la fecha final sigue abierto, igual que en el servidor.
+ */
+export function estaVencida(fechaFinal: string | null | undefined, hoy: string = hoyISO()): boolean {
+    return !!fechaFinal && fechaFinal.slice(0, 10) < hoy;
+}
+
+/** Quita los vencidos de un listado, salvo que se pida mostrarlos. */
+export function ocultarVencidas<T>(
+    items: T[],
+    fechaFinalDe: (item: T) => string | null | undefined,
+    mostrarVencidas: boolean
+): T[] {
+    if (mostrarVencidas) {
+        return items;
+    }
+    const hoy = hoyISO();
+    return items.filter(item => !estaVencida(fechaFinalDe(item), hoy));
+}

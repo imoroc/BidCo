@@ -9,13 +9,16 @@ export interface SubastaResponseDTO {
     precioFinal: string;
     categoria: string;
     subastaNormal: boolean;
+    fechaFinal: string;
 }
 
 export interface Filtro {
     minPrice: number, 
     maxPrice: number, 
     categories: string[], 
-    dateOrder: string 
+    dateOrder: string,
+    /** Solo en el cliente: la API no lo recibe. Por defecto se ocultan las vencidas. */
+    mostrarVencidas?: boolean
 }
 
 @Injectable({
@@ -26,10 +29,6 @@ export class SubastaService {
     private pujasSubastasUrl = `${environment.apiUrl}/pujas`;
 
     constructor(private http: HttpClient) {}
-
-    getSubastasPorTipo(normal: boolean): Observable<SubastaResponseDTO[]> {
-        return this.http.get<SubastaResponseDTO[]>(`${this.subastasUrl}/filtrar?normal=${normal}`);
-    }
 
     getSubastasPorCreador(id: number): Observable<SubastaResponseDTO[]> {
         return this.http.get<SubastaResponseDTO[]>(`${this.subastasUrl}/filtrar-creador`, {params: { id: id }});
