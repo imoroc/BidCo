@@ -24,4 +24,31 @@ describe('ProductComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('tiene una región aria-live educada para los avisos', () => {
+    const region = fixture.nativeElement.querySelector('[aria-live="polite"]');
+    expect(region).not.toBeNull();
+  });
+
+  it('no anuncia el precio en la primera carga', () => {
+    component.anunciarCambioDePrecio(undefined, 100);
+    expect(component.anuncio).toBe('');
+  });
+
+  it('no anuncia nada si el precio no ha cambiado', () => {
+    component.anunciarCambioDePrecio(100, 100);
+    expect(component.anuncio).toBe('');
+  });
+
+  it('anuncia el nuevo precio cuando cambia', () => {
+    component.anunciarCambioDePrecio(100, 112.5);
+    expect(component.anuncio).toContain('El precio actual es');
+    expect(component.anuncio).toContain('112,50');
+  });
+
+  it('no anuncia el precio en una subasta a ciegas', () => {
+    component.isBlindAuction = true;
+    component.anunciarCambioDePrecio(100, 120);
+    expect(component.anuncio).toBe('');
+  });
 });
