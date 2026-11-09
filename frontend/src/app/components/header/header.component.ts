@@ -71,6 +71,16 @@ export class HeaderComponent {
     this.isExamplesDropdownOpen = !this.isExamplesDropdownOpen;
   }
 
+  /** Escape cierra el menú abierto y devuelve el foco a su botón. */
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    const abierto = this.elRef.nativeElement.querySelector('[aria-expanded="true"]') as HTMLElement | null;
+    this.isDropdownOpen = false;
+    this.isUserMenuOpen = false;
+    this.isExamplesDropdownOpen = false;
+    abierto?.focus();
+  }
+
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
     // Cierra ambos menús si se hace clic fuera

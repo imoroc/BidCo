@@ -141,7 +141,8 @@
 
 /* --- BOTONES Y DROPDOWNS --- */
 .dropdown-wrapper { display: flex; align-items: center; }
-.dropdown, .user-dropdown { position: relative; cursor: pointer; }
+.dropdown, .user-dropdown { position: relative; }
+.avatar-btn { display: flex; padding: 0; background: none; border: 0; border-radius: 50%; cursor: pointer; }
 
 .dropbtn {
   display: flex;
@@ -206,8 +207,14 @@
 
 .expert-header { color: #b07d00; } /* Tono dorado para diferenciar a los expertos */
 
-.dropdown-content a {
+.dropdown-content a, .dropdown-content button {
   display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
   padding: 12px 16px;
   color: var(--text-main);
   text-decoration: none;
@@ -216,7 +223,7 @@
   transition: background-color 0.2s;
 }
 
-.dropdown-content a:hover { background-color: var(--search-bg); }
+.dropdown-content a:hover, .dropdown-content button:hover { background-color: var(--search-bg); }
 
 .divider { height: 1px; background-color: var(--border-color); margin: 8px 0; }
 .logout-link { color: var(--color-error) !important; }

@@ -36,4 +36,24 @@ describe('HeaderComponent', () => {
       principal.remove();
     }
   });
+
+  it('el botón de secciones refleja si el menú está abierto', () => {
+    const boton = fixture.nativeElement.querySelector('.dropbtn') as HTMLButtonElement;
+    expect(boton.getAttribute('aria-expanded')).toBe('false');
+    boton.click();
+    fixture.detectChanges();
+    expect(boton.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('Escape cierra el menú y devuelve el foco al botón', () => {
+    const boton = fixture.nativeElement.querySelector('.dropbtn') as HTMLButtonElement;
+    // El botón puede estar oculto por CSS responsive en la ventana de pruebas: se comprueba la llamada.
+    const foco = spyOn(boton, 'focus');
+    boton.click();
+    fixture.detectChanges();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+    expect(boton.getAttribute('aria-expanded')).toBe('false');
+    expect(foco).toHaveBeenCalled();
+  });
 });

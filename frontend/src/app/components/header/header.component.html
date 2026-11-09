@@ -11,29 +11,30 @@
       </a>
     </div>
 
-    <div class="dropdown-wrapper">
-      <div class="dropdown" (click)="toggleDropdown($event)">
-        <button class="dropbtn">
+    <nav class="dropdown-wrapper" aria-label="Secciones">
+      <div class="dropdown">
+        <button type="button" class="dropbtn" aria-haspopup="true" aria-controls="menu-secciones"
+                [attr.aria-expanded]="isDropdownOpen" (click)="toggleDropdown($event)">
           Secciones
-          <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M480-360 280-560h400L480-360Z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" aria-hidden="true"><path d="M480-360 280-560h400L480-360Z"/></svg>
         </button>
-        <div class="dropdown-content" [class.show]="isDropdownOpen">
+        <div class="dropdown-content" id="menu-secciones" [class.show]="isDropdownOpen">
           <a routerLink="/auction">Subastas Activas</a>
           <a routerLink="/blind-auctions">Subastas a Ciegas</a>
           <a routerLink="/raffle">Sorteos Exclusivos</a>
         </div>
       </div>
-    </div>
+    </nav>
   </div>
 
   <div class="header-center">
-    <div id="search-bar">
+    <div id="search-bar" role="search">
       <div class="search-icon-wrapper">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" aria-hidden="true">
           <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
         </svg>
       </div>
-      <input type="text" placeholder="Buscar artículos, categorías o marcas..." [(ngModel)]="searchTerm" (keyup.enter)="onSearch()"/>
+      <input type="text" aria-label="Buscar artículos, categorías o marcas" placeholder="Buscar artículos, categorías o marcas..." [(ngModel)]="searchTerm" (keyup.enter)="onSearch()"/>
     </div>
   </div>
 
@@ -45,15 +46,18 @@
 
     @if (isLoggedIn && !isExpert) {
       <div class="user-menu">
-        <div class="user-dropdown" (click)="toggleUserMenu($event)">
-          <img class="profile-pic" src="default-avatar.png" alt="Mi perfil" />
-          <div class="dropdown-content user-dropdown-content" [class.show]="isUserMenuOpen">
+        <div class="user-dropdown">
+          <button type="button" class="avatar-btn" aria-label="Menú de mi cuenta" aria-haspopup="true"
+                  aria-controls="menu-cuenta" [attr.aria-expanded]="isUserMenuOpen" (click)="toggleUserMenu($event)">
+            <img class="profile-pic" src="default-avatar.png" alt="" />
+          </button>
+          <div class="dropdown-content user-dropdown-content" id="menu-cuenta" [class.show]="isUserMenuOpen">
             <div class="dropdown-header">Mi Cuenta</div>
             <a routerLink="/my-bids">Mis Pujas</a>
             <a routerLink="/my-auctions">Mis Subastas</a>
             <a routerLink="/profile">Configuración</a>
             <div class="divider"></div>
-            <a class="logout-link" (click)="logout()">Cerrar Sesión</a>
+            <button type="button" class="logout-link" (click)="logout()">Cerrar Sesión</button>
           </div>
         </div>
       </div>
@@ -61,13 +65,16 @@
 
     @if (isLoggedIn && isExpert) {
       <div class="user-menu">
-        <div class="user-dropdown" (click)="toggleUserMenu($event)">
-          <img class="profile-pic expert-border" src="expert-avatar.png" alt="Perfil experto" />
-          <div class="dropdown-content user-dropdown-content" [class.show]="isUserMenuOpen">
+        <div class="user-dropdown">
+          <button type="button" class="avatar-btn" aria-label="Menú del panel de experto" aria-haspopup="true"
+                  aria-controls="menu-cuenta" [attr.aria-expanded]="isUserMenuOpen" (click)="toggleUserMenu($event)">
+            <img class="profile-pic expert-border" src="expert-avatar.png" alt="" />
+          </button>
+          <div class="dropdown-content user-dropdown-content" id="menu-cuenta" [class.show]="isUserMenuOpen">
             <div class="dropdown-header expert-header">Panel de Experto</div>
             <a routerLink="/profile">Configuración Interna</a>
             <div class="divider"></div>
-            <a class="logout-link" (click)="logout()">Cerrar Sesión</a>
+            <button type="button" class="logout-link" (click)="logout()">Cerrar Sesión</button>
           </div>
         </div>
       </div>
