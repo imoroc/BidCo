@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
@@ -10,6 +10,7 @@ const LONGITUD_MINIMA = 10;
 
 @Component({
   selector: 'app-reset-password',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [FormsModule, RouterModule, HeaderComponent, FooterComponent],
   // Mismo aspecto que "Recuperar contraseña".

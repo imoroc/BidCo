@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { HeaderComponent } from '../../components/header/header.component';
@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [RouterModule, HeaderComponent, FooterComponent, FormsModule],
   templateUrl: './login.component.html',

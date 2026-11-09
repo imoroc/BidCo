@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ToastService } from '../../services/toast.service';
 
 /** Contenedor de toasts: se monta una sola vez en la raíz de la aplicación. */
 @Component({
   selector: 'app-toast',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   template: `
     <div class="toasts">

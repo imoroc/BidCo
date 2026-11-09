@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { HttpParams } from '@angular/common/http';
@@ -13,6 +13,7 @@ import { SubastaService, Filtro } from '../../services/auction.service';
 
 @Component({
   selector: 'app-my-bids',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [
     RouterLink,

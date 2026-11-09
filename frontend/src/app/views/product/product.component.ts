@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -16,6 +16,7 @@ import { finDeDiaMs, hoyISO } from '../../utils/fechas';
 
 @Component({
   selector: 'app-product',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [CurrencyPipe, RouterLink, FormsModule, HeaderComponent, ProductDetailsComponent, ExpertCommentsComponent, FooterComponent],
   templateUrl: './product.component.html',

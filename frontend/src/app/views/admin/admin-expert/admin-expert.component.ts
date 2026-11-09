@@ -1,11 +1,12 @@
 // src/app/admin/admin-expert.component.ts
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { AdminService, ExpertDTO } from '../../../services/admin.service';
 
 @Component({
   selector: 'app-admin-expert',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [FormsModule],
   templateUrl: './admin-expert.component.html',

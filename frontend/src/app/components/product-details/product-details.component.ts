@@ -1,10 +1,11 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProductoService, SorteoResponseDto, SubastaResponseDto } from '../../services/product.service';
 
 @Component({
   selector: 'app-product-details',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [CurrencyPipe],
   templateUrl: './product-details.component.html',

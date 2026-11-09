@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 
 @Component({
   selector: 'app-expert-login',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterModule, FooterComponent, FormsModule],
   templateUrl: './expert-login.component.html',
   styleUrl: './expert-login.component.css'

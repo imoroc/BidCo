@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -6,6 +6,7 @@ import { Filtro, SubastaService } from '../../services/auction.service';
 
 @Component({
   selector: 'app-filter',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, CommonModule],
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.css']

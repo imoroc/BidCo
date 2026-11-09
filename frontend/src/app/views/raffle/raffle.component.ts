@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { ListadoFiltrado } from '../../utils/listado-filtrado';
@@ -15,6 +15,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 
 @Component({
   selector: 'app-raffle',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     RouterLink,
     HeaderComponent,

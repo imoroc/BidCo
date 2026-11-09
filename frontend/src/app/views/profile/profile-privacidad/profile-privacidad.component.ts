@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { UserService, Privacidad } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile-privacidad',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule],
   standalone: true,
   templateUrl: './profile-privacidad.component.html',

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
  
 
@@ -8,6 +8,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 
 @Component({
   selector: 'app-profile',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [
     RouterLink,

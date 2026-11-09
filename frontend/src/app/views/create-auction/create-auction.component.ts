@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ const TAMANO_MAXIMO_IMAGEN = 8 * 1024 * 1024;
 
 @Component({
   selector: 'app-create-auction',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [
     HeaderComponent,

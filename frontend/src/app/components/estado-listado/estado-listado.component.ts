@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 /** Mensaje de estado de un listado: cargando, error o sin resultados. No muestra nada si hay datos. */
 @Component({
   selector: 'app-estado-listado',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   template: `
     @if (cargando) {
