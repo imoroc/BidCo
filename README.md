@@ -26,8 +26,8 @@ BidCo es una aplicación universitaria desarrollada para la asignatura Servicios
 
 | Área | Tecnología |
 |---|---|
-| Frontend | Angular 21, TypeScript, CSS |
-| Backend | Java 25, Spring Boot 4 |
+| Frontend | Angular 22, TypeScript 6, CSS |
+| Backend | Java 25, Spring Boot 4.1 |
 | Persistencia | PostgreSQL, Spring Data JPA |
 | Seguridad | JWT, BCrypt, CORS |
 | Imágenes | Cloudinary |

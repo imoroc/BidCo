@@ -1,65 +1,61 @@
-# BidCo Frontend Client (Cloud Edition)
+# BidCo · Frontend
 
-Interfaz de usuario premium para la plataforma web BidCo. Esta rama ha sido completamente rediseñada e incluye un Design System propio, mejoras drásticas de UX/UI y está optimizada para su despliegue en la nube.
+Cliente web de BidCo, una plataforma de subastas simuladas, subastas a ciegas y sorteos.
 
-## Stack Tecnológico Actualizado
+## Stack
 
-* **Framework:** Angular 21.2.0 (Standalone Components)
-* **Lenguaje:** TypeScript 5.9
-* **Analíticas:** Chart.js 4.4.8
-* **Seguridad:** JWT Decode 4.0.0
-* **Estilos:** CSS3 Avanzado (Grid, Flexbox, Glassmorphism)
+- Angular 22.2 con componentes standalone, carga diferida de rutas y títulos por ruta.
+- TypeScript 6.0.
+- Chart.js 4 para las estadísticas del perfil.
+- `jwt-decode` para leer el rol y la caducidad del token.
+- Montserrat autoalojada (`@fontsource-variable/montserrat`).
+- Pruebas con Jasmine y Karma.
 
-## Novedades de esta versión
+## Puesta en marcha
 
-* **UI/UX Premium:** Efectos visuales modernos y estados de carga personalizados.
-* **Fricción Cero:** Flujos de autenticación rediseñados y simplificados.
-* **Dashboards Integrados:** Paneles de datos visuales impulsados por Chart.js.
-* **Cloud Ready:** Configuración preparada para el despliegue automático en plataformas como Vercel.
+Requisitos: Node.js 22 y npm.
 
-## Configuración de Entornos
-
-Las URLs de la API se gestionan dinámicamente. Debes configurar tus archivos de entorno en la carpeta `src/environments/`:
-
-1. **Entorno Local** (`environment.development.ts`):
-Debe apuntar a tu servidor local:
-```typescript
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8080/api'
-};
-```
-
-2. **Entorno de Producción** (`environment.ts`):
-Debe apuntar a la URL de tu backend en la nube:
-```typescript
-export const environment = {
-  production: true,
-  apiUrl: '[https://tu-backend-api.onrender.com/api](https://tu-backend-api.onrender.com/api)'
-};
-```
-
-## Instalación y Despliegue Local
-
-Para levantar el proyecto en tu máquina:
-
-1. Instala las dependencias:
 ```bash
-npm install
+npm ci
+npm start
 ```
 
-2. Inicia el servidor de desarrollo:
-```bash
-ng serve
+La aplicación queda en `http://localhost:4200`. Las llamadas a `/api` usan la URL de `src/environments/`.
+
+## Entornos
+
+La URL de la API está en `src/environments/`:
+
+| Fichero | Uso | `apiUrl` |
+|---|---|---|
+| `environment.development.ts` | `npm start` | `http://localhost:8080/api` |
+| `environment.ts` | build de producción | URL del backend desplegado |
+
+## Scripts
+
+| Comando | Qué hace |
+|---|---|
+| `npm start` | Servidor de desarrollo. |
+| `npm test` | Pruebas unitarias con Karma (en el CI: `npm test -- --watch=false --browsers=ChromeHeadlessCI`). |
+| `npm run build -- --configuration production` | Build de producción en `dist/frontend`. |
+
+## Estructura
+
+```
+src/app/
+  components/    Piezas reutilizables (cabecera, pie, filtro, tarjeta de producto, toasts...)
+  views/         Una carpeta por página
+  services/      Acceso a la API, autenticación y guards
+  interceptors/  Token JWT y gestión de errores HTTP
+  utils/         Fechas, filtrado de listados y loader de imágenes de Cloudinary
 ```
 
-Abre tu navegador en `http://localhost:4200/`.
+## Convenciones
 
-## Build para Producción
+- Los estilos globales y las variables de diseño están en `src/styles.css`; los componentes usan esas variables en lugar de colores sueltos.
+- Los importes se muestran con el locale `es-ES` (pipe `currency`).
+- Las imágenes de los listados se cargan con `NgOptimizedImage` y el loader de Cloudinary.
 
-Para compilar los artefactos estáticos optimizados:
-```bash
-ng build
-```
+## Despliegue
 
-Los archivos se generarán en la carpeta `dist/`. Este es el comando que plataformas como Vercel ejecutan automáticamente.
+El frontend se despliega en Vercel. `vercel.json` reescribe todas las rutas a `index.html` para que funcione el enrutado de Angular.
