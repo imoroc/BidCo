@@ -1,6 +1,7 @@
 package com.bidco.api_rest.service.impl;
 
 import com.bidco.api_rest.config.JwtUtil;
+import com.bidco.api_rest.exception.ContrasenaActualIncorrectaException;
 import com.bidco.api_rest.dto.usuario.LoginDTO;
 import com.bidco.api_rest.dto.usuario.PerfilPublicoDTO;
 import com.bidco.api_rest.dto.usuario.PrivacidadDTO;
@@ -154,7 +155,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
         if (currentPassword == null || !passwordEncoder.matches(currentPassword, usuario.getContrasena())) {
-            throw new IllegalArgumentException("Contraseña actual incorrecta");
+            throw new ContrasenaActualIncorrectaException("Contraseña actual incorrecta");
         }
         if (newPassword == null || newPassword.length() < 10 || newPassword.length() > 100) {
             throw new IllegalArgumentException("La nueva contraseña debe tener entre 10 y 100 caracteres");
