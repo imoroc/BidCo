@@ -1,8 +1,13 @@
 package com.bidco.api_rest.dto.usuario;
 
+import jakarta.validation.constraints.NotNull;
+
 public class PrivacidadDTO {
+    @NotNull(message = "Indica si esta opción de privacidad está activada")
     private Boolean privacidadAnonimoPujas;
+    @NotNull(message = "Indica si esta opción de privacidad está activada")
     private Boolean privacidadEstadisticas;
+    @NotNull(message = "Indica si esta opción de privacidad está activada")
     private Boolean privacidadPerfilVisible;
 
     // getters y setters

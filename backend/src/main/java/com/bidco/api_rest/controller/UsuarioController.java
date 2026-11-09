@@ -104,7 +104,7 @@ public class UsuarioController {
     @PutMapping("/{id}/privacidad")
     public ResponseEntity<UsuarioResponseDTO> actualizarPrivacidad(
             @PathVariable Long id,
-            @RequestBody PrivacidadDTO privacidadUpdateDTO,
+            @Valid @RequestBody PrivacidadDTO privacidadUpdateDTO,
             @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
         requireOwner(id, authenticatedUserId);
         return ResponseEntity.ok(usuarioService.actualizarPrivacidad(id, privacidadUpdateDTO));
