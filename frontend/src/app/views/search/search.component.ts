@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
@@ -20,6 +21,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
   selector: 'app-search',
   standalone: true,
   imports: [
+    CurrencyPipe,
     RouterLink,
     HeaderComponent,
     FilterComponent,

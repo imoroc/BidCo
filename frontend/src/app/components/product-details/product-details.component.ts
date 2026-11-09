@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProductoService, SorteoResponseDto, SubastaResponseDto } from '../../services/product.service';
@@ -5,7 +6,7 @@ import { ProductoService, SorteoResponseDto, SubastaResponseDto } from '../../se
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [],
+  imports: [CurrencyPipe],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.css'
 })

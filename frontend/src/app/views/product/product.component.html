@@ -24,7 +24,7 @@
                 
                 @if (isLoggedIn && !isBlindAuction) {
                   <div class="main-price">
-                    {{ isRaffle ? user.puntos : product.precioFinal + '€' }}
+                    {{ isRaffle ? user.puntos : (product.precioFinal | currency:'EUR':'symbol':'1.0-2') }}
                   </div>
                 }
               </header>

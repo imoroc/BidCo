@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -16,6 +17,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 @Component({
   selector: 'app-blind-auction',
   imports: [
+    CurrencyPipe,
     RouterLink,
     HeaderComponent,
     FilterComponent,
