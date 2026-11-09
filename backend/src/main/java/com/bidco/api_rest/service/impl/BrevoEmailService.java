@@ -1,6 +1,8 @@
 package com.bidco.api_rest.service.impl;
 
 import com.bidco.api_rest.service.contract.EmailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.time.Duration;
 public class BrevoEmailService implements EmailService {
 
     private static final String ENDPOINT = "https://api.brevo.com/v3/smtp/email";
+    private static final Logger log = LoggerFactory.getLogger(BrevoEmailService.class);
 
     private final String apiKey;
     private final String remitente;
@@ -34,6 +37,23 @@ public class BrevoEmailService implements EmailService {
         this.apiKey = apiKey == null ? "" : apiKey.trim();
         this.remitente = remitente == null ? "" : remitente.trim();
         this.nombreRemitente = nombreRemitente;
+        registrarEstado();
+    }
+
+    /** Deja constancia en el arranque de qué falta, sin mostrar nunca los valores. */
+    private void registrarEstado() {
+        if (estaDisponible()) {
+            log.info("Envío de correo configurado: la recuperación de contraseña está activa");
+            return;
+        }
+        StringBuilder faltan = new StringBuilder();
+        if (apiKey.isEmpty()) {
+            faltan.append("BREVO_API_KEY ");
+        }
+        if (remitente.isEmpty()) {
+            faltan.append("MAIL_FROM");
+        }
+        log.warn("Envío de correo desactivado: faltan las variables {}", faltan.toString().trim());
     }
 
     @Override
