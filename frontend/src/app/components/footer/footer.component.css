@@ -1,8 +1,8 @@
 .mini-footer {
   /* Fondo con tu azul principal */
-  background-color: #0d0063; 
+  background-color: var(--color-marca); 
   /* Línea superior con el azul clarito para rematar */
-  border-top: 2px solid #c6dafc; 
+  border-top: 2px solid var(--color-acento); 
   padding: 16px 24px;
   font-family: 'Montserrat', sans-serif;
   margin-top: auto;
@@ -16,7 +16,7 @@
   align-items: center;
   font-size: 13px;
   /* El texto normal en blanco para que lea perfecto sobre el azul oscuro */
-  color: #ffffff; 
+  color: var(--color-sobre-marca); 
 }
 
 .footer-content p {
@@ -31,7 +31,7 @@
 
 .footer-links a {
   /* Los enlaces en tu azul claro para que llamen a hacer clic */
-  color: #c6dafc;
+  color: var(--color-acento);
   text-decoration: none;
   font-weight: 600;
   padding: 6px 10px;
@@ -41,8 +41,8 @@
 
 /* Efecto hover: Se invierten los colores (fondo claro, texto oscuro) */
 .footer-links a:hover {
-  background-color: #c6dafc; 
-  color: #0d0063;
+  background-color: var(--color-acento); 
+  color: var(--color-marca);
 }
 
 .footer-links a:active {

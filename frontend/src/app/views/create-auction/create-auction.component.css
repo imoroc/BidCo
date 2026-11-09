@@ -1,10 +1,10 @@
 /* --- ESTRUCTURA Y FONDO --- */
 .page-background {
-  background-color: #f8f9fa; /* Fondo premium sutil */
+  background-color: var(--color-superficie-suave); /* Fondo premium sutil */
   min-height: 85vh;
   padding: 40px 24px;
   font-family: 'Montserrat', sans-serif;
-  color: #202124;
+  color: var(--color-texto-fuerte);
 }
 
 .create-container {
@@ -21,14 +21,14 @@
 .page-header h1 {
   font-size: clamp(2rem, 3vw, 2.5rem);
   font-weight: 800;
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0 0 8px 0;
   letter-spacing: -0.5px;
 }
 
 .page-header p {
   font-size: 1rem;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   margin: 0;
 }
 
@@ -38,18 +38,18 @@
 .form-group input:focus-visible,
 .form-group select:focus-visible,
 .form-group textarea:focus-visible {
-  outline: 3px solid #0d0063;
+  outline: 3px solid var(--color-marca);
   outline-offset: 2px;
 }
 
 .image-upload:focus-within {
-  border-color: #0d0063;
-  outline: 3px solid #0d0063;
+  border-color: var(--color-marca);
+  outline: 3px solid var(--color-marca);
   outline-offset: 2px;
 }
 
 .radio-option input[type="radio"]:focus-visible + .custom-radio {
-  outline: 3px solid #0d0063;
+  outline: 3px solid var(--color-marca);
   outline-offset: 2px;
 }
 
@@ -58,9 +58,9 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background-color: #fce8e6;
+  background-color: var(--color-error-fondo);
   border: 1px solid #f28b82;
-  color: #c5221f;
+  color: var(--color-error-fuerte);
   padding: 16px 24px;
   border-radius: 8px;
   margin-bottom: 32px;
@@ -77,7 +77,7 @@
 }
 
 .field-error {
-  color: #c5221f;
+  color: var(--color-error-fuerte);
   font-size: 0.85rem;
   font-weight: 600;
   margin: 8px 0 0;
@@ -93,7 +93,7 @@
 .modalidad legend {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 0;
@@ -101,7 +101,7 @@
 }
 
 .btn-submit:disabled {
-  background-color: #5f6368;
+  background-color: var(--color-texto-suave);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -112,9 +112,9 @@
   display: grid;
   grid-template-columns: 1fr 1.5fr; /* Imagen ocupa un 40%, formulario un 60% */
   gap: 40px;
-  background-color: #ffffff;
+  background-color: var(--color-superficie);
   border-radius: 16px;
-  border: 1px solid #e8eaed;
+  border: 1px solid var(--color-borde-suave);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
   padding: 40px;
 }
@@ -129,8 +129,8 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1; /* Cuadrado perfecto */
-  background-color: #f8f9fa;
-  border: 2px dashed #dadce0;
+  background-color: var(--color-superficie-suave);
+  border: 2px dashed var(--color-borde);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -142,15 +142,15 @@
 }
 
 .image-upload:hover {
-  border-color: #0d0063;
+  border-color: var(--color-marca);
   background-color: #f0f4ff; /* Se ilumina en azul al pasar el ratón */
 }
 
 /* Estado cuando ya hay imagen */
 .image-upload.has-image {
   border-style: solid;
-  border-color: #e8eaed;
-  background-color: #fff;
+  border-color: var(--color-borde-suave);
+  background-color: var(--color-superficie);
 }
 
 .upload-placeholder {
@@ -164,13 +164,13 @@
 }
 
 .upload-text {
-  color: #202124;
+  color: var(--color-texto-fuerte);
   font-weight: 600;
   font-size: 1rem;
 }
 
 .upload-hint {
-  color: #5f6368;
+  color: var(--color-texto-suave);
   font-size: 0.8rem;
 }
 
@@ -243,7 +243,7 @@
 .modalidad legend {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -259,9 +259,9 @@
   padding: 12px 16px;
   font-size: 1rem;
   font-family: inherit;
-  color: #202124;
-  background-color: #ffffff;
-  border: 1px solid #dadce0;
+  color: var(--color-texto-fuerte);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 8px;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -280,7 +280,7 @@
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #0d0063;
+  border-color: var(--color-marca);
   box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.15);
 }
 
@@ -303,7 +303,7 @@ input[type="number"]::-webkit-outer-spin-button {
   align-items: center;
   cursor: pointer;
   font-size: 0.95rem;
-  color: #202124;
+  color: var(--color-texto-fuerte);
   font-weight: 500;
   gap: 8px;
 }
@@ -325,14 +325,14 @@ input[type="number"]::-webkit-outer-spin-button {
 .custom-radio {
   width: 20px;
   height: 20px;
-  border: 2px solid #dadce0;
+  border: 2px solid var(--color-borde);
   border-radius: 50%;
   position: relative;
   transition: all 0.2s ease;
 }
 
 .radio-option input[type="radio"]:checked + .custom-radio {
-  border-color: #0d0063;
+  border-color: var(--color-marca);
 }
 
 .radio-option input[type="radio"]:checked + .custom-radio::after {
@@ -343,7 +343,7 @@ input[type="number"]::-webkit-outer-spin-button {
   transform: translate(-50%, -50%);
   width: 10px;
   height: 10px;
-  background-color: #0d0063;
+  background-color: var(--color-marca);
   border-radius: 50%;
 }
 
@@ -356,8 +356,8 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .btn-submit {
-  background-color: #0d0063;
-  color: #ffffff;
+  background-color: var(--color-marca);
+  color: var(--color-sobre-marca);
   padding: 14px 32px;
   font-size: 1rem;
   font-weight: 700;
@@ -370,7 +370,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .btn-submit:hover {
-  background-color: #15009e;
+  background-color: var(--color-marca-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(13, 0, 99, 0.25);
 }

@@ -1,30 +1,30 @@
 /* --- ESTRUCTURA PRINCIPAL --- */
 .auth-page-background {
-  background-color: #f8f9fa;
+  background-color: var(--color-superficie-suave);
   min-height: 85vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
   font-family: 'Montserrat', sans-serif;
-  color: #202124;
+  color: var(--color-texto-fuerte);
 }
 
 /* --- TARJETA DE LOGIN EXPERTO --- */
 .auth-card {
-  background-color: #ffffff;
+  background-color: var(--color-superficie);
   width: 100%;
   max-width: 450px; 
   padding: 48px 40px;
   border-radius: 16px;
-  border: 1px solid #e8eaed;
+  border: 1px solid var(--color-borde-suave);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
 /* Variante sutil para herramientas internas */
 .worker-card {
-  border-top: 6px solid #202124; /* Una línea oscura arriba que grita "Portal Interno" */
+  border-top: 6px solid var(--color-texto-fuerte); /* Una línea oscura arriba que grita "Portal Interno" */
 }
 
 /* --- CABECERA --- */
@@ -40,15 +40,15 @@
   gap: 12px;
   font-size: 2.2rem;
   font-weight: 800;
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0 0 16px 0;
   letter-spacing: -1px;
 }
 
 /* Etiqueta corporativa */
 .badge-worker {
-  background-color: #202124;
-  color: #ffffff;
+  background-color: var(--color-texto-fuerte);
+  color: var(--color-sobre-marca);
   font-size: 0.8rem;
   padding: 6px 12px;
   border-radius: 6px;
@@ -59,12 +59,12 @@
 
 .auth-header h2 {
   font-size: 1.3rem;
-  color: #202124;
+  color: var(--color-texto-fuerte);
   margin: 0 0 8px 0;
 }
 
 .auth-header p {
-  color: #5f6368;
+  color: var(--color-texto-suave);
   font-size: 0.95rem;
   margin: 0;
 }
@@ -74,9 +74,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: #fce8e6;
+  background-color: var(--color-error-fondo);
   border: 1px solid #f28b82;
-  color: #c5221f;
+  color: var(--color-error-fuerte);
   padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -103,7 +103,7 @@
 .input-group label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -113,9 +113,9 @@
   padding: 14px 16px;
   font-size: 1rem;
   font-family: inherit;
-  color: #202124;
-  background-color: #ffffff;
-  border: 1px solid #dadce0;
+  color: var(--color-texto-fuerte);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 8px;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -126,7 +126,7 @@
 }
 
 .input-group input:focus {
-  border-color: #0d0063;
+  border-color: var(--color-marca);
   box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.15);
   outline: none;
 }
@@ -153,17 +153,17 @@
 .custom-checkbox {
   width: 18px;
   height: 18px;
-  border: 2px solid #dadce0;
+  border: 2px solid var(--color-borde);
   border-radius: 4px;
   margin-right: 8px;
   position: relative;
   transition: all 0.2s ease;
-  background-color: #fff;
+  background-color: var(--color-superficie);
 }
 
 .checkbox-group input[type="checkbox"]:checked + .custom-checkbox {
-  background-color: #202124; /* Color oscuro para los workers */
-  border-color: #202124;
+  background-color: var(--color-texto-fuerte); /* Color oscuro para los workers */
+  border-color: var(--color-texto-fuerte);
 }
 
 .checkbox-group input[type="checkbox"]:checked + .custom-checkbox::after {
@@ -187,8 +187,8 @@
 /* --- BOTÓN PRINCIPAL --- */
 .btn-primary {
   width: 100%;
-  background-color: #202124; /* Negro suave de Google en vez de tu azul normal */
-  color: #ffffff;
+  background-color: var(--color-texto-fuerte); /* Negro suave de Google en vez de tu azul normal */
+  color: var(--color-sobre-marca);
   padding: 16px;
   font-size: 1.05rem;
   font-weight: 700;

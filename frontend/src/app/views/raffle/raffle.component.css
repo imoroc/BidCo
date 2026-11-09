@@ -3,7 +3,7 @@
   display: flex;
   flex: 1;
   flex-wrap: wrap;
-  background-color: #f8f9fa; /* Fondo gris súper claro */
+  background-color: var(--color-superficie-suave); /* Fondo gris súper claro */
 }
 
 /* Dejamos el hueco exacto del 18% para el filtro de la izquierda */
@@ -23,12 +23,12 @@
   align-items: flex-end; /* Alinea por la base */
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 2px solid #e8eaed;
+  border-bottom: 2px solid var(--color-borde-suave);
 }
 
 .header-titles h1 {
   font-size: clamp(2rem, 3vw, 2.5rem);
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0;
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -45,10 +45,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  background: #ffffff;
+  background: var(--color-superficie);
   padding: 8px 16px;
   border-radius: 8px;
-  border: 1px solid #dadce0;
+  border: 1px solid var(--color-borde);
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
@@ -61,21 +61,21 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   font-weight: 700;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   letter-spacing: 0.5px;
 }
 
 .balance-value {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #0d0063;
+  color: var(--color-marca);
   line-height: 1.1;
 }
 
 .balance-value small {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   margin-left: 2px;
 }
 

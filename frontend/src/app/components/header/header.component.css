@@ -1,14 +1,14 @@
 /* --- VARIABLES GLOBALES (Google Material 3) --- */
 :host {
-  --primary-color: #0d0063;
-  --primary-hover: #15009e;
+  --primary-color: var(--color-marca);
+  --primary-hover: var(--color-marca-hover);
   /* El fondo es blanco al 90% para permitir el efecto cristal */
   --bg-color: rgba(255, 255, 255, 0.92); 
-  --search-bg: #f1f3f4;
-  --search-hover: #e8eaed;
-  --text-main: #202124;
-  --text-muted: #5f6368;
-  --border-color: #dadce0;
+  --search-bg: var(--color-superficie-alt);
+  --search-hover: var(--color-borde-suave);
+  --text-main: var(--color-texto-fuerte);
+  --text-muted: var(--color-texto-suave);
+  --border-color: var(--color-borde);
   --shadow-sm: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
   --shadow-dropdown: 0 8px 16px rgba(0, 0, 0, 0.1);
   --font-family: 'Montserrat', sans-serif;
@@ -108,7 +108,7 @@
 }
 
 #search-bar:focus-within {
-  background-color: #ffffff;
+  background-color: var(--color-superficie);
   box-shadow: var(--shadow-sm);
   border-color: transparent;
 }
@@ -174,7 +174,7 @@
   position: absolute;
   top: calc(100% + 16px); /* Separación limpia */
   left: 0;
-  background-color: #ffffff;
+  background-color: var(--color-superficie);
   border: 1px solid var(--border-color);
   border-radius: 12px; /* Esquinas más suaves */
   min-width: 220px;
@@ -219,7 +219,7 @@
 .dropdown-content a:hover { background-color: var(--search-bg); }
 
 .divider { height: 1px; background-color: var(--border-color); margin: 8px 0; }
-.logout-link { color: #d93025 !important; }
+.logout-link { color: var(--color-error) !important; }
 
 /* --- BOTÓN DE LOGIN INICIAL --- */
 .btn-login {
@@ -227,7 +227,7 @@
   align-items: center;
   justify-content: center;
   padding: 10px 24px;
-  color: #fff;
+  color: var(--color-sobre-marca);
   background-color: var(--primary-color);
   border: none;
   border-radius: 24px;

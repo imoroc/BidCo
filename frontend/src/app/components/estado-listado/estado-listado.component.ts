@@ -17,7 +17,7 @@ import { Component, Input } from '@angular/core';
     .estado-listado {
       padding: 48px 16px;
       text-align: center;
-      color: #5f6368;
+      color: var(--color-texto-suave);
       font-size: 1rem;
     }
 

@@ -1,5 +1,5 @@
 .profile-page-background {
-  background-color: #f8f9fa; /* Fondo gris claro general */
+  background-color: var(--color-superficie-suave); /* Fondo gris claro general */
   min-height: 85vh;
   padding: 40px 24px;
   font-family: 'Montserrat', sans-serif;
@@ -24,7 +24,7 @@
 .sidebar-header h2 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0 0 24px 16px;
   letter-spacing: -0.5px;
 }
@@ -41,7 +41,7 @@
 .sidebar-nav a {
   display: block;
   padding: 12px 16px;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.95rem;
@@ -50,14 +50,14 @@
 }
 
 .sidebar-nav a:hover {
-  background-color: #e8eaed;
-  color: #202124;
+  background-color: var(--color-borde-suave);
+  color: var(--color-texto-fuerte);
 }
 
 /* Estado Activo: Franja corporativa */
 .sidebar-nav a.active {
   background-color: #e8f0fe; /* Fondo azul clarito de Google */
-  color: #0d0063;
+  color: var(--color-marca);
   font-weight: 700;
 }
 
