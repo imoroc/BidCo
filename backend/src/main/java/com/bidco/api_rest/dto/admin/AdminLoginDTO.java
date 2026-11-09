@@ -1,7 +1,14 @@
 package com.bidco.api_rest.dto.admin;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class AdminLoginDTO {
+    @NotBlank(message = "El usuario es obligatorio")
+    @Size(max = 100, message = "El usuario no es válido")
     private String username;
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(max = 100, message = "La contraseña no es válida")
     private String password;
     private boolean rol;
 

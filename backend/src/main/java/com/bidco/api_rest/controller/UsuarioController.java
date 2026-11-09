@@ -5,6 +5,7 @@ import com.bidco.api_rest.dto.usuario.CambiarContrasenaDTO;
 import com.bidco.api_rest.dto.usuario.LoginDTO;
 import com.bidco.api_rest.dto.usuario.PerfilPublicoDTO;
 import com.bidco.api_rest.dto.usuario.PrivacidadDTO;
+import com.bidco.api_rest.dto.usuario.RecargaSaldoDTO;
 import com.bidco.api_rest.dto.usuario.StatsDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioCreateDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioResponseDTO;
@@ -133,11 +134,10 @@ public class UsuarioController {
     @PatchMapping("/{id}/recargar-saldo")
     public ResponseEntity<BigDecimal> recargarSaldo(
             @PathVariable Long id,
-            @RequestBody Map<String, BigDecimal> body,
+            @Valid @RequestBody RecargaSaldoDTO body,
             @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
         requireOwner(id, authenticatedUserId);
-        BigDecimal cantidad = body.get("cantidad");
-        return ResponseEntity.ok(usuarioService.recargarSaldo(id, cantidad));
+        return ResponseEntity.ok(usuarioService.recargarSaldo(id, body.getCantidad()));
     }
 
     private void requireOwner(Long resourceUserId, Long authenticatedUserId) {

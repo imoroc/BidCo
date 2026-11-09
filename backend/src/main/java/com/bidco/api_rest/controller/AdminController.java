@@ -7,6 +7,7 @@ import com.bidco.api_rest.config.LoginRateLimiter;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,11 +26,11 @@ public class AdminController {
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(
-            @RequestBody AdminLoginDTO dto,
+            @Valid @RequestBody AdminLoginDTO dto,
             HttpServletRequest request,
             HttpSession session
     ) {
-        String key = loginRateLimiter.key("admin", dto == null ? null : dto.getUsername(), request.getRemoteAddr());
+        String key = loginRateLimiter.key("admin", dto.getUsername(), request.getRemoteAddr());
         loginRateLimiter.assertAllowed(key);
         try {
             adminService.login(dto, session);
