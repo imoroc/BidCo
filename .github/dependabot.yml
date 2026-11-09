@@ -31,6 +31,9 @@ updates:
       # Angular 22 exige TypeScript 6.0: no se sube a una versión mayor.
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+      # karma-jasmine 5.1.0 (la última versión) no funciona con jasmine-core 7: fallan las pruebas.
+      - dependency-name: "jasmine-core"
+        update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
       - "javascript"
