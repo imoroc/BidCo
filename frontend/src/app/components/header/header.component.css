@@ -1,284 +1,160 @@
-/* --- VARIABLES GLOBALES (Google Material 3) --- */
-:host {
-  --primary-color: var(--color-marca);
-  --primary-hover: var(--color-marca-hover);
-  /* El fondo es blanco al 90% para permitir el efecto cristal */
-  --bg-color: rgba(255, 255, 255, 0.92); 
-  --search-bg: var(--color-superficie-alt);
-  --search-hover: var(--color-borde-suave);
-  --text-main: var(--color-texto-fuerte);
-  --text-muted: var(--color-texto-suave);
-  --border-color: var(--color-borde);
-  --shadow-sm: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
-  --shadow-dropdown: 0 8px 16px rgba(0, 0, 0, 0.1);
-  --font-family: 'Montserrat', sans-serif;
-}
-
-/* --- CONTENEDOR PRINCIPAL --- */
 .main-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: var(--bg-color);
-  backdrop-filter: blur(8px); /* MAGIA: Desenfoca lo que queda por debajo al hacer scroll */
-  -webkit-backdrop-filter: blur(8px); /* Soporte para Safari */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px; /* Un poco más alto para respirar */
-  border-bottom: 1px solid var(--border-color);
-  font-family: var(--font-family);
-  gap: 24px;
+  gap: var(--espacio-5);
+  padding: var(--espacio-3) var(--espacio-5);
+  background: var(--color-cabecera);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--color-borde);
 }
 
-/* --- SECCIONES FLEX --- */
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 32px; /* Más espacio entre logo y menús */
-  flex-shrink: 0;
-}
+.header-left,
+.header-right { display: flex; align-items: center; flex-shrink: 0; }
+.header-left { gap: var(--espacio-5); }
+.header-right { gap: var(--espacio-4); }
+.header-center { display: flex; flex: 1; justify-content: center; max-width: 680px; }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-shrink: 0;
-}
+.header-brand { display: flex; align-items: center; gap: var(--espacio-3); }
+.logo-link { display: flex; align-items: center; }
+.brand-logo { width: 38px; height: 38px; object-fit: contain; border-radius: var(--radio-md); }
+.name-link { text-decoration: none; }
+.brand-text { font-size: var(--texto-xl); font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: var(--color-marca); }
 
-.header-center {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  max-width: 680px; /* Ancho máximo de la barra de búsqueda */
-}
-
-/* --- BRAND (Logo y Título Modernizados) --- */
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-link {
-  display: flex;
-  align-items: center;
-}
-
-.brand-logo {
-  height: 38px;
-  width: 38px;
-  object-fit: contain;
-  border-radius: 8px; /* Le quita ese aspecto de "imagen pegada" */
-  transition: transform 0.2s ease;
-}
-
-.logo-link:hover .brand-logo {
-  transform: scale(1.05) rotate(-3deg); /* Interacción juguetona al pasar el ratón */
-}
-
-.name-link {
-  text-decoration: none;
-}
-
-.brand-text {
-  color: var(--primary-color);
-  font-size: 24px;
-  font-weight: 800; /* Extra negrita para darle peso de marca */
-  letter-spacing: -1px; /* Letras más juntas = diseño moderno */
-  line-height: 1;
-}
-
-/* --- BARRA DE BÚSQUEDA (Estilo Google Drive) --- */
 #search-bar {
   display: flex;
   align-items: center;
+  gap: var(--espacio-3);
   width: 100%;
-  background-color: var(--search-bg);
-  border: 1px solid transparent;
-  border-radius: 24px;
-  padding: 0 8px 0 16px;
   height: 48px;
-  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  padding: 0 var(--espacio-4);
+  background: var(--color-superficie-alt);
+  border-radius: var(--radio-pill);
+  transition: background var(--transicion);
 }
 
-#search-bar:hover {
-  background-color: var(--search-hover);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-#search-bar:focus-within {
-  background-color: var(--color-superficie);
-  box-shadow: var(--shadow-sm);
-  border-color: transparent;
-}
-
-.search-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12px;
-}
-
-.search-icon {
-  fill: var(--text-muted);
-}
+#search-bar:hover { background: var(--color-borde-suave); }
+#search-bar:focus-within { background: var(--color-superficie); box-shadow: var(--sombra-1); }
+.search-icon { display: block; fill: var(--color-texto-suave); }
 
 #search-bar input {
-  flex-grow: 1;
-  border: none;
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: var(--color-texto-fuerte);
   background: transparent;
+  border: 0;
   outline: none;
-  font-size: 1rem;
-  color: var(--text-main);
-  font-family: inherit;
-  width: 100%;
 }
 
-#search-bar input::placeholder {
-  color: var(--text-muted);
-}
+#search-bar input::placeholder { color: var(--color-texto-suave); }
 
-/* --- BOTONES Y DROPDOWNS --- */
-.dropdown-wrapper { display: flex; align-items: center; }
-.dropdown, .user-dropdown { position: relative; }
-.avatar-btn { display: flex; padding: 0; background: none; border: 0; border-radius: 50%; cursor: pointer; }
+.dropdown-wrapper { display: flex; }
+.dropdown,
+.user-dropdown { position: relative; }
 
-.dropbtn {
+.dropbtn,
+.avatar-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
+  min-height: var(--objetivo-tactil);
+  font: inherit;
   font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--text-muted);
+  color: var(--color-texto-suave);
   background: transparent;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 20px; /* Más redondeado */
+  border: 0;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
 }
 
-.dropbtn:hover {
-  background-color: var(--search-bg);
-  color: var(--text-main);
-}
-
+.dropbtn { padding: 0 var(--espacio-4); border-radius: var(--radio-pill); transition: background var(--transicion), color var(--transicion); }
+.dropbtn:hover { color: var(--color-texto-fuerte); background: var(--color-superficie-alt); }
 .dropbtn svg { fill: currentColor; }
+.icono-menu { display: none; }
+.avatar-btn { padding: 0; border-radius: 50%; }
 
-/* Contenido del Dropdown animado */
 .dropdown-content {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px); /* Viene desde abajo sutilmente */
   position: absolute;
-  top: calc(100% + 16px); /* Separación limpia */
+  top: calc(100% + var(--espacio-3));
   left: 0;
-  background-color: var(--color-superficie);
-  border: 1px solid var(--border-color);
-  border-radius: 12px; /* Esquinas más suaves */
-  min-width: 220px;
-  box-shadow: var(--shadow-dropdown);
   z-index: 10;
-  padding: 8px 0;
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  min-width: 220px;
+  padding: var(--espacio-2) 0;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(8px);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-md);
+  box-shadow: var(--sombra-2);
+  transition: opacity var(--transicion), transform var(--transicion), visibility var(--transicion);
 }
 
-.user-dropdown-content {
-  left: auto;
-  right: 0;
-}
-
-.dropdown-content.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
+.user-dropdown-content { left: auto; right: 0; }
+.dropdown-content.show { visibility: visible; opacity: 1; transform: none; }
 
 .dropdown-header {
-  padding: 12px 16px 8px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  padding: var(--espacio-3) var(--espacio-4) var(--espacio-2);
+  font-size: var(--texto-xs);
   font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
 }
 
-.expert-header { color: #b07d00; } /* Tono dorado para diferenciar a los expertos */
+.expert-header { color: var(--color-destacado-texto); }
 
-.dropdown-content a, .dropdown-content button {
+.dropdown-content a,
+.dropdown-content button {
   display: block;
   width: 100%;
+  min-height: var(--objetivo-tactil);
+  padding: var(--espacio-3) var(--espacio-4);
+  font: inherit;
+  font-weight: 500;
   text-align: left;
+  color: var(--color-texto-fuerte);
+  text-decoration: none;
   background: none;
   border: 0;
-  font-family: inherit;
   cursor: pointer;
-  padding: 12px 16px;
-  color: var(--text-main);
-  text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: background-color 0.2s;
 }
 
-.dropdown-content a:hover, .dropdown-content button:hover { background-color: var(--search-bg); }
+.dropdown-content a:hover,
+.dropdown-content button:hover { background: var(--color-superficie-alt); }
 
-.divider { height: 1px; background-color: var(--border-color); margin: 8px 0; }
-.logout-link { color: var(--color-error) !important; }
-
-/* --- BOTÓN DE LOGIN INICIAL --- */
-.btn-login {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 24px;
-  color: var(--color-sobre-marca);
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 24px;
-  font-size: 0.95rem;
+.dropdown-content a.activo {
   font-weight: 700;
-  text-decoration: none;
-  font-family: inherit;
-  transition: all 0.2s ease;
+  color: var(--color-marca);
+  background: var(--color-info-fondo);
 }
 
-.btn-login:hover {
-  background-color: var(--primary-hover);
-  box-shadow: 0 2px 6px rgba(13, 0, 99, 0.2);
-  transform: translateY(-1px);
-}
+.divider { height: 1px; margin: var(--espacio-2) 0; background: var(--color-borde); }
+.dropdown-content .logout-link { color: var(--color-error); }
 
-.btn-login:active { transform: translateY(0); }
-
-/* --- PERFIL DE USUARIO --- */
 .profile-pic {
   width: 42px;
   height: 42px;
-  border-radius: 50%;
   object-fit: cover;
   border: 2px solid transparent;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 50%;
 }
 
-.profile-pic:hover {
-  box-shadow: 0 0 0 4px var(--search-bg);
-  transform: scale(1.05);
-}
+.expert-border { padding: 2px; border-color: var(--color-destacado); }
 
-/* Aro distintivo para cuentas de empleados/expertos */
-.expert-border {
-  border: 2px solid #fbbc04; /* Amarillo Google */
-  padding: 2px; /* Deja un pequeño hueco blanco entre la foto y el aro */
-}
-
-/* --- RESPONSIVO BÁSICO --- */
 @media (max-width: 900px) {
-  .brand-text, .dropbtn { display: none; }
-  .main-header { padding: 8px 16px; gap: 16px; }
-  .header-left { gap: 12px; }
-  #search-bar { padding: 0 12px; }
+  .main-header { gap: var(--espacio-3); padding: var(--espacio-2) var(--espacio-4); }
+  .header-left { gap: var(--espacio-2); }
+  .dropbtn { padding: 0 var(--espacio-2); }
+  .dropbtn-label,
+  .icono-flecha { display: none; }
+  .icono-menu { display: block; }
+}
+
+@media (max-width: 600px) {
+  .brand-text { display: none; }
+  .header-right { gap: var(--espacio-2); }
 }
