@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
 import { HttpParams } from '@angular/common/http';
@@ -19,6 +19,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 
 @Component({
   selector: 'app-search',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [
     CurrencyPipe,

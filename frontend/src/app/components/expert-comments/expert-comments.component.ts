@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
 
 
 import { AuthExpertService } from '../../services/auth.expert.service';
@@ -7,6 +7,7 @@ import { ExpertService } from '../../services/expert.service';
 
 @Component({
   selector: 'app-expert-comments',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [CurrencyPipe],
   templateUrl: './expert-comments.component.html',

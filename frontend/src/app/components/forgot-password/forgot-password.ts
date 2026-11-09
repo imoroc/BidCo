@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -7,6 +7,7 @@ import { RecuperacionService, mensajeDeRecuperacion } from '../../services/recup
 
 @Component({
   selector: 'app-forgot-password',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [FormsModule, RouterModule, HeaderComponent, FooterComponent],
   templateUrl: './forgot-password.html',

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, UsuarioResponse } from '../../../services/auth.service';
@@ -7,6 +7,7 @@ import { AuthExpertService } from '../../../services/auth.expert.service';
 
 @Component({
   selector: 'app-profile-datos',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './profile-datos.component.html',

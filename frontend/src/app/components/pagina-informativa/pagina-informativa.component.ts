@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
 
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
@@ -6,6 +6,7 @@ import { FooterComponent } from '../footer/footer.component';
 /** Marco común de las páginas de texto (contacto, términos, privacidad): cabecera, contenido y pie. */
 @Component({
   selector: 'app-pagina-informativa',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [HeaderComponent, FooterComponent],
   encapsulation: ViewEncapsulation.None,

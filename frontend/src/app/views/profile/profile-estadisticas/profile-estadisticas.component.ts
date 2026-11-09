@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, AfterViewInit, Component, OnInit, OnDestroy } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
@@ -8,6 +8,7 @@ Chart.register(...registerables);
 
 @Component({
   selector: 'app-profile-estadisticas',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   templateUrl: './profile-estadisticas.component.html',
   styleUrls: ['./profile-estadisticas.component.css']

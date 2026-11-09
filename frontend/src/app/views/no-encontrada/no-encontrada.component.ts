@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { PaginaInformativaComponent } from '../../components/pagina-informativa/pagina-informativa.component';
 
 @Component({
   selector: 'app-no-encontrada',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [PaginaInformativaComponent, RouterLink],
   template: `

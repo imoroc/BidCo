@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
 import { ListadoFiltrado } from '../../utils/listado-filtrado';
@@ -17,6 +17,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 
 @Component({
   selector: 'app-auction',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [
     CurrencyPipe,

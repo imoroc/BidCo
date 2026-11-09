@@ -1,4 +1,4 @@
-import { Component, HostListener, ElementRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, ElementRef } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 
 @Component({
   selector: 'app-header',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [
     RouterLink,

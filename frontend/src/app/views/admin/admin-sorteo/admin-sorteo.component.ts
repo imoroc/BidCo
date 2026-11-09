@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AdminService, SorteoDTO } from '../../../services/admin.service';
 
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-sorteo',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule],
   standalone: true,
   templateUrl: './admin-sorteo.component.html',

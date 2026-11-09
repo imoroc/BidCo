@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { NgForm, FormsModule } from '@angular/forms';
 
@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [RouterModule, FooterComponent, HeaderComponent, FormsModule],
   templateUrl: './register.component.html',
