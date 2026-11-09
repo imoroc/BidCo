@@ -23,6 +23,7 @@ export const routes: Routes = [
   { path: 'my-bids', title: 'Mis pujas · BidCo', canActivate: [userGuard], loadComponent: () => import('./views/my-bids/my-bids.component').then(m => m.MyBidsComponent) },
   { path: 'my-auctions', title: 'Mis subastas · BidCo', canActivate: [userGuard], loadComponent: () => import('./views/my-auctions/my-auctions.component').then(m => m.MyAuctionsComponent) },
   { path: 'forgot-password', title: 'Recuperar contraseña · BidCo', loadComponent: () => import('./components/forgot-password/forgot-password').then(m => m.ForgotPasswordComponent) },
+  { path: 'reset-password', title: 'Nueva contraseña · BidCo', loadComponent: () => import('./views/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
   { path: 'admin/login', title: 'Acceso de administración · BidCo', loadComponent: () => import('./views/admin/admin-login/admin-login.component').then(m => m.AdminLoginComponent) },
   {
     path: 'admin',
