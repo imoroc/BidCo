@@ -1,14 +1,17 @@
 package com.bidco.api_rest.controller;
 
 import com.bidco.api_rest.config.LoginRateLimiter;
+import com.bidco.api_rest.dto.usuario.CambiarContrasenaDTO;
 import com.bidco.api_rest.dto.usuario.LoginDTO;
 import com.bidco.api_rest.dto.usuario.PerfilPublicoDTO;
 import com.bidco.api_rest.dto.usuario.PrivacidadDTO;
+import com.bidco.api_rest.dto.usuario.RecargaSaldoDTO;
 import com.bidco.api_rest.dto.usuario.StatsDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioCreateDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioResponseDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioUpdateDTO;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
+import com.bidco.api_rest.exception.ContrasenaActualIncorrectaException;
 import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.service.contract.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -86,10 +89,20 @@ public class UsuarioController {
     @PatchMapping("/{id}/password")
     public ResponseEntity<Void> updatePassword(
             @PathVariable Long id,
-            @RequestBody Map<String, String> passwords,
-            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+            @Valid @RequestBody CambiarContrasenaDTO passwords,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId,
+            HttpServletRequest request) {
         requireOwner(id, authenticatedUserId);
-        usuarioService.updatePassword(id, passwords.get("currentPassword"), passwords.get("newPassword"));
+        // Limita los intentos con la contraseña actual por si alguien usa un token robado.
+        String key = loginRateLimiter.key("password", String.valueOf(id), request.getRemoteAddr());
+        loginRateLimiter.assertAllowed(key);
+        try {
+            usuarioService.updatePassword(id, passwords.getCurrentPassword(), passwords.getNewPassword());
+        } catch (ContrasenaActualIncorrectaException exception) {
+            loginRateLimiter.recordFailure(key);
+            throw exception;
+        }
+        loginRateLimiter.reset(key);
         return ResponseEntity.ok().build();
     }
 
@@ -104,7 +117,7 @@ public class UsuarioController {
     @PutMapping("/{id}/privacidad")
     public ResponseEntity<UsuarioResponseDTO> actualizarPrivacidad(
             @PathVariable Long id,
-            @RequestBody PrivacidadDTO privacidadUpdateDTO,
+            @Valid @RequestBody PrivacidadDTO privacidadUpdateDTO,
             @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
         requireOwner(id, authenticatedUserId);
         return ResponseEntity.ok(usuarioService.actualizarPrivacidad(id, privacidadUpdateDTO));
@@ -121,11 +134,10 @@ public class UsuarioController {
     @PatchMapping("/{id}/recargar-saldo")
     public ResponseEntity<BigDecimal> recargarSaldo(
             @PathVariable Long id,
-            @RequestBody Map<String, BigDecimal> body,
+            @Valid @RequestBody RecargaSaldoDTO body,
             @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
         requireOwner(id, authenticatedUserId);
-        BigDecimal cantidad = body.get("cantidad");
-        return ResponseEntity.ok(usuarioService.recargarSaldo(id, cantidad));
+        return ResponseEntity.ok(usuarioService.recargarSaldo(id, body.getCantidad()));
     }
 
     private void requireOwner(Long resourceUserId, Long authenticatedUserId) {
