@@ -22,7 +22,10 @@ public class TrabajadorServiceImpl implements TrabajadorService {
     private final TrabajadorRepository trabajadorRepository;
     private final TrabajadorMapper trabajadorMapper;
     private final JwtUtil jwtUtil;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private static final String CREDENCIALES_INCORRECTAS = "Credenciales incorrectas";
+    private static final BCryptPasswordEncoder STATIC_ENCODER = new BCryptPasswordEncoder();
+    private static final String DUMMY_HASH = STATIC_ENCODER.encode("contraseña-inexistente");
+    private final BCryptPasswordEncoder passwordEncoder = STATIC_ENCODER;
 
     public TrabajadorServiceImpl(TrabajadorRepository trabajadorRepository, TrabajadorMapper trabajadorMapper, JwtUtil jwtUtil) {
         this.trabajadorRepository = trabajadorRepository;
@@ -81,13 +84,14 @@ public class TrabajadorServiceImpl implements TrabajadorService {
         if (trabajadorOpt.isEmpty()) {
             trabajadorOpt = trabajadorRepository.findByCorreoElectronico(dto.getIdentificador());
         }
-        if (trabajadorOpt.isEmpty()) {
-            throw new AuthenticationFailedException("Credenciales incorrectas");
-        }
+        // Se comprueba siempre una contraseña (aunque la cuenta no exista) para que el tiempo
+        // de respuesta no revele qué cuentas existen, y se usa un único mensaje de error.
+        Trabajador trabajador = trabajadorOpt.orElse(null);
+        String hash = trabajador != null ? trabajador.getContraseña() : DUMMY_HASH;
+        boolean passwordOk = passwordEncoder.matches(dto.getContraseña(), hash);
 
-        Trabajador trabajador = trabajadorOpt.get();
-        if (!passwordEncoder.matches(dto.getContraseña(), trabajador.getContraseña()) || trabajador.isExperto() != dto.getRol()) {
-            throw new AuthenticationFailedException("Credenciales incorrectas");
+        if (trabajador == null || !passwordOk || trabajador.isExperto() != dto.getRol()) {
+            throw new AuthenticationFailedException(CREDENCIALES_INCORRECTAS);
         }
 
         String role = trabajador.isExperto() ? "EXPERT" : "WORKER";
