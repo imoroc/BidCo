@@ -45,6 +45,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
     }
 
+    @ExceptionHandler(ServicioNoDisponibleException.class)
+    public ResponseEntity<Object> handleServicioNoDisponible(ServicioNoDisponibleException ex) {
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
