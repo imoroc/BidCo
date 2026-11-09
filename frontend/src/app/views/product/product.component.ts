@@ -29,6 +29,8 @@ export class ProductComponent implements OnDestroy {
     isBlindAuction = false;
     isRaffle = false;
     countdown = '';
+    // Texto para la región aria-live: solo cambia con sucesos relevantes (fin del plazo, nuevo precio).
+    anuncio = '';
     private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
     user: any;
@@ -90,9 +92,11 @@ export class ProductComponent implements OnDestroy {
         switch (this.tipo) {
             case 'subasta':
                 this.productoService.getSubastaPorId(this.productId).subscribe((product) => {
+                    const precioAnterior: number | undefined = this.product?.precioFinal;
                     this.product = product;
                     this.isBlindAuction = !product.subastaNormal;
                     this.setupCountdown(this.product.fechaFinal);
+                    this.anunciarCambioDePrecio(precioAnterior, product.precioFinal);
                 });
                 break;
             case 'sorteo':
@@ -125,6 +129,17 @@ export class ProductComponent implements OnDestroy {
     private textoDeError(err: any, porDefecto: string): string {
         const texto = err?.error?.message;
         return typeof texto === 'string' && texto.trim() ? texto : porDefecto;
+    }
+
+    anunciar(texto: string) {
+        this.anuncio = texto;
+    }
+
+    // Avisa del nuevo precio solo si ya había uno cargado y ha cambiado (no en la primera carga).
+    anunciarCambioDePrecio(anterior: number | undefined, actual: number) {
+        if (this.isBlindAuction || anterior === undefined || anterior === actual) return;
+        const importe = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(actual);
+        this.anunciar(`El precio actual es ${importe}.`);
     }
 
     limpiarMensaje() {
@@ -207,7 +222,9 @@ export class ProductComponent implements OnDestroy {
             const now = new Date().getTime();
             const distance = endDate - now;
             if (distance <= 0) {
+                const estabaEnCurso = this.countdown !== '' && this.countdown !== 'Finalizada';
                 this.countdown = "Finalizada";
+                if (estabaEnCurso) this.anunciar(this.isRaffle ? 'El sorteo ha finalizado.' : 'La subasta ha finalizado.');
                 if (!this.product.ganador) {
                     switch (this.tipo) {
                         case 'subasta':
