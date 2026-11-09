@@ -406,7 +406,8 @@ img {
     gap: var(--espacio-2);
 }
 
-.input-group label {
+.input-group label,
+.input-group legend {
     font-size: var(--texto-xs);
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -627,4 +628,116 @@ img {
 @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; gap: var(--espacio-4); }
     .admin-form-card .form-body { padding: var(--espacio-5) var(--espacio-4); }
+}
+
+/* --- Botones secundarios --- */
+.btn-secondary,
+.btn-ghost,
+.btn-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--objetivo-tactil);
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transicion), color var(--transicion);
+}
+
+.btn-secondary {
+    padding: 0 var(--espacio-5);
+    color: var(--color-marca);
+    background: transparent;
+    border: 2px solid var(--color-marca);
+    border-radius: var(--radio-pill);
+}
+
+.btn-secondary:hover { color: var(--color-sobre-marca); background: var(--color-marca); }
+
+.btn-ghost {
+    padding: 0 var(--espacio-4);
+    color: var(--color-texto-suave);
+    background: none;
+    border: 0;
+    border-radius: var(--radio-md);
+}
+
+.btn-ghost:hover { color: var(--color-texto-fuerte); background: var(--color-superficie-alt); }
+
+.btn-close {
+    min-width: var(--objetivo-tactil);
+    font-size: var(--texto-2xl);
+    line-height: 1;
+    color: var(--color-texto-suave);
+    background: none;
+    border: 0;
+    border-radius: 50%;
+}
+
+.btn-close:hover { color: var(--color-texto-fuerte); background: var(--color-superficie-alt); }
+
+.btn-large { width: 100%; min-height: 52px; font-size: var(--texto-lg); }
+
+/* --- Mensajes de formulario y utilidades --- */
+.form-message {
+    padding: var(--espacio-3) var(--espacio-4);
+    font-size: var(--texto-sm);
+    font-weight: 600;
+    line-height: 1.4;
+    border-radius: var(--radio-md);
+}
+
+.form-message-error { color: var(--color-error-fuerte); background: var(--color-error-fondo); }
+.form-message-exito { color: var(--color-exito-fuerte); background: var(--color-exito-fondo); }
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* --- Dialogo modal --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--espacio-4);
+    background: var(--color-velo);
+    backdrop-filter: blur(4px);
+}
+
+.modal-card {
+    width: 100%;
+    max-width: 500px;
+    max-height: 100%;
+    overflow-y: auto;
+    background: var(--color-superficie);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-2);
+    animation: modal-entrada 0.25s ease-out;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-5);
+    padding: var(--espacio-6);
+}
+
+.modal-header { display: flex; align-items: center; justify-content: space-between; }
+.modal-header h3 { font-size: var(--texto-lg); color: var(--color-texto-fuerte); }
+.modal-actions { display: flex; justify-content: flex-end; gap: var(--espacio-3); }
+
+@keyframes modal-entrada {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to { opacity: 1; transform: none; }
 }
