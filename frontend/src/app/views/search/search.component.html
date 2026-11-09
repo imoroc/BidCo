@@ -27,10 +27,7 @@
     </header>
 
     @if (cargaDeProductos) {
-      <div class="loader-container">
-        <span class="spinner"></span>
-        <p>Buscando las mejores coincidencias...</p>
-      </div>
+      <app-estado-listado [cargando]="true" mensajeCarga="Buscando las mejores coincidencias…"></app-estado-listado>
     } @else {
       
       @if (products.length > 0) {

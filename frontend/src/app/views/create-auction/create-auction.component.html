@@ -50,23 +50,23 @@
       <div class="details-section">
         
         <div class="form-row">
-          <div class="form-group">
+          <div class="input-group">
             <label for="titulo">Nombre del producto</label>
             <input type="text" id="titulo" [(ngModel)]="subasta.nombreArticulo" name="nombreArticulo" placeholder="Ej: Reloj Rolex Vintage" required>
           </div>
-          <div class="form-group">
+          <div class="input-group">
             <label for="precio_inicial">Precio Base (€)</label>
             <input type="number" id="precio_inicial" [(ngModel)]="subasta.precioInicial" name="precioInicial" placeholder="0.00" min="0" required>
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="input-group">
           <label for="descripcion">Descripción del artículo</label>
           <textarea id="descripcion" [(ngModel)]="subasta.descripcion" name="descripcion" rows="4" placeholder="Describe el estado, marca, dimensiones y cualquier detalle relevante..." required></textarea>
         </div>
 
         <div class="form-row">
-          <fieldset class="form-group modalidad">
+          <fieldset class="input-group modalidad">
             <legend>Modalidad de Subasta</legend>
             <div class="radio-group">
               <label class="radio-option">
@@ -82,7 +82,7 @@
             </div>
           </fieldset>
 
-          <div class="form-group">
+          <div class="input-group">
             <label for="categoria">Categoría</label>
             <select id="categoria" name="categoria" [(ngModel)]="subasta.categoria" required>
               <option value="" disabled selected>Selecciona una categoría</option>
@@ -96,13 +96,13 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="input-group">
           <label for="fecha_fin">Fecha de Finalización</label>
           <input type="date" id="fecha_fin" [(ngModel)]="subasta.fechaFinal" name="fechaFinal" [min]="fechaMinima" required>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn-submit" [disabled]="enviando" [attr.aria-busy]="enviando">{{ enviando ? 'Publicando…' : 'Publicar Subasta' }}</button>
+          <button type="submit" class="btn-primary" [disabled]="enviando" [attr.aria-busy]="enviando">{{ enviando ? 'Publicando…' : 'Publicar Subasta' }}</button>
         </div>
 
       </div>

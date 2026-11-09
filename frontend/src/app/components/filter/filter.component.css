@@ -48,7 +48,17 @@
   .filter-container {
     position: static;
     max-height: none;
+    padding: var(--espacio-4);
   }
+
+  .filter-container h2 { display: none; }
+  .filter-toggle { width: 100%; }
+  .filter-container form:not(.abierto) { display: none; }
+  .filter-container form.abierto { margin-top: var(--espacio-4); }
+}
+
+@media (min-width: 881px) {
+  .filter-toggle { display: none; }
 }
 
 /* --- FIELDSETS Y LEYENDAS --- */

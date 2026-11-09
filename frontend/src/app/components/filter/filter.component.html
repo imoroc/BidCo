@@ -1,6 +1,10 @@
 <div class="filter-container">
   <h2>Filtros</h2>
-  <form>
+  <button type="button" class="filter-toggle btn-secondary" aria-controls="filtros-cuerpo"
+          [attr.aria-expanded]="abierto" (click)="abierto = !abierto">
+    {{ abierto ? 'Ocultar filtros' : 'Mostrar filtros' }}@if (filtrosActivos > 0) { ({{ filtrosActivos }}) }
+  </button>
+  <form id="filtros-cuerpo" [class.abierto]="abierto">
     <!-- Filtro de Precio -->
     <fieldset>
       <legend>Precio</legend>
