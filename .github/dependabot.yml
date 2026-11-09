@@ -20,10 +20,6 @@ updates:
         patterns:
           - "@angular/material"
           - "@angular/cdk"
-      hono:
-        patterns:
-          - "hono"
-          - "@hono/*"
       vite-and-build:
         patterns:
           - "vite"
@@ -31,15 +27,10 @@ updates:
           - "webpack*"
           - "postcss*"
           - "rollup*"
-      babel:
-        patterns:
-          - "@babel/*"
-          - "babel-*"
       testing:
         patterns:
-          - "jest*"
-          - "@jest/*"
           - "jasmine*"
+          - "karma*"
           - "@types/*"
         update-types:
           - minor
@@ -48,7 +39,8 @@ updates:
         update-types:
           - patch
     ignore:
-      - dependency-name: "lodash"
+      # Angular 22 exige TypeScript 6.0: no se sube a una versión mayor.
+      - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
@@ -88,6 +80,10 @@ updates:
       day: monday
       time: "09:00"
     open-pull-requests-limit: 3
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "github-actions"
