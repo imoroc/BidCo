@@ -18,6 +18,7 @@ describe('ExpertCommentsComponent', () => {
 
     fixture = TestBed.createComponent(ExpertCommentsComponent);
     component = fixture.componentInstance;
+    component.comment = { trabajadorID: 1, comentario: 'Comentario de prueba', precioEstimado: 100 };
     fixture.detectChanges();
   });
 

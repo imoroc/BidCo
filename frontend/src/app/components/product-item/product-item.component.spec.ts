@@ -18,6 +18,15 @@ describe('ProductItemComponent', () => {
 
     fixture = TestBed.createComponent(ProductItemComponent);
     component = fixture.componentInstance;
+    component.product = {
+      subastaID: 1,
+      nombreArticulo: 'Artículo de prueba',
+      imagen: 'prueba.jpg',
+      precioInicial: 10,
+      precioFinal: 10,
+      subastaNormal: true,
+      fechaFinal: '2099-01-01T00:00:00'
+    };
     fixture.detectChanges();
   });
 
