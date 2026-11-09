@@ -28,10 +28,6 @@ export class SorteoService {
 
     constructor(private http: HttpClient) {}
 
-    getSorteos(): Observable<SorteoResponseDto[]> {
-        return this.http.get<SorteoResponseDto[]>(this.apiUrl);
-    }
-
     getSorteosPorFiltro(filtro: HttpParams): Observable<SorteoResponseDto[]> {
         return this.http.get<SorteoResponseDto[]>(`${this.apiUrl}/filtro`, {params: filtro});
     }
