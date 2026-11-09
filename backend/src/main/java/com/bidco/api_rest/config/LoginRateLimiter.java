@@ -10,8 +10,21 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Limita los intentos fallidos de inicio de sesión por cuenta e IP para frenar
- * ataques de fuerza bruta. El estado vive en memoria (una sola instancia de la API).
+ * Limita los intentos fallidos de inicio de sesión, de cambio de contraseña y de
+ * recuperación de contraseña por cuenta e IP para frenar ataques de fuerza bruta.
+ *
+ * <p>Limitaciones conocidas, que conviene tener presentes al desplegar:
+ * <ul>
+ *   <li>El estado vive en memoria. Con varias instancias de la API cada una cuenta
+ *       por separado, así que el límite efectivo sería de {@link #MAX_FAILURES} por instancia.</li>
+ *   <li>Se pierde al reiniciar o redesplegar la aplicación, lo que reinicia los contadores.</li>
+ *   <li>La clave incluye la dirección remota. La aplicación activa
+ *       {@code server.forward-headers-strategy=framework} para recibir la IP real tras el
+ *       proxy de la plataforma; si se despliega en otro entorno hay que mantenerlo, porque
+ *       si no todos los clientes compartirían la misma clave.</li>
+ * </ul>
+ * Si se escala a más de una instancia, habría que mover el contador a un almacén
+ * compartido (por ejemplo Redis o la propia base de datos).
  */
 @Component
 public class LoginRateLimiter {
