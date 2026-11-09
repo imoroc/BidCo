@@ -28,7 +28,7 @@
   <footer class="comment-footer">
     <div class="estimation-badge">
       <span class="estimation-label">Valor estimado del experto</span>
-      <span class="estimation-value">{{ comment.precioEstimado }}€</span>
+      <span class="estimation-value">{{ comment.precioEstimado | currency:'EUR':'symbol':'1.0-2' }}</span>
     </div>
   </footer>
 </article>

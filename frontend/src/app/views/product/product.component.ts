@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +17,7 @@ import { finDeDiaMs, hoyISO } from '../../utils/fechas';
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [RouterLink, FormsModule, HeaderComponent, ProductDetailsComponent, ExpertCommentsComponent, FooterComponent],
+  imports: [CurrencyPipe, RouterLink, FormsModule, HeaderComponent, ProductDetailsComponent, ExpertCommentsComponent, FooterComponent],
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.css']
 })

@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 
@@ -7,7 +8,7 @@ import { ExpertService } from '../../services/expert.service';
 @Component({
   selector: 'app-expert-comments',
   standalone: true,
-  imports: [],
+  imports: [CurrencyPipe],
   templateUrl: './expert-comments.component.html',
   styleUrls: ['./expert-comments.component.css']
 })

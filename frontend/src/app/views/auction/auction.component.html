@@ -14,7 +14,7 @@
         <div class="user-actions">
           <div class="balance-badge">
             <span class="balance-label">Tu Saldo Disponible</span>
-            <span class="balance-value">{{ saldoUser }}€</span>
+            <span class="balance-value">{{ saldoUser | currency:'EUR':'symbol':'1.0-2' }}</span>
           </div>
           <a class="btn-primary" routerLink="/create-auction">+ Crear Subasta</a>
         </div>

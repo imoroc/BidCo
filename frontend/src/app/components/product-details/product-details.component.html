@@ -13,7 +13,7 @@
       
       <div class="price-box">
         <span class="price-label">Precio Base</span>
-        <span class="price-value">{{ productoSubasta.precioInicial }}€</span>
+        <span class="price-value">{{ productoSubasta.precioInicial | currency:'EUR':'symbol':'1.0-2' }}</span>
       </div>
 
       <div class="product-description">

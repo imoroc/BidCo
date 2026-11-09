@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
@@ -18,6 +19,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
   selector: 'app-auction',
   standalone: true,
   imports: [
+    CurrencyPipe,
     RouterLink,
     HeaderComponent,
     FilterComponent,
