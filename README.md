@@ -1,26 +1,74 @@
 <div align="center">
+  <img src="frontend/public/Logo%20BidCo%20Recortado.jpg" alt="Logo de BidCo" height="96" />
   <h1 align="center">BidCo</h1>
 
   <p align="center">
-    <strong>Plataforma web Full-Stack para gestionar subastas simuladas, subastas a ciegas y sorteos.</strong>
+    <strong>Plataforma web Full-Stack de subastas simuladas, subastas a ciegas y sorteos.</strong>
     <br /><br />
     <a href="https://bid-co.vercel.app/auction"><strong>Ver demostración en vivo</strong></a>
     <br /><br />
+    <a href="https://github.com/imoroc/BidCo/actions/workflows/ci-validation.yml"><img alt="CI" src="https://github.com/imoroc/BidCo/actions/workflows/ci-validation.yml/badge.svg?branch=deploy" /></a>
+    <a href="LICENSE"><img alt="Licencia MIT" src="https://img.shields.io/badge/licencia-MIT-blue.svg" /></a>
+    <img alt="Angular 22" src="https://img.shields.io/badge/Angular-22-dd0031.svg" />
+    <img alt="Spring Boot 4.1" src="https://img.shields.io/badge/Spring%20Boot-4.1-6db33f.svg" />
+    <img alt="Java 25" src="https://img.shields.io/badge/Java-25-007396.svg" />
   </p>
 </div>
 
 ---
 
-## Sobre el proyecto
+## Qué es BidCo
 
-BidCo es una aplicación universitaria desarrollada para la asignatura Servicios y Sistemas Web. Está construida con una arquitectura cliente-servidor y utiliza créditos y puntos virtuales para simular la participación. No integra pasarelas de pago ni procesa dinero real.
+BidCo es una aplicación desarrollada para la asignatura Servicios y Sistemas Web. Tiene una arquitectura cliente-servidor: un frontend Angular que consume una API REST de Spring Boot sobre PostgreSQL.
 
-**Características principales**
-- Subastas tradicionales y a ciegas.
-- Sorteos con puntos virtuales.
-- Gestión de perfiles, privacidad y estadísticas.
-- Valoraciones de expertos.
-- Almacenamiento de imágenes en Cloudinary.
+**Qué no es.** BidCo **no maneja dinero real**: no integra pasarelas de pago ni cobra nada. El saldo y los puntos son créditos virtuales que sirven para simular la participación, y el saldo se recarga sin pago (hasta 10 000 por operación).
+
+## Funcionalidades
+
+- **Subastas normales:** la puja visible sube el precio; hay que superar la puja actual.
+- **Subastas a ciegas:** nadie ve las pujas hasta que termina; solo cuenta superar el precio base.
+- **Sorteos:** se participa aportando puntos; el ganador sale de un sorteo ponderado por los puntos aportados.
+- **Perfil de usuario:** datos, saldo, puntos, estadísticas con gráficos y opciones de privacidad (pujas anónimas, estadísticas y perfil visibles u ocultos).
+- **Valoraciones de expertos:** comentarios con precio estimado sobre las subastas.
+- **Búsqueda y filtros** por nombre, categoría, precio y fecha, con subastas y sorteos vencidos ocultos por defecto.
+- **Recuperación de contraseña** por correo electrónico.
+
+### Roles y permisos
+
+| Acción | Visitante | Usuario | Experto | Administración |
+|---|:-:|:-:|:-:|:-:|
+| Ver listados, filtros y fichas de subastas y sorteos | Sí | Sí | Sí | Sí |
+| Leer las valoraciones de expertos | Sí | Sí | Sí | Sí |
+| Registrarse y recuperar la contraseña por correo | Sí | Sí | No | No |
+| Pujar en subastas y participar en sorteos | No | Sí | No | No |
+| Crear subastas | No | Sí | No | No |
+| Recargar saldo, editar el perfil y ver estadísticas | No | Sí | No | No |
+| Cerrar una subasta o sorteo ya vencido | No | Sí | No | No |
+| Escribir y editar valoraciones | No | No | Sí | No |
+| Crear sorteos | No | No | No | Sí |
+| Dar de alta trabajadores y expertos | No | No | No | Sí |
+
+Usuario y experto se identifican con un token JWT y tienen su propio acceso (`/login` y `/expert`). La administración (`/admin/login`) usa una sesión con cookie y una cabecera anti-CSRF; es una cuenta de trabajador no experto.
+
+## Reglas de negocio
+
+**Alta y saldo.** Una cuenta nueva empieza con saldo 0 y 10 puntos; ambos valores los fija el servidor. El saldo se recarga con un máximo de 10 000 por operación.
+
+**Pujas en subastas.**
+
+- No se puede pujar en una subasta propia, ni antes de su inicio ni después de su cierre.
+- En una subasta **normal**, la puja debe superar el precio actual (o el base si aún no hay pujas). El importe de la puja líder queda retenido del saldo y se devuelve cuando alguien la supera.
+- En una subasta **a ciegas**, basta con superar el precio base. El precio no se actualiza ni se muestran las pujas hasta el cierre, para no revelar la máxima. Una puja que no supera a la líder se registra sin retener saldo.
+- Un usuario no puede gastar el mismo saldo dos veces en paralelo: la fila del usuario se bloquea durante la puja.
+
+**Cierre de subastas.** Pasada la fecha final, gana la puja más alta y el ganador recibe 100 puntos (normal) o 200 (a ciegas). En las ciegas el precio definitivo se publica en ese momento. El cierre es **idempotente**: si ya hay ganador, repetir la petición no vuelve a repartir puntos, y dos cierres simultáneos no pueden puntuar dos veces.
+
+**Sorteos.**
+
+- Solo la administración los crea.
+- Cada participación aporta puntos enteros, con un mínimo por sorteo. Los puntos se descuentan al participar.
+- Al cerrarse, el ganador se elige con `SecureRandom` y probabilidad proporcional a los puntos aportados.
+- El resultado es definitivo: un sorteo cerrado no se puede volver a tirar.
 
 ## Stack tecnológico
 
