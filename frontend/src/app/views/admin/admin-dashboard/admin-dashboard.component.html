@@ -1,16 +1,25 @@
 <div class="admin-layout">
-  <header class="admin-topbar">
-    <div class="admin-title">
-      <h2>Panel de Administración</h2>
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <span class="admin-brand-name">BidCo</span>
+      <span class="badge-admin">Admin</span>
     </div>
-    <nav class="admin-actions">
-      <button class="btn-nav" (click)="goToSorteo()">+ Añadir Sorteo</button>
-      <button class="btn-nav" (click)="goToExpertos()">Registrar Expertos</button>
-      <button class="btn-nav btn-danger" (click)="cerrarSesion()">Cerrar Sesión</button>
+
+    <nav class="admin-nav" aria-label="Administración">
+      <a routerLink="/admin/sorteo" routerLinkActive="activo" ariaCurrentWhenActive="page">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor" aria-hidden="true"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+        Añadir sorteo
+      </a>
+      <a routerLink="/admin/expertos" routerLinkActive="activo" ariaCurrentWhenActive="page">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor" aria-hidden="true"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.500T224-378q62-31 126-46.500T480-440q66 0 130 15.500T736-378q29 15 46.500 43.500T800-272v112H160Z"/></svg>
+        Registrar expertos
+      </a>
     </nav>
-  </header>
-  
-  <main class="admin-content">
+
+    <button type="button" class="admin-salir" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="admin-content" id="contenido">
     <router-outlet></router-outlet>
   </main>
 </div>
