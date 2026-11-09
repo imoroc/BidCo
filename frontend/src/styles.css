@@ -165,8 +165,21 @@
     transform: translateY(0);
 }
 
+/* Transicion entre vistas: fundido corto del documento completo */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 150ms;
+    animation-timing-function: ease-out;
+}
+
 /* Respeta la preferencia de menos movimiento */
 @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
+
     *,
     *::before,
     *::after {

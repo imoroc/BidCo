@@ -1,7 +1,7 @@
 import { ApplicationConfig, LOCALE_ID, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { IMAGE_LOADER, registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withViewTransitions } from '@angular/router';
 import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 
 import { routes } from './app.routes';
@@ -17,7 +17,8 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     { provide: LOCALE_ID, useValue: 'es-ES' },
     { provide: IMAGE_LOADER, useValue: cloudinaryLoader },
-    provideRouter(routes),
+    // Fundido corto entre vistas (View Transitions API); sin efecto en la carga inicial.
+    provideRouter(routes, withViewTransitions({ skipInitialTransition: true })),
     // XHR y no fetch (el valor por defecto en Angular 22): zone.js vigila XHR, así que las respuestas
     // repintan la vista. Con fetch, los campos de los componentes no se actualizaban hasta un clic.
     provideHttpClient(withXhr(), withInterceptors([authInterceptor, errorInterceptor])),
