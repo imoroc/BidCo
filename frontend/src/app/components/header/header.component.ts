@@ -31,6 +31,17 @@ export class HeaderComponent {
     private router: Router
   ) {}
 
+  /** Salta la cabecera y deja el foco en el contenido principal (sin cambiar la URL). */
+  saltarAlContenido(event: Event): void {
+    event.preventDefault();
+    const principal = document.querySelector<HTMLElement>('main');
+    if (principal) {
+      principal.setAttribute('tabindex', '-1');
+      principal.focus();
+      principal.scrollIntoView();
+    }
+  }
+
   ngOnInit() {
     this.authService.isLoggedIn$.subscribe((estado: boolean) => {
       this.isLoggedIn = estado;

@@ -24,4 +24,16 @@ describe('HeaderComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('el enlace de salto deja el foco en el contenido principal', () => {
+    const principal = document.createElement('main');
+    document.body.appendChild(principal);
+    try {
+      const enlace = fixture.nativeElement.querySelector('.skip-link') as HTMLAnchorElement;
+      enlace.click();
+      expect(document.activeElement).toBe(principal);
+    } finally {
+      principal.remove();
+    }
+  });
 });

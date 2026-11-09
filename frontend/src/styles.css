@@ -83,6 +83,25 @@
     outline-offset: 2px;
 }
 
+/* Enlace "saltar al contenido": solo visible al recibir foco con teclado */
+.skip-link {
+    position: absolute;
+    top: var(--espacio-2);
+    left: var(--espacio-2);
+    z-index: 3000;
+    padding: var(--espacio-3) var(--espacio-4);
+    border-radius: var(--radio-md);
+    background: var(--color-marca);
+    color: var(--color-sobre-marca);
+    font-weight: 600;
+    text-decoration: none;
+    transform: translateY(-200%);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
 /* Respeta la preferencia de menos movimiento */
 @media (prefers-reduced-motion: reduce) {
     *,
