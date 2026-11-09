@@ -16,17 +16,6 @@ updates:
         update-types:
           - minor
           - patch
-      angular-material:
-        patterns:
-          - "@angular/material"
-          - "@angular/cdk"
-      vite-and-build:
-        patterns:
-          - "vite"
-          - "@vitejs/*"
-          - "webpack*"
-          - "postcss*"
-          - "rollup*"
       testing:
         patterns:
           - "jasmine*"
