@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService, Privacidad } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
 
 import { FormsModule } from '@angular/forms';
 
@@ -21,7 +22,8 @@ export class ProfilePrivacidadComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -48,12 +50,12 @@ export class ProfilePrivacidadComponent implements OnInit {
     const userId = this.authService.currentUser.value?.usuarioID;
     if (userId) {
       this.userService.updatePrivacidad(userId, this.privacidad).subscribe({
-        next: (response) => {
-          console.log('Configuración guardada:', response);
+        next: () => {
+          this.toastService.exito('Configuración guardada');
         },
         error: (err) => {
           console.error('Error guardando cambios:', err);
-          alert('Error: ' + (err.error?.message || 'Verifica la consola'));
+          this.toastService.error(err.error?.message || 'No se han podido guardar los cambios');
         }
       });
     }
