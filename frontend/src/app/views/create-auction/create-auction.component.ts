@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 
 import { CreateSubastaService, SubastaCreateDTO } from '../../services/create-auction.service';
 import { AuthService } from '../../services/auth.service';
+import { hoyISO, mananaISO } from '../../utils/fechas';
 
 const TIPOS_IMAGEN_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp'];
 const TAMANO_MAXIMO_IMAGEN = 8 * 1024 * 1024;
@@ -28,7 +29,7 @@ export class CreateAuctionComponent {
     imagen: File | null = null;
     imagenPreview: string | ArrayBuffer | null = null;
     subasta: SubastaCreateDTO = {
-        fechaInicial: new Date().toISOString().split('T')[0],
+        fechaInicial: hoyISO(),
         fechaFinal: '',
         precioInicial: 0,
         subastaNormal: true,
@@ -172,10 +173,6 @@ export class CreateAuctionComponent {
     }
 
     private calcularFechaMinima(): string {
-        const manana = new Date();
-        manana.setDate(manana.getDate() + 1);
-        const mes = String(manana.getMonth() + 1).padStart(2, '0');
-        const dia = String(manana.getDate()).padStart(2, '0');
-        return `${manana.getFullYear()}-${mes}-${dia}`;
+        return mananaISO();
     }
 }
