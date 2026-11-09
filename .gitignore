@@ -63,3 +63,6 @@ coverage/
 test-output/
 *.tmp
 *.swp
+
+# Plantilla de variables de entorno (sin valores reales): sí se versiona.
+!.env.example
