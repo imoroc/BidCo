@@ -20,6 +20,69 @@
 /* Global styles for the app */
 :root {
     --header-height: 74px;
+
+    /* Color */
+    --color-marca: #0d0063;
+    --color-marca-hover: #1a0e8a;
+    --color-acento: #c6dafc;
+    --color-fondo: #f4f4f4;
+    --color-superficie: #ffffff;
+    --color-borde: #dadce0;
+    --color-texto: #333333;
+    --color-texto-suave: #5f6368;
+    --color-exito: #1e8e3e;
+    --color-error: #d93025;
+    --color-aviso: #b06000;
+    --color-sobre-marca: #ffffff;
+
+    /* Tipografia */
+    --fuente-base: 'Montserrat', Arial, sans-serif;
+    --texto-xs: 0.75rem;
+    --texto-sm: 0.875rem;
+    --texto-md: 1rem;
+    --texto-lg: 1.25rem;
+    --texto-xl: 1.5rem;
+    --texto-2xl: 2rem;
+
+    /* Espaciado (base 4 px) */
+    --espacio-1: 4px;
+    --espacio-2: 8px;
+    --espacio-3: 12px;
+    --espacio-4: 16px;
+    --espacio-5: 24px;
+    --espacio-6: 32px;
+    --espacio-7: 48px;
+
+    /* Radios y sombras */
+    --radio-sm: 4px;
+    --radio-md: 8px;
+    --radio-lg: 16px;
+    --radio-pill: 999px;
+    --sombra-1: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    --sombra-2: 0 1px 3px rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+
+    /* Interaccion */
+    --anillo-foco: 2px solid var(--color-marca);
+    --objetivo-tactil: 44px;
+    --transicion: 150ms ease-out;
+}
+
+/* Foco visible solo con teclado */
+:focus-visible {
+    outline: var(--anillo-foco);
+    outline-offset: 2px;
+}
+
+/* Respeta la preferencia de menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 html {
@@ -43,9 +106,9 @@ html::-webkit-scrollbar-thumb:hover { background: #9aa0a6; }
   }
   
   body {
-    font-family: 'Montserrat', Arial, sans-serif;
-    background: #f4f4f4;
-    color: #333;
+    font-family: var(--fuente-base);
+    background: var(--color-fondo);
+    color: var(--color-texto);
   }
 
   /* La vista enrutada ocupa al menos toda la altura de la ventana: el pie queda abajo sin tapar nada */
