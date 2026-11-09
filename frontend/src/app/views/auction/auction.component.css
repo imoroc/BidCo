@@ -4,7 +4,7 @@
   flex: 1;
   flex-wrap: wrap;
   /* Un fondo casi blanco (gris muuuy claro) hace que las tarjetas blancas resalten mucho más */
-  background-color: #f8f9fa; 
+  background-color: var(--color-superficie-suave); 
 }
 
 /* El contenedor deja hueco al filtro fijo de la izquierda */
@@ -24,12 +24,12 @@
   align-items: flex-end;
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 2px solid #e8eaed;
+  border-bottom: 2px solid var(--color-borde-suave);
 }
 
 .header-titles h1 {
   font-size: clamp(2rem, 3vw, 2.5rem);
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0;
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -47,10 +47,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  background: #ffffff;
+  background: var(--color-superficie);
   padding: 8px 16px;
   border-radius: 8px;
-  border: 1px solid #dadce0;
+  border: 1px solid var(--color-borde);
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
@@ -58,21 +58,21 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   font-weight: 700;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   letter-spacing: 0.5px;
 }
 
 .balance-value {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #0d0063;
+  color: var(--color-marca);
   line-height: 1.1;
 }
 
 /* Botón Crear Subasta */
 .btn-primary {
-  background-color: #0d0063;
-  color: #ffffff;
+  background-color: var(--color-marca);
+  color: var(--color-sobre-marca);
   padding: 12px 24px;
   border-radius: 24px; /* Botón píldora moderno */
   text-decoration: none;
@@ -83,7 +83,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #15009e;
+  background-color: var(--color-marca-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(13, 0, 99, 0.25);
 }

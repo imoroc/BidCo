@@ -1,23 +1,23 @@
 /* --- ESTRUCTURA PRINCIPAL --- */
 .auth-page-background {
-  background-color: #f8f9fa;
+  background-color: var(--color-superficie-suave);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 60px 24px;
   font-family: 'Montserrat', sans-serif;
-  color: #202124;
+  color: var(--color-texto-fuerte);
 }
 
 /* --- TARJETA DE LOGIN --- */
 .auth-card {
-  background-color: #ffffff;
+  background-color: var(--color-superficie);
   width: 100%;
   max-width: 480px; /* Aumentado de 450px para menos compresión */
   padding: 40px 48px;
   border-radius: 20px;
-  border: 1px solid #e8eaed;
+  border: 1px solid var(--color-borde-suave);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
@@ -33,7 +33,7 @@
 .auth-tab {
   padding: 12px 20px;
   text-decoration: none;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   font-weight: 600;
   font-size: 0.95rem;
   border-bottom: 2px solid transparent;
@@ -42,13 +42,13 @@
 }
 
 .auth-tab.active {
-  color: #0d0063;
-  border-bottom-color: #0d0063;
+  color: var(--color-marca);
+  border-bottom-color: var(--color-marca);
 }
 
 .auth-tab:hover:not(.active) {
-  color: #202124;
-  background-color: #f8f9fa;
+  color: var(--color-texto-fuerte);
+  background-color: var(--color-superficie-suave);
 }
 
 /* --- CABECERA --- */
@@ -60,13 +60,13 @@
 .brand-title {
   font-size: 2.8rem;
   font-weight: 800;
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0 0 10px 0;
   letter-spacing: -1.5px;
 }
 
 .auth-header p {
-  color: #5f6368;
+  color: var(--color-texto-suave);
   font-size: 1rem;
   margin: 0;
 }
@@ -76,9 +76,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: #fce8e6;
+  background-color: var(--color-error-fondo);
   border: 1px solid #f28b82;
-  color: #c5221f;
+  color: var(--color-error-fuerte);
   padding: 14px;
   border-radius: 10px;
   margin-bottom: 24px;
@@ -102,7 +102,7 @@
 .input-group label {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -113,11 +113,11 @@
   border: 1px solid #80868b;
   border-radius: 12px;
   transition: all 0.2s ease;
-  background-color: #fff;
+  background-color: var(--color-superficie);
 }
 
 .input-group input:focus {
-  border-color: #0d0063;
+  border-color: var(--color-marca);
   box-shadow: 0 0 0 4px rgba(13, 0, 99, 0.08);
   outline: none;
 }
@@ -160,8 +160,8 @@
 }
 
 .checkbox-group input:checked + .custom-checkbox {
-  background-color: #0d0063;
-  border-color: #0d0063;
+  background-color: var(--color-marca);
+  border-color: var(--color-marca);
 }
 
 .custom-checkbox::after {
@@ -181,7 +181,7 @@
 
 .forgot-link {
   font-size: 0.85rem;
-  color: #0d0063;
+  color: var(--color-marca);
   font-weight: 600;
   text-decoration: none;
 }
@@ -191,8 +191,8 @@
 /* --- BOTÓN --- */
 .btn-primary {
   width: 100%;
-  background-color: #0d0063;
-  color: #ffffff;
+  background-color: var(--color-marca);
+  color: var(--color-sobre-marca);
   padding: 16px;
   font-size: 1.1rem;
   font-weight: 700;
@@ -204,7 +204,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #15009e;
+  background-color: var(--color-marca-hover);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(13, 0, 99, 0.2);
 }
@@ -225,17 +225,17 @@
 .btn-primary:focus-visible,
 .forgot-link:focus-visible,
 .auth-tab:focus-visible {
-  outline: 3px solid #0d0063;
+  outline: 3px solid var(--color-marca);
   outline-offset: 2px;
 }
 
 .checkbox-group input:focus-visible + .custom-checkbox {
-  outline: 3px solid #0d0063;
+  outline: 3px solid var(--color-marca);
   outline-offset: 2px;
 }
 
 .input-group input[aria-invalid='true'] {
-  border-color: #c5221f;
+  border-color: var(--color-error-fuerte);
 }
 
 .btn-primary:disabled {

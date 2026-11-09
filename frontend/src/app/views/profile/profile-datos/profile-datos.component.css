@@ -1,11 +1,11 @@
 .settings-header { margin-bottom: 24px; }
-.settings-header h2 { font-size: 1.8rem; color: #202124; margin: 0 0 8px 0; }
-.settings-header p { color: #5f6368; margin: 0; }
+.settings-header h2 { font-size: 1.8rem; color: var(--color-texto-fuerte); margin: 0 0 8px 0; }
+.settings-header p { color: var(--color-texto-suave); margin: 0; }
 
 .settings-card {
-  background: #ffffff;
+  background: var(--color-superficie);
   border-radius: 12px;
-  border: 1px solid #e8eaed;
+  border: 1px solid var(--color-borde-suave);
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   padding: 32px;
   margin-bottom: 24px;
@@ -13,9 +13,9 @@
 
 .settings-card h3 {
   font-size: 1.2rem;
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0 0 24px 0;
-  border-bottom: 1px solid #f1f3f4;
+  border-bottom: 1px solid var(--color-superficie-alt);
   padding-bottom: 12px;
 }
 
@@ -26,25 +26,25 @@
 .span-2 { grid-column: span 1; } /* En PC ocupa lo normal, en móvil adaptamos */
 
 .input-group { display: flex; flex-direction: column; gap: 6px; }
-.input-group label { font-size: 0.85rem; font-weight: 700; color: #5f6368; text-transform: uppercase; }
+.input-group label { font-size: 0.85rem; font-weight: 700; color: var(--color-texto-suave); text-transform: uppercase; }
 .input-group input {
-  padding: 12px; border: 1px solid #dadce0; border-radius: 8px; font-size: 1rem; color: #202124; transition: all 0.2s; box-sizing: border-box;
+  padding: 12px; border: 1px solid var(--color-borde); border-radius: 8px; font-size: 1rem; color: var(--color-texto-fuerte); transition: all 0.2s; box-sizing: border-box;
 }
-.input-group input:focus { border-color: #0d0063; outline: none; box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.1); }
+.input-group input:focus { border-color: var(--color-marca); outline: none; box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.1); }
 
 /* Billetera */
-.wallet-card { display: flex; justify-content: space-between; align-items: center; background-color: #f8f9fa; border: 2px solid #e8eaed; }
+.wallet-card { display: flex; justify-content: space-between; align-items: center; background-color: var(--color-superficie-suave); border: 2px solid var(--color-borde-suave); }
 .wallet-info h3 { border: none; margin-bottom: 8px; }
-.balance-label { display: block; font-size: 0.85rem; color: #5f6368; text-transform: uppercase; font-weight: 700; }
-.balance-amount { font-size: 2.5rem; font-weight: 800; color: #0d0063; line-height: 1; }
+.balance-label { display: block; font-size: 0.85rem; color: var(--color-texto-suave); text-transform: uppercase; font-weight: 700; }
+.balance-amount { font-size: 2.5rem; font-weight: 800; color: var(--color-marca); line-height: 1; }
 .recharge-form { display: flex; align-items: flex-end; gap: 16px; }
 
 /* Botones y Mensajes */
 .form-actions { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-top: 16px; }
-.btn-primary { background: #0d0063; color: white; padding: 12px 24px; border: none; border-radius: 24px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap;}
-.btn-primary:hover { background: #15009e; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(13,0,99,0.2); }
-.msg-success { color: #137333; font-size: 0.9rem; font-weight: 600; }
-.msg-error { color: #c5221f; font-size: 0.9rem; font-weight: 600; }
+.btn-primary { background: var(--color-marca); color: white; padding: 12px 24px; border: none; border-radius: 24px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap;}
+.btn-primary:hover { background: var(--color-marca-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(13,0,99,0.2); }
+.msg-success { color: var(--color-exito-fuerte); font-size: 0.9rem; font-weight: 600; }
+.msg-error { color: var(--color-error-fuerte); font-size: 0.9rem; font-weight: 600; }
 .center-msg { text-align: right; display: block; margin-top: 8px;}
 
 @media (max-width: 768px) {

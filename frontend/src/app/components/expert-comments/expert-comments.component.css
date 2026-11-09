@@ -1,7 +1,7 @@
 /* --- TARJETA PRINCIPAL --- */
 .expert-comment-card {
-  background: #ffffff;
-  border: 1px solid #e8eaed; /* Borde sutil */
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde-suave); /* Borde sutil */
   border-radius: 12px;
   padding: 20px 24px;
   margin: 16px 0;
@@ -21,7 +21,7 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: #0d0063;
+  background: var(--color-marca);
   border-radius: 12px 0 0 12px;
 }
 
@@ -53,14 +53,14 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: #f1f3f4;
+  background: var(--color-superficie-alt);
   border-radius: 50%;
-  color: #5f6368;
+  color: var(--color-texto-suave);
 }
 
 .expert-name {
   font-weight: 700;
-  color: #202124;
+  color: var(--color-texto-fuerte);
   font-size: 1rem;
 }
 
@@ -69,8 +69,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #e6f4ea; 
-  color: #137333;
+  background: var(--color-exito-fondo); 
+  color: var(--color-exito-fuerte);
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -85,8 +85,8 @@
   align-items: center;
   gap: 6px;
   background: transparent;
-  color: #5f6368;
-  border: 1px solid #dadce0;
+  color: var(--color-texto-suave);
+  border: 1px solid var(--color-borde);
   padding: 6px 14px;
   border-radius: 20px;
   cursor: pointer;
@@ -97,9 +97,9 @@
 }
 
 .btn-edit:hover {
-  background: #f8f9fa;
-  color: #0d0063; /* Se ilumina con tu color */
-  border-color: #0d0063;
+  background: var(--color-superficie-suave);
+  color: var(--color-marca); /* Se ilumina con tu color */
+  border-color: var(--color-marca);
 }
 
 .btn-edit:active {
@@ -123,8 +123,8 @@
 .estimation-badge {
   display: inline-flex;
   align-items: center;
-  background: #f8f9fa;
-  border: 1px solid #e8eaed;
+  background: var(--color-superficie-suave);
+  border: 1px solid var(--color-borde-suave);
   border-radius: 8px;
   padding: 8px 16px;
   gap: 16px;
@@ -132,7 +132,7 @@
 
 .estimation-label {
   font-size: 0.75rem;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 700;
@@ -140,7 +140,7 @@
 
 .estimation-value {
   font-size: 1.25rem;
-  color: #0d0063; /* Tu color azul dándole peso al precio */
+  color: var(--color-marca); /* Tu color azul dándole peso al precio */
   font-weight: 800;
 }
 

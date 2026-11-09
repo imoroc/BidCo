@@ -23,7 +23,7 @@
 
     /* Color */
     --color-marca: #0d0063;
-    --color-marca-hover: #1a0e8a;
+    --color-marca-hover: #15009e;
     --color-acento: #c6dafc;
     --color-fondo: #f4f4f4;
     --color-superficie: #ffffff;
@@ -34,6 +34,16 @@
     --color-error: #d93025;
     --color-aviso: #b06000;
     --color-sobre-marca: #ffffff;
+    --color-texto-fuerte: #202124;
+    --color-superficie-suave: #f8f9fa;
+    --color-superficie-alt: #f1f3f4;
+    --color-borde-suave: #e8eaed;
+    --color-error-fuerte: #c5221f;
+    --color-error-fondo: #fce8e6;
+    --color-exito-fuerte: #137333;
+    --color-exito-fondo: #e6f4ea;
+    --color-scroll: #c4c7cc;
+    --color-scroll-hover: #9aa0a6;
 
     /* Tipografia */
     --fuente-base: 'Montserrat', Arial, sans-serif;
@@ -73,6 +83,25 @@
     outline-offset: 2px;
 }
 
+/* Enlace "saltar al contenido": solo visible al recibir foco con teclado */
+.skip-link {
+    position: absolute;
+    top: var(--espacio-2);
+    left: var(--espacio-2);
+    z-index: 3000;
+    padding: var(--espacio-3) var(--espacio-4);
+    border-radius: var(--radio-md);
+    background: var(--color-marca);
+    color: var(--color-sobre-marca);
+    font-weight: 600;
+    text-decoration: none;
+    transform: translateY(-200%);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
 /* Respeta la preferencia de menos movimiento */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -87,146 +116,56 @@
 
 html {
     scrollbar-width: thin;
-    scrollbar-color: #c4c7cc transparent;
+    scrollbar-color: var(--color-scroll) transparent;
 }
 
 html::-webkit-scrollbar { width: 10px; }
 html::-webkit-scrollbar-track { background: transparent; }
 html::-webkit-scrollbar-thumb {
-    background: #c4c7cc;
-    border-radius: 8px;
-    border: 2px solid #f8f9fa;
+    background: var(--color-scroll);
+    border-radius: var(--radio-md);
+    border: 2px solid var(--color-superficie-suave);
 }
-html::-webkit-scrollbar-thumb:hover { background: #9aa0a6; }
+html::-webkit-scrollbar-thumb:hover { background: var(--color-scroll-hover); }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
-  
-  body {
+}
+
+body {
     font-family: var(--fuente-base);
     background: var(--color-fondo);
     color: var(--color-texto);
-  }
+}
 
-  /* La vista enrutada ocupa al menos toda la altura de la ventana: el pie queda abajo sin tapar nada */
-  router-outlet + * {
+/* La vista enrutada ocupa al menos toda la altura de la ventana: el pie queda abajo sin tapar nada */
+router-outlet + * {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-  }
+}
 
-  /* El host debe ocupar todo el ancho para que la cabecera pueda quedarse pegada arriba al hacer scroll */
-  app-header {
+/* El host debe ocupar todo el ancho para que la cabecera pueda quedarse pegada arriba al hacer scroll */
+app-header {
     display: block;
     position: sticky;
     top: 0;
     z-index: 1000;
-  }
+}
 
-  app-footer {
+app-footer {
     display: block;
     margin-top: auto;
-  }
+}
 
-  /* Contenido principal */
-  main {
+/* Contenido principal */
+main {
     margin: 20px;
-  }
-  
-  /* Formularios */
-  .formulario {
-    background: #fff;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 5px;
-  }
-  
-  .formulario label {
-    display: block;
-    margin: 10px 0 5px;
-  }
-  
-  .formulario input,
-  .formulario textarea,
-  .formulario select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-  }
-  
-  .formulario button {
-    background: #35424a;
-    color: #fff;
-    padding: 10px 15px;
-    border: none;
-    cursor: pointer;
-  }
-  
-  /* Secciones, artículos y elementos */
-  .secciones {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-  }
-  
-  .seccion, 
-  .producto-detalle, 
-  .comentarios, 
-  .item,
-  .comentarios-expertos {
-    background: #fff;
-    padding: 15px;
-    margin: 10px;
-    border-radius: 5px;
-  }
-  
-  .seccion img, 
-  .producto-detalle img {
-    max-width: 100%;
-    display: block;
-    margin-bottom: 10px;
-  }
-  
-  /* Aviso para usuarios no registrados */
-  .aviso {
-    margin-top: 15px;
-    font-style: italic;
-    color: #a00;
-  }
-  
-  /* Footer */
-  footer {
-    background: #35424a;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-  }
+}
 
-/* Ajustes globales para imágenes */
 img {
-  max-width: 100%;
-  height: auto;
+    max-width: 100%;
+    height: auto;
 }
-
-/* Ajustes específicos para imágenes en secciones y detalles de productos */
-.seccion img,
-.producto-detalle img {
-  max-width: 300px;  /* Ajusta este valor según lo que necesites */
-  height: auto;
-  display: block;
-  margin: 0 auto 10px; /* Centra la imagen y añade margen inferior */
-}
-
-/* Ajustes responsivos para pantallas pequeñas */
-@media (max-width: 600px) {
-  .seccion img,
-  .producto-detalle img {
-    max-width: 100%;  /* Que la imagen ocupe el ancho completo en móviles */
-  }
-}
-
-  
-  

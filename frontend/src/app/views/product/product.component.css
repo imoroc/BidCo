@@ -1,10 +1,10 @@
 /* --- ESTRUCTURA PRINCIPAL --- */
 .product-page-background {
-  background-color: #f8f9fa; /* Fondo premium para que resalten las tarjetas */
+  background-color: var(--color-superficie-suave); /* Fondo premium para que resalten las tarjetas */
   min-height: 85vh;
   padding: 40px 24px;
   font-family: 'Montserrat', sans-serif;
-  color: #202124;
+  color: var(--color-texto-fuerte);
 }
 
 .product-container {
@@ -25,9 +25,9 @@
 
 /* --- TARJETA DE ACCIÓN (PUJA) --- */
 .action-card {
-  background-color: #ffffff;
+  background-color: var(--color-superficie);
   border-radius: 16px;
-  border: 1px solid #e8eaed;
+  border: 1px solid var(--color-borde-suave);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
   padding: 32px;
 }
@@ -40,15 +40,15 @@
 
 .card-header {
   margin-bottom: 24px;
-  border-bottom: 2px solid #f8f9fa;
+  border-bottom: 2px solid var(--color-superficie-suave);
   padding-bottom: 20px;
 }
 
 .status-badge {
   display: inline-block;
   padding: 4px 10px;
-  background-color: #e6f4ea;
-  color: #137333; /* Verde activo */
+  background-color: var(--color-exito-fondo);
+  color: var(--color-exito-fuerte); /* Verde activo */
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 700;
@@ -57,13 +57,13 @@
 }
 
 .status-badge.ended {
-  background-color: #fce8e6;
-  color: #c5221f; /* Rojo finalizada */
+  background-color: var(--color-error-fondo);
+  color: var(--color-error-fuerte); /* Rojo finalizada */
 }
 
 .action-title {
   font-size: 1.1rem;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   font-weight: 600;
   margin: 0 0 8px 0;
 }
@@ -71,7 +71,7 @@
 .main-price {
   font-size: 2.8rem;
   font-weight: 800;
-  color: #0d0063;
+  color: var(--color-marca);
   line-height: 1;
   letter-spacing: -1px;
 }
@@ -94,26 +94,26 @@
 
 .info-label {
   font-weight: 600;
-  color: #5f6368;
+  color: var(--color-texto-suave);
 }
 
 .info-value {
   font-weight: 700;
-  color: #202124;
+  color: var(--color-texto-fuerte);
 }
 
 .time-row {
   justify-content: flex-start;
   gap: 8px;
   padding: 12px;
-  background-color: #f8f9fa;
+  background-color: var(--color-superficie-suave);
   border-radius: 8px;
-  color: #0d0063;
+  color: var(--color-marca);
 }
 
 .time-row.time-up {
-  color: #c5221f;
-  background-color: #fce8e6;
+  color: var(--color-error-fuerte);
+  background-color: var(--color-error-fondo);
 }
 
 .time-value {
@@ -121,7 +121,7 @@
 }
 
 .highlight-row { padding: 12px; background-color: #e8f0fe; border-radius: 8px; }
-.winner-row { padding: 12px; background-color: #e6f4ea; border-radius: 8px; border: 1px solid #ceead6;}
+.winner-row { padding: 12px; background-color: var(--color-exito-fondo); border-radius: 8px; border: 1px solid #ceead6;}
 
 /* Formulario e Inputs de Puja */
 .bid-form {
@@ -145,13 +145,13 @@
 }
 
 .form-message-error {
-  background-color: #fce8e6;
-  color: #c5221f;
+  background-color: var(--color-error-fondo);
+  color: var(--color-error-fuerte);
 }
 
 .form-message-exito {
-  background-color: #e6f4ea;
-  color: #137333;
+  background-color: var(--color-exito-fondo);
+  color: var(--color-exito-fuerte);
 }
 
 .input-wrapper input {
@@ -159,7 +159,7 @@
   padding: 16px;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #202124;
+  color: var(--color-texto-fuerte);
   text-align: center;
   border: 2px solid #80868b;
   border-radius: 12px;
@@ -168,7 +168,7 @@
 }
 
 .input-wrapper input:focus {
-  border-color: #0d0063;
+  border-color: var(--color-marca);
   box-shadow: 0 0 0 3px rgba(13, 0, 99, 0.1);
   outline: none;
 }
@@ -178,8 +178,8 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  background-color: #0d0063;
-  color: #ffffff;
+  background-color: var(--color-marca);
+  color: var(--color-sobre-marca);
   padding: 12px 24px;
   border: none;
   border-radius: 24px;
@@ -199,7 +199,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #15009e;
+  background-color: var(--color-marca-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(13, 0, 99, 0.25);
 }
@@ -213,7 +213,7 @@
 
 .login-prompt p {
   font-size: 0.9rem;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   margin-bottom: 16px;
   line-height: 1.5;
 }
@@ -227,25 +227,25 @@
 
 .reviews-header {
   margin-bottom: 32px;
-  border-bottom: 2px solid #e8eaed;
+  border-bottom: 2px solid var(--color-borde-suave);
   padding-bottom: 24px;
 }
 
 .reviews-header h2 {
   font-size: 1.8rem;
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0 0 8px 0;
 }
 
 .reviews-subtitle {
-  color: #5f6368;
+  color: var(--color-texto-suave);
   margin: 0 0 24px 0;
 }
 
 .btn-secondary {
   background-color: transparent;
-  color: #0d0063;
-  border: 2px solid #0d0063;
+  color: var(--color-marca);
+  border: 2px solid var(--color-marca);
   padding: 10px 20px;
   border-radius: 20px;
   font-weight: 700;
@@ -253,7 +253,7 @@
   transition: all 0.2s ease;
 }
 
-.btn-secondary:hover { background-color: #0d0063; color: #fff; }
+.btn-secondary:hover { background-color: var(--color-marca); color: #fff; }
 
 .reviews-list {
   display: flex;
@@ -278,7 +278,7 @@
 }
 
 .modal-card {
-  background: #ffffff;
+  background: var(--color-superficie);
   width: 100%;
   max-width: 500px;
   border-radius: 16px;
@@ -306,7 +306,7 @@
 
 .modal-header h3 {
   font-size: 1.2rem;
-  color: #202124;
+  color: var(--color-texto-fuerte);
   margin: 0;
 }
 
@@ -314,13 +314,13 @@
   background: none;
   border: none;
   font-size: 2rem;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   cursor: pointer;
   line-height: 1;
   transition: color 0.2s;
 }
 
-.btn-close:hover { color: #202124; }
+.btn-close:hover { color: var(--color-texto-fuerte); }
 
 .form-group {
   display: flex;
@@ -331,7 +331,7 @@
 .form-group label {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #5f6368;
+  color: var(--color-texto-suave);
 }
 
 .form-group textarea,
@@ -348,7 +348,7 @@
 
 .form-group textarea { min-height: 120px; resize: vertical; }
 .form-group textarea:focus, .form-group input:focus {
-  border-color: #0d0063;
+  border-color: var(--color-marca);
   box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.15);
   outline: none;
 }
@@ -363,14 +363,14 @@
 .btn-ghost {
   background: none;
   border: none;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   font-weight: 600;
   cursor: pointer;
   padding: 10px 16px;
   border-radius: 8px;
 }
 
-.btn-ghost:hover { background-color: #f1f3f4; color: #202124; }
+.btn-ghost:hover { background-color: var(--color-superficie-alt); color: var(--color-texto-fuerte); }
 
 /* --- RESPONSIVO --- */
 @media (max-width: 900px) {
@@ -390,14 +390,14 @@
 .input-wrapper input:focus-visible,
 .form-group textarea:focus-visible,
 .form-group input:focus-visible {
-  outline: 3px solid #0d0063;
+  outline: 3px solid var(--color-marca);
   outline-offset: 2px;
 }
 
 .input-wrapper input[aria-invalid='true'],
 .form-group textarea[aria-invalid='true'],
 .form-group input[aria-invalid='true'] {
-  border-color: #c5221f;
+  border-color: var(--color-error-fuerte);
 }
 
 @media (prefers-reduced-motion: reduce) {

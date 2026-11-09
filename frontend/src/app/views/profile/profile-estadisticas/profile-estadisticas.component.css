@@ -1,6 +1,6 @@
 .settings-header { margin-bottom: 24px; }
-.settings-header h2 { font-size: 1.8rem; color: #202124; margin: 0 0 8px 0; }
-.settings-header p { color: #5f6368; margin: 0; }
+.settings-header h2 { font-size: 1.8rem; color: var(--color-texto-fuerte); margin: 0 0 8px 0; }
+.settings-header p { color: var(--color-texto-suave); margin: 0; }
 
 .stats-dashboard { display: flex; flex-direction: column; gap: 24px; }
 
@@ -12,8 +12,8 @@
 }
 
 .stat-widget {
-  background: #ffffff;
-  border: 1px solid #e8eaed;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde-suave);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.02);
@@ -22,15 +22,15 @@
   gap: 8px;
 }
 
-.stat-widget.win { border-bottom: 4px solid #137333; } /* Destaca las victorias en verde */
+.stat-widget.win { border-bottom: 4px solid var(--color-exito-fuerte); } /* Destaca las victorias en verde */
 
-.stat-title { font-size: 0.8rem; color: #5f6368; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
-.stat-value { font-size: 2rem; font-weight: 800; color: #0d0063; line-height: 1; }
+.stat-title { font-size: 0.8rem; color: var(--color-texto-suave); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
+.stat-value { font-size: 2rem; font-weight: 800; color: var(--color-marca); line-height: 1; }
 
 /* Gráfico */
 .chart-card {
-  background: #ffffff;
-  border: 1px solid #e8eaed;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde-suave);
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);

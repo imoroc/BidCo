@@ -3,7 +3,7 @@
   display: flex;
   flex: 1;
   flex-wrap: wrap;
-  background-color: #f8f9fa; /* Fondo premium para resaltar las tarjetas */
+  background-color: var(--color-superficie-suave); /* Fondo premium para resaltar las tarjetas */
 }
 
 /* Dejamos hueco exacto al app-filter que mide 18% */
@@ -23,25 +23,25 @@
   align-items: flex-end; 
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 2px solid #e8eaed;
+  border-bottom: 2px solid var(--color-borde-suave);
 }
 
 .header-titles h1 {
   font-size: clamp(2rem, 3vw, 2.5rem);
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0 0 8px 0;
   font-weight: 800;
   letter-spacing: -0.5px;
 }
 
 .subtitle {
-  color: #5f6368;
+  color: var(--color-texto-suave);
   margin: 0;
   font-size: 1.05rem;
 }
 
 .subtitle strong {
-  color: #202124;
+  color: var(--color-texto-fuerte);
 }
 
 /* --- ACCIONES DEL USUARIO --- */
@@ -49,21 +49,21 @@
 
 .balance-badge {
   display: flex; flex-direction: column; align-items: flex-end;
-  background: #ffffff; padding: 8px 16px; border-radius: 8px;
-  border: 1px solid #dadce0; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: var(--color-superficie); padding: 8px 16px; border-radius: 8px;
+  border: 1px solid var(--color-borde); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-.balance-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #5f6368; letter-spacing: 0.5px; }
-.balance-value { font-size: 1.4rem; font-weight: 800; color: #0d0063; line-height: 1.1; }
+.balance-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--color-texto-suave); letter-spacing: 0.5px; }
+.balance-value { font-size: 1.4rem; font-weight: 800; color: var(--color-marca); line-height: 1.1; }
 
 .btn-primary {
-  background-color: #0d0063; color: #ffffff; padding: 12px 24px;
+  background-color: var(--color-marca); color: #ffffff; padding: 12px 24px;
   border-radius: 24px; text-decoration: none; font-weight: 600;
   font-size: 0.95rem; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(13, 0, 99, 0.15);
 }
 
 .btn-primary:hover {
-  background-color: #15009e; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(13, 0, 99, 0.25);
+  background-color: var(--color-marca-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(13, 0, 99, 0.25);
 }
 
 /* --- CUADRÍCULA DE PRODUCTOS --- */
@@ -85,15 +85,15 @@
   justify-content: center;
   padding: 80px 0;
   gap: 16px;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   font-weight: 600;
 }
 
 .spinner {
   width: 48px;
   height: 48px;
-  border: 5px solid #e8eaed;
-  border-bottom-color: #0d0063;
+  border: 5px solid var(--color-borde-suave);
+  border-bottom-color: var(--color-marca);
   border-radius: 50%;
   display: inline-block;
   box-sizing: border-box;
@@ -113,19 +113,19 @@
   justify-content: center;
   padding: 80px 20px;
   text-align: center;
-  background-color: #ffffff;
+  background-color: var(--color-superficie);
   border-radius: 16px;
-  border: 1px dashed #dadce0;
+  border: 1px dashed var(--color-borde);
 }
 
 .empty-state h3 {
   font-size: 1.5rem;
-  color: #202124;
+  color: var(--color-texto-fuerte);
   margin: 24px 0 8px 0;
 }
 
 .empty-state p {
-  color: #5f6368;
+  color: var(--color-texto-suave);
   font-size: 1rem;
   max-width: 400px;
   margin: 0;

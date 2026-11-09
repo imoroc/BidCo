@@ -3,7 +3,7 @@
   display: flex;
   flex: 1;
   flex-wrap: wrap;
-  background-color: #f8f9fa; /* Fondo gris claro para destacar las tarjetas blancas */
+  background-color: var(--color-superficie-suave); /* Fondo gris claro para destacar las tarjetas blancas */
 }
 
 /* Espacio reservado para el filtro de la izquierda (18%) */
@@ -23,12 +23,12 @@
   align-items: flex-end; 
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 2px solid #e8eaed;
+  border-bottom: 2px solid var(--color-borde-suave);
 }
 
 .header-titles h1 {
   font-size: clamp(2rem, 3vw, 2.5rem);
-  color: #0d0063;
+  color: var(--color-marca);
   margin: 0;
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -42,8 +42,8 @@
 
 /* Botón Crear Subasta (Estilo Píldora Premium) */
 .btn-primary {
-  background-color: #0d0063;
-  color: #ffffff;
+  background-color: var(--color-marca);
+  color: var(--color-sobre-marca);
   padding: 12px 24px;
   border-radius: 24px; 
   text-decoration: none;
@@ -54,7 +54,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #15009e;
+  background-color: var(--color-marca-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(13, 0, 99, 0.25);
 }

@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin
+Disallow: /my-bids
+Disallow: /my-auctions
+Disallow: /create-auction
+Disallow: /reset-password
+Allow: /

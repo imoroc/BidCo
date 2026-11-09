@@ -6,8 +6,8 @@
   display: block;
   flex: 0 0 280px;
   width: 280px;
-  background-color: #ffffff;
-  border-right: 1px solid #e8eaed;
+  background-color: var(--color-superficie);
+  border-right: 1px solid var(--color-borde-suave);
 }
 
 /* Se queda pegado bajo la cabecera mientras se recorre el listado */
@@ -25,8 +25,8 @@
   margin: 0 0 20px 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0d0063;
-  border-bottom: 1px solid #e8eaed;
+  color: var(--color-marca);
+  border-bottom: 1px solid var(--color-borde-suave);
   padding-bottom: 12px;
 }
 
@@ -42,7 +42,7 @@
     flex: 1 1 100%;
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid #e8eaed;
+    border-bottom: 1px solid var(--color-borde-suave);
   }
 
   .filter-container {
@@ -61,7 +61,7 @@
 .filter-container legend {
   font-size: clamp(0.75rem, 1vw, 0.85rem);
   margin-bottom: 12px;
-  color: #202124; 
+  color: var(--color-texto-fuerte); 
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -77,11 +77,11 @@
 .filter-container select {
   width: 100%;
   padding: 10px 6px; /* Padding elástico */
-  border: 1px solid #dadce0;
+  border: 1px solid var(--color-borde);
   border-radius: 6px;
   font-size: clamp(0.85rem, 1vw, 0.95rem);
-  color: #202124;
-  background-color: #ffffff;
+  color: var(--color-texto-fuerte);
+  background-color: var(--color-superficie);
   transition: all 0.2s ease;
   box-sizing: border-box;
   font-family: inherit;
@@ -89,7 +89,7 @@
 
 .filter-container input[type="number"]:focus,
 .filter-container select:focus {
-  border-color: #0d0063;
+  border-color: var(--color-marca);
   box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.15); 
   outline: none;
 }
@@ -112,7 +112,7 @@ input[type="number"]::-webkit-outer-spin-button {
   position: relative;
   width: 100%;
   height: 6px; 
-  background: #e8eaed;
+  background: var(--color-borde-suave);
   border-radius: 3px;
   top: 12px; 
 }
@@ -121,7 +121,7 @@ input[type="number"]::-webkit-outer-spin-button {
   position: absolute;
   top: 0;
   height: 100%;
-  background: #0d0063;
+  background: var(--color-marca);
   border-radius: 3px;
 }
 
@@ -144,8 +144,8 @@ input[type="range"].thumb::-webkit-slider-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #0d0063;
+  background: var(--color-superficie);
+  border: 2px solid var(--color-marca);
   margin-top: -23px; 
   cursor: pointer;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
@@ -161,8 +161,8 @@ input[type="range"].thumb::-moz-range-thumb {
   width: 16px; 
   height: 16px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #0d0063;
+  background: var(--color-superficie);
+  border: 2px solid var(--color-marca);
   cursor: pointer;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
@@ -188,21 +188,21 @@ input[type="range"].thumb::-moz-range-thumb {
   -webkit-appearance: none;
   width: 20px; /* Tamaño fijo para que no se deforme el cuadrado */
   height: 20px;
-  border: 2px solid #dadce0;
+  border: 2px solid var(--color-borde);
   border-radius: 4px;
   margin-right: 6px;
   margin-left: 0;
   margin-top: 0;
   cursor: pointer;
   position: relative;
-  background-color: #fff;
+  background-color: var(--color-superficie);
   transition: all 0.2s ease;
   flex-shrink: 0; 
 }
 
 .checkbox-group input[type="checkbox"]:checked {
-  background-color: #0d0063;
-  border-color: #0d0063;
+  background-color: var(--color-marca);
+  border-color: var(--color-marca);
 }
 
 .checkbox-group input[type="checkbox"]:checked::after {
@@ -225,7 +225,7 @@ input[type="range"].thumb::-moz-range-thumb {
 }
 
 .checkbox-group:hover input[type="checkbox"]:not(:checked) {
-  border-color: #0d0063; 
+  border-color: var(--color-marca); 
 }
 
 /* --- SELECT DE FECHA --- */

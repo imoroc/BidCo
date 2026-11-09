@@ -7,14 +7,14 @@
   margin: 40px auto;
   padding: 0 24px;
   font-family: 'Montserrat', sans-serif;
-  color: #202124;
+  color: var(--color-texto-fuerte);
 }
 
 /* --- COLUMNA 1: GALERÍA E IMAGEN --- */
 .product-gallery {
   position: relative;
-  background-color: #f8f9fa; /* Fondo gris claro estilo Apple */
-  border: 1px solid #e8eaed;
+  background-color: var(--color-superficie-suave); /* Fondo gris claro estilo Apple */
+  border: 1px solid var(--color-borde-suave);
   border-radius: 20px;
   padding: 40px;
   display: flex;
@@ -52,8 +52,8 @@
   z-index: 2;
 }
 
-.badge-auction { background-color: #0d0063; color: white; }
-.badge-raffle { background-color: #fbbc04; color: #0d0063; } /* Amarillo Google */
+.badge-auction { background-color: var(--color-marca); color: white; }
+.badge-raffle { background-color: #fbbc04; color: var(--color-marca); } /* Amarillo Google */
 
 /* --- COLUMNA 2: DETALLES --- */
 .product-info {
@@ -67,15 +67,15 @@
   font-weight: 800;
   line-height: 1.2;
   margin: 0 0 24px 0;
-  color: #0d0063;
+  color: var(--color-marca);
   letter-spacing: -1px;
 }
 
 /* CAJA DE PRECIO / PUNTOS DESTACADA */
 .price-box {
-  background-color: #ffffff;
-  border: 1px solid #dadce0;
-  border-left: 6px solid #0d0063; /* Franja azul a la izquierda */
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-left: 6px solid var(--color-marca); /* Franja azul a la izquierda */
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 32px;
@@ -91,7 +91,7 @@
 
 .price-label {
   font-size: 0.9rem;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -100,14 +100,14 @@
 .price-value {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #0d0063;
+  color: var(--color-marca);
   line-height: 1;
 }
 
 .points-text {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #5f6368;
+  color: var(--color-texto-suave);
 }
 
 /* DESCRIPCIÓN */
@@ -117,9 +117,9 @@
 
 .product-description h3 {
   font-size: 1.1rem;
-  color: #202124;
+  color: var(--color-texto-fuerte);
   margin: 0 0 12px 0;
-  border-bottom: 2px solid #f8f9fa;
+  border-bottom: 2px solid var(--color-superficie-suave);
   padding-bottom: 8px;
 }
 
@@ -135,7 +135,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background-color: #f8f9fa;
+  background-color: var(--color-superficie-suave);
   padding: 16px;
   border-radius: 12px;
 }
@@ -143,8 +143,8 @@
 .creator-avatar {
   width: 48px;
   height: 48px;
-  background-color: #c6dafc; /* Tu azul clarito */
-  color: #0d0063;
+  background-color: var(--color-acento); /* Tu azul clarito */
+  color: var(--color-marca);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -152,7 +152,7 @@
 }
 
 .avatar-bidco {
-  background-color: #0d0063;
+  background-color: var(--color-marca);
   color: white;
 }
 
@@ -163,7 +163,7 @@
 
 .creator-label {
   font-size: 0.75rem;
-  color: #5f6368;
+  color: var(--color-texto-suave);
   text-transform: uppercase;
   font-weight: 700;
 }
@@ -171,7 +171,7 @@
 .creator-name {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #202124;
+  color: var(--color-texto-fuerte);
 }
 
 /* --- MODO MÓVIL (Auto-apilable) --- */
