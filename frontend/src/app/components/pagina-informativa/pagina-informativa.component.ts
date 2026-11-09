@@ -34,22 +34,22 @@ import { FooterComponent } from '../footer/footer.component';
       max-width: 780px;
       margin: 0 auto;
       padding: 32px;
-      background: #ffffff;
+      background: var(--color-superficie);
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
       line-height: 1.65;
-      color: #202124;
+      color: var(--color-texto-fuerte);
     }
 
     .pagina-info-contenido h1 {
       margin: 0 0 4px;
-      color: #0d0063;
+      color: var(--color-marca);
       font-size: 1.9rem;
     }
 
     .pagina-info-contenido h2 {
       margin: 28px 0 8px;
-      color: #0d0063;
+      color: var(--color-marca);
       font-size: 1.15rem;
     }
 
@@ -59,13 +59,13 @@ import { FooterComponent } from '../footer/footer.component';
     }
 
     .pagina-info-contenido a {
-      color: #0d0063;
+      color: var(--color-marca);
       font-weight: 600;
     }
 
     .pagina-info-fecha {
       margin: 0 0 8px;
-      color: #5f6368;
+      color: var(--color-texto-suave);
       font-size: 0.85rem;
     }
 

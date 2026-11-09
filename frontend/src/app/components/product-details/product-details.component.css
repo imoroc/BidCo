@@ -52,8 +52,8 @@
   z-index: 2;
 }
 
-.badge-auction { background-color: var(--color-marca); color: white; }
-.badge-raffle { background-color: #fbbc04; color: var(--color-marca); } /* Amarillo Google */
+.badge-auction { background-color: var(--color-marca); color: var(--color-sobre-marca); }
+.badge-raffle { background-color: var(--color-destacado); color: var(--color-marca); } /* Amarillo Google */
 
 /* --- COLUMNA 2: DETALLES --- */
 .product-info {
@@ -86,7 +86,7 @@
 }
 
 .box-raffle {
-  border-left-color: #fbbc04; /* Franja amarilla para sorteos */
+  border-left-color: var(--color-destacado); /* Franja amarilla para sorteos */
 }
 
 .price-label {
@@ -126,7 +126,7 @@
 .product-description p {
   font-size: 1rem;
   line-height: 1.6;
-  color: #3c4043;
+  color: var(--color-texto-medio);
   margin: 0;
 }
 
@@ -153,7 +153,7 @@
 
 .avatar-bidco {
   background-color: var(--color-marca);
-  color: white;
+  color: var(--color-sobre-marca);
 }
 
 .creator-details {

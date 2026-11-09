@@ -89,7 +89,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: 0.95rem;
-  color: #3c4043;
+  color: var(--color-texto-medio);
 }
 
 .info-label {
@@ -120,8 +120,8 @@
   margin-left: auto;
 }
 
-.highlight-row { padding: 12px; background-color: #e8f0fe; border-radius: 8px; }
-.winner-row { padding: 12px; background-color: var(--color-exito-fondo); border-radius: 8px; border: 1px solid #ceead6;}
+.highlight-row { padding: 12px; background-color: var(--color-info-fondo); border-radius: 8px; }
+.winner-row { padding: 12px; background-color: var(--color-exito-fondo); border-radius: 8px; border: 1px solid var(--color-exito-borde);}
 
 /* Formulario e Inputs de Puja */
 .bid-form {
@@ -161,7 +161,7 @@
   font-weight: 600;
   color: var(--color-texto-fuerte);
   text-align: center;
-  border: 2px solid #80868b;
+  border: 2px solid var(--color-borde-fuerte);
   border-radius: 12px;
   box-sizing: border-box;
   transition: all 0.2s ease;
@@ -169,42 +169,17 @@
 
 .input-wrapper input:focus {
   border-color: var(--color-marca);
-  box-shadow: 0 0 0 3px rgba(13, 0, 99, 0.1);
+  box-shadow: 0 0 0 3px var(--color-marca-halo);
   outline: none;
 }
 
 /* Botones */
-.btn-primary {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--color-marca);
-  color: var(--color-sobre-marca);
-  padding: 12px 24px;
-  border: none;
-  border-radius: 24px;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(13, 0, 99, 0.15);
-}
-
 .btn-large {
   padding: 16px;
   font-size: 1.1rem;
   border-radius: 12px; /* Botón cuadrado redondeado para pujas */
   width: 100%;
 }
-
-.btn-primary:hover {
-  background-color: var(--color-marca-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(13, 0, 99, 0.25);
-}
-
-.btn-primary:active { transform: translateY(0); }
 
 .login-prompt {
   text-align: center;
@@ -253,7 +228,7 @@
   transition: all 0.2s ease;
 }
 
-.btn-secondary:hover { background-color: var(--color-marca); color: #fff; }
+.btn-secondary:hover { background-color: var(--color-marca); color: var(--color-sobre-marca); }
 
 .reviews-list {
   display: flex;
@@ -269,7 +244,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(32, 33, 36, 0.6); /* Gris oscuro transparente */
+  background-color: var(--color-velo); /* Gris oscuro transparente */
   backdrop-filter: blur(4px); /* Efecto cristal desenfocado de iOS/Google */
   display: flex;
   justify-content: center;
@@ -338,7 +313,7 @@
 .form-group input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #80868b;
+  border: 1px solid var(--color-borde-fuerte);
   border-radius: 8px;
   font-family: inherit;
   font-size: 1rem;
@@ -349,7 +324,7 @@
 .form-group textarea { min-height: 120px; resize: vertical; }
 .form-group textarea:focus, .form-group input:focus {
   border-color: var(--color-marca);
-  box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.15);
+  box-shadow: 0 0 0 2px var(--color-marca-halo);
   outline: none;
 }
 

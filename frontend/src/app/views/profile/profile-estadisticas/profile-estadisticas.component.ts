@@ -64,6 +64,10 @@ export class ProfileEstadisticasComponent implements OnInit, AfterViewInit, OnDe
 
   private initChart(): void {
     const ctx = document.getElementById('barChart') as HTMLCanvasElement;
+    // Los textos y rejillas del gráfico siguen el tema (claro u oscuro)
+    const estilos = getComputedStyle(document.documentElement);
+    Chart.defaults.color = estilos.getPropertyValue('--color-texto-suave').trim() || '#5f6368';
+    Chart.defaults.borderColor = estilos.getPropertyValue('--color-borde-suave').trim() || '#e8eaed';
     this.chart = new Chart(ctx, {
       type: 'bar',
       data: this.getChartData(),

@@ -1,23 +1,5 @@
-.auth-page-background { background-color: var(--color-superficie-suave); min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; }
-.auth-container { width: 100%; padding: 24px; display: flex; justify-content: center; }
-.auth-card { background: var(--color-superficie); width: 100%; max-width: 420px; padding: 40px; border-radius: 12px; border: 1px solid var(--color-borde-suave); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-
-/* Detalle Admin: Línea roja arriba para alertar de que es zona crítica */
-.admin-card { border-top: 6px solid var(--color-error); } 
-
-.auth-header { text-align: center; margin-bottom: 30px; }
-.brand-title { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 2rem; color: var(--color-texto-fuerte); margin: 0 0 12px 0; font-weight: 800; }
-.badge-admin { background: var(--color-error); color: white; font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; }
-.auth-header h2 { font-size: 1.2rem; margin: 0 0 8px 0; color: var(--color-texto-fuerte); }
-.auth-header p { color: var(--color-texto-suave); font-size: 0.9rem; margin: 0; }
-
-.alert-error { background: var(--color-error-fondo); color: var(--color-error-fuerte); padding: 12px; border-radius: 8px; border: 1px solid #f28b82; margin-bottom: 24px; font-size: 0.9rem; text-align: center; font-weight: 600;}
-
-.auth-form { display: flex; flex-direction: column; gap: 20px; }
-.input-group { display: flex; flex-direction: column; gap: 8px; }
-.input-group label { font-size: 0.8rem; font-weight: 700; color: var(--color-texto-suave); text-transform: uppercase; }
-.input-group input { padding: 12px; border-radius: 8px; border: 1px solid var(--color-borde); font-size: 1rem; transition: 0.2s; }
-.input-group input:focus { border-color: var(--color-texto-fuerte); outline: none; box-shadow: 0 0 0 2px rgba(32,33,36,0.1); }
-
-.btn-admin { background: var(--color-texto-fuerte); color: white; padding: 14px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; margin-top: 10px; }
-.btn-admin:hover { background: #000000; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+/* Estructura, campos, botones y alertas: ver el kit de UI en styles.css */
+.auth-page-background { min-height: 100vh; }
+.auth-card { max-width: 420px; }
+.brand-title { font-size: 2rem; color: var(--color-texto-fuerte); }
+.alert-error { justify-content: center; text-align: center; }

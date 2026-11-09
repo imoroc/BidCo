@@ -23,7 +23,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
     }
 
     .estado-error {
-      color: #b3261e;
+      color: var(--color-error-fuerte);
     }
   `
 })

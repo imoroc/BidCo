@@ -63,18 +63,18 @@ import { PaginaInformativaComponent } from '../../components/pagina-informativa/
   `,
   styles: `
     details {
-      border-bottom: 1px solid #e0e3e7;
+      border-bottom: 1px solid var(--color-borde-suave);
       padding: 10px 0;
     }
 
     summary {
       cursor: pointer;
       font-weight: 600;
-      color: #0d0063;
+      color: var(--color-marca);
     }
 
     summary:focus-visible {
-      outline: 2px solid #0d0063;
+      outline: 2px solid var(--color-marca);
       outline-offset: 2px;
     }
 

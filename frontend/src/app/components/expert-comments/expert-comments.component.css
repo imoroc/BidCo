@@ -109,7 +109,7 @@
 /* --- CUERPO DEL COMENTARIO --- */
 .comment-body p {
   margin: 0 0 20px 0;
-  color: #3c4043;
+  color: var(--color-texto-medio);
   line-height: 1.6;
   font-size: 0.95rem;
 }

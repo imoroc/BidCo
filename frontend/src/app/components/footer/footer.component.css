@@ -1,59 +1,37 @@
 .mini-footer {
-  /* Fondo con tu azul principal */
-  background-color: var(--color-marca); 
-  /* Línea superior con el azul clarito para rematar */
-  border-top: 2px solid var(--color-acento); 
-  padding: 16px 24px;
-  font-family: 'Montserrat', sans-serif;
   margin-top: auto;
+  padding: var(--espacio-4) var(--espacio-5);
+  background: var(--color-superficie);
+  border-top: 1px solid var(--color-borde);
 }
 
 .footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  /* El texto normal en blanco para que lea perfecto sobre el azul oscuro */
-  color: var(--color-sobre-marca); 
+  font-size: var(--texto-sm);
+  color: var(--color-texto-suave);
 }
 
-.footer-content p {
-  margin: 0;
-  font-weight: 500;
-}
-
-.footer-links {
-  display: flex;
-  gap: 20px;
-}
+.footer-links { display: flex; flex-wrap: wrap; gap: var(--espacio-2); }
 
 .footer-links a {
-  /* Los enlaces en tu azul claro para que llamen a hacer clic */
-  color: var(--color-acento);
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--objetivo-tactil);
+  padding: 0 var(--espacio-3);
   font-weight: 600;
-  padding: 6px 10px;
-  border-radius: 4px;
-  transition: background-color 0.2s, color 0.2s, transform 0.1s;
-}
-
-/* Efecto hover: Se invierten los colores (fondo claro, texto oscuro) */
-.footer-links a:hover {
-  background-color: var(--color-acento); 
   color: var(--color-marca);
+  text-decoration: none;
+  border-radius: var(--radio-sm);
 }
 
-.footer-links a:active {
-  transform: scale(0.95);
-}
+.footer-links a:hover { background: var(--color-info-fondo); }
 
-/* Modo móvil: se apila todo al centro */
 @media (max-width: 600px) {
-  .footer-content {
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-  }
+  .footer-content { flex-direction: column; text-align: center; }
+  .footer-links { justify-content: center; }
 }

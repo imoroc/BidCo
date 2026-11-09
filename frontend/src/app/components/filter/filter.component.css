@@ -90,7 +90,7 @@
 .filter-container input[type="number"]:focus,
 .filter-container select:focus {
   border-color: var(--color-marca);
-  box-shadow: 0 0 0 2px rgba(13, 0, 99, 0.15); 
+  box-shadow: 0 0 0 2px var(--color-marca-halo); 
   outline: none;
 }
 
@@ -212,7 +212,7 @@ input[type="range"].thumb::-moz-range-thumb {
   top: 1px;
   width: 5px;
   height: 10px;
-  border: solid white;
+  border: solid var(--color-sobre-marca);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -220,7 +220,7 @@ input[type="range"].thumb::-moz-range-thumb {
 .checkbox-group label {
   cursor: pointer;
   font-size: clamp(0.85rem, 1vw, 0.95rem); /* Texto elástico */
-  color: #3c4043;
+  color: var(--color-texto-medio);
   user-select: none;
 }
 

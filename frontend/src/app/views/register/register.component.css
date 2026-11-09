@@ -1,159 +1,32 @@
-/* --- ESTRUCTURA PRINCIPAL --- */
-.auth-page-background {
-  background-color: var(--color-superficie-suave);
-  min-height: 100vh; /* Cambiado a 100vh para asegurar que el footer no tape nada */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 24px;
-  font-family: 'Montserrat', sans-serif;
-  color: var(--color-texto-fuerte);
-}
+/* Estructura, campos, botones y alertas: ver el kit de UI en styles.css */
+.auth-card { max-width: 600px; }
+.brand-title { font-size: 2.5rem; }
 
-/* --- TARJETA DE REGISTRO (MÁS ANCHA) --- */
-.auth-card {
-  background-color: var(--color-superficie);
-  width: 100%;
-  max-width: 600px; /* Un poco más ancha para las 2 columnas */
-  padding: 40px 48px;
-  border-radius: 20px;
-  border: 1px solid var(--color-borde-suave);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-  box-sizing: border-box;
-}
-
-/* --- PESTAÑAS (TABS) --- */
-.auth-tabs {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 32px;
-  border-bottom: 1px solid #eee;
-}
-
-.auth-tab {
-  padding: 12px 24px;
-  text-decoration: none;
-  color: var(--color-texto-suave);
-  font-weight: 600;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.auth-tab.active {
-  color: var(--color-marca);
-  border-bottom-color: var(--color-marca);
-}
-
-.auth-tab:hover:not(.active) {
-  background-color: var(--color-superficie-suave);
-  color: var(--color-texto-fuerte);
-}
-
-/* --- CABECERA --- */
-.auth-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.brand-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--color-marca);
-  margin-bottom: 8px;
-  letter-spacing: -1.5px;
-}
-
-/* --- SECCIONES Y GRID --- */
-.form-section {
-  margin-bottom: 24px;
-}
+.form-section { margin-bottom: var(--espacio-5); }
 
 .form-section h3 {
-  font-size: 0.9rem;
-  color: var(--color-marca);
+  margin-bottom: var(--espacio-4);
+  padding-bottom: var(--espacio-2);
+  font-size: var(--texto-sm);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  border-bottom: 1px solid var(--color-superficie-alt);
-  padding-bottom: 8px;
-  margin-bottom: 16px;
+  color: var(--color-marca);
+  border-bottom: 1px solid var(--color-borde-suave);
 }
 
 .form-row {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--espacio-4);
+  margin-bottom: var(--espacio-4);
 }
 
-/* FIX PARA LA DIRECCIÓN: Grid estable */
-.address-grid {
-  display: grid;
-  grid-template-columns: 2.5fr 1fr 1fr; /* Proporciones fijas */
-  gap: 16px;
-}
+.form-row .input-group { flex: 1; min-width: 0; }
 
-.input-group {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0; /* Evita que los inputs empujen el contenedor */
-}
+.address-grid { display: grid; grid-template-columns: 2.5fr 1fr 1fr; }
 
-.input-group label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--color-texto-suave);
-  margin-bottom: 6px;
-}
+.btn-primary { width: 100%; margin-top: var(--espacio-4); }
 
-.input-group input {
-  width: 100%; /* Asegura que no se salgan del grid */
-  padding: 12px 16px;
-  font-size: 1rem;
-  border: 1px solid var(--color-borde);
-  border-radius: 12px;
-  transition: all 0.2s ease;
-  box-sizing: border-box; /* Vital para que el padding no sume al ancho */
-}
-
-.input-group input:focus {
-  border-color: var(--color-marca);
-  box-shadow: 0 0 0 4px rgba(13, 0, 99, 0.08);
-  outline: none;
-}
-
-.input-group input.invalid-input {
-  border-color: var(--color-error);
-}
-
-/* --- BOTÓN --- */
-.btn-primary {
-  width: 100%;
-  background-color: var(--color-marca);
-  color: var(--color-sobre-marca);
-  padding: 16px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 16px;
-}
-
-.btn-primary:hover {
-  background-color: var(--color-marca-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(13, 0, 99, 0.2);
-}
-
-/* --- RESPONSIVO --- */
 @media (max-width: 650px) {
-  .auth-card { padding: 32px 24px; }
-  .form-row, .address-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+  .form-row,
+  .address-grid { flex-direction: column; display: flex; }
 }
