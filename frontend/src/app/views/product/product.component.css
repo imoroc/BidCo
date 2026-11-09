@@ -1,385 +1,84 @@
-/* --- ESTRUCTURA PRINCIPAL --- */
+/* Botones, campos, mensajes y modal: ver el kit de UI en styles.css */
 .product-page-background {
-  background-color: var(--color-superficie-suave); /* Fondo premium para que resalten las tarjetas */
   min-height: 85vh;
-  padding: 40px 24px;
-  font-family: 'Montserrat', sans-serif;
+  padding: var(--espacio-7) var(--espacio-5);
+  background: var(--color-superficie-suave);
   color: var(--color-texto-fuerte);
 }
 
-.product-container {
-  max-width: 1200px; /* Ancho máximo para pantallas enormes */
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 64px; /* Separación grande entre el producto y los comentarios */
-}
+.product-container { display: flex; flex-direction: column; gap: 64px; max-width: 1200px; margin: 0 auto; }
+.product-hero-layout { display: grid; grid-template-columns: 1fr 400px; gap: var(--espacio-6); align-items: start; }
 
-/* --- SECCIÓN SUPERIOR: GRID DE DETALLES Y ACCIÓN --- */
-.product-hero-layout {
-  display: grid;
-  grid-template-columns: 1fr 400px; /* Columna Izquierda: Flexible | Derecha: Fija 400px */
-  gap: 40px;
-  align-items: start; /* Importante para que el sticky funcione bien */
-}
-
-/* --- TARJETA DE ACCIÓN (PUJA) --- */
+/* Tarjeta de puja */
 .action-card {
-  background-color: var(--color-superficie);
-  border-radius: 16px;
+  padding: var(--espacio-6);
+  background: var(--color-superficie);
   border: 1px solid var(--color-borde-suave);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-  padding: 32px;
+  border-radius: var(--radio-lg);
+  box-shadow: var(--sombra-1);
 }
 
-/* Magia del Sticky: La tarjeta te persigue al hacer scroll */
-.sticky-card {
-  position: sticky;
-  top: 100px; /* Deja un margen desde arriba de la pantalla */
-}
-
-.card-header {
-  margin-bottom: 24px;
-  border-bottom: 2px solid var(--color-superficie-suave);
-  padding-bottom: 20px;
-}
+.sticky-card { position: sticky; top: 100px; }
+.card-header { margin-bottom: var(--espacio-5); padding-bottom: var(--espacio-5); border-bottom: 1px solid var(--color-borde-suave); }
 
 .status-badge {
   display: inline-block;
-  padding: 4px 10px;
-  background-color: var(--color-exito-fondo);
-  color: var(--color-exito-fuerte); /* Verde activo */
-  border-radius: 4px;
-  font-size: 0.75rem;
+  margin-bottom: var(--espacio-3);
+  padding: var(--espacio-1) var(--espacio-3);
+  font-size: var(--texto-xs);
   font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-.status-badge.ended {
-  background-color: var(--color-error-fondo);
-  color: var(--color-error-fuerte); /* Rojo finalizada */
-}
-
-.action-title {
-  font-size: 1.1rem;
-  color: var(--color-texto-suave);
-  font-weight: 600;
-  margin: 0 0 8px 0;
-}
-
-.main-price {
-  font-size: 2.8rem;
-  font-weight: 800;
-  color: var(--color-marca);
-  line-height: 1;
-  letter-spacing: -1px;
-}
-
-/* Filas de información (Tiempo, Ganador, etc.) */
-.auction-status {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.95rem;
-  color: var(--color-texto-medio);
-}
-
-.info-label {
-  font-weight: 600;
-  color: var(--color-texto-suave);
-}
-
-.info-value {
-  font-weight: 700;
-  color: var(--color-texto-fuerte);
-}
-
-.time-row {
-  justify-content: flex-start;
-  gap: 8px;
-  padding: 12px;
-  background-color: var(--color-superficie-suave);
-  border-radius: 8px;
-  color: var(--color-marca);
-}
-
-.time-row.time-up {
-  color: var(--color-error-fuerte);
-  background-color: var(--color-error-fondo);
-}
-
-.time-value {
-  margin-left: auto;
-}
-
-.highlight-row { padding: 12px; background-color: var(--color-info-fondo); border-radius: 8px; }
-.winner-row { padding: 12px; background-color: var(--color-exito-fondo); border-radius: 8px; border: 1px solid var(--color-exito-borde);}
-
-/* Formulario e Inputs de Puja */
-.bid-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;
-}
-
-/* Mensajes de estado del formulario (sustituyen a los alert) */
-.form-message {
-  margin: 0;
-  padding: 12px 14px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.form-message-error {
-  background-color: var(--color-error-fondo);
-  color: var(--color-error-fuerte);
-}
-
-.form-message-exito {
-  background-color: var(--color-exito-fondo);
   color: var(--color-exito-fuerte);
+  background: var(--color-exito-fondo);
+  border-radius: var(--radio-sm);
 }
+
+.status-badge.ended { color: var(--color-error-fuerte); background: var(--color-error-fondo); }
+.action-title { margin-bottom: var(--espacio-2); font-size: var(--texto-md); font-weight: 600; color: var(--color-texto-suave); }
+.main-price { font-size: 2.75rem; font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: var(--color-marca); }
+
+.auction-status { display: flex; flex-direction: column; gap: var(--espacio-4); margin-bottom: var(--espacio-5); }
+.info-row { display: flex; align-items: center; justify-content: space-between; color: var(--color-texto-medio); }
+.info-label { font-weight: 600; color: var(--color-texto-suave); }
+.info-value { font-weight: 700; color: var(--color-texto-fuerte); }
+.time-row { justify-content: flex-start; gap: var(--espacio-2); padding: var(--espacio-3); color: var(--color-marca); background: var(--color-superficie-suave); border-radius: var(--radio-md); }
+.time-row.time-up { color: var(--color-error-fuerte); background: var(--color-error-fondo); }
+.time-value { margin-left: auto; }
+.highlight-row,
+.winner-row { padding: var(--espacio-3); border-radius: var(--radio-md); }
+.highlight-row { background: var(--color-info-fondo); }
+.winner-row { background: var(--color-exito-fondo); border: 1px solid var(--color-exito-borde); }
+
+.bid-form { display: flex; flex-direction: column; gap: var(--espacio-4); }
 
 .input-wrapper input {
   width: 100%;
-  padding: 16px;
-  font-size: 1.2rem;
+  min-height: 56px;
+  padding: var(--espacio-4);
+  font: inherit;
+  font-size: var(--texto-lg);
   font-weight: 600;
+  text-align: center;
   color: var(--color-texto-fuerte);
-  text-align: center;
-  border: 2px solid var(--color-borde-fuerte);
-  border-radius: 12px;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-}
-
-.input-wrapper input:focus {
-  border-color: var(--color-marca);
-  box-shadow: 0 0 0 3px var(--color-marca-halo);
-  outline: none;
-}
-
-/* Botones */
-.btn-large {
-  padding: 16px;
-  font-size: 1.1rem;
-  border-radius: 12px; /* Botón cuadrado redondeado para pujas */
-  width: 100%;
-}
-
-.login-prompt {
-  text-align: center;
-  padding-top: 16px;
-}
-
-.login-prompt p {
-  font-size: 0.9rem;
-  color: var(--color-texto-suave);
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-
-/* --- SECCIÓN INFERIOR: COMENTARIOS DE EXPERTOS --- */
-.expert-reviews-section {
-  max-width: 800px; /* No queremos que las valoraciones crucen de lado a lado */
-  margin: 0;
-}
-
-.reviews-header {
-  margin-bottom: 32px;
-  border-bottom: 2px solid var(--color-borde-suave);
-  padding-bottom: 24px;
-}
-
-.reviews-header h2 {
-  font-size: 1.8rem;
-  color: var(--color-marca);
-  margin: 0 0 8px 0;
-}
-
-.reviews-subtitle {
-  color: var(--color-texto-suave);
-  margin: 0 0 24px 0;
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: var(--color-marca);
-  border: 2px solid var(--color-marca);
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover { background-color: var(--color-marca); color: var(--color-sobre-marca); }
-
-.reviews-list {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-
-/* --- MODAL DEL EXPERTO (EL POP-UP PREMIUM) --- */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-velo); /* Gris oscuro transparente */
-  backdrop-filter: blur(4px); /* Efecto cristal desenfocado de iOS/Google */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-card {
   background: var(--color-superficie);
-  width: 100%;
-  max-width: 500px;
-  border-radius: 16px;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 2px solid var(--color-borde-fuerte);
+  border-radius: var(--radio-md);
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
+.input-wrapper input:focus { outline: none; border-color: var(--color-marca); box-shadow: 0 0 0 3px var(--color-marca-halo); }
+.input-wrapper input[aria-invalid='true'] { border-color: var(--color-error); }
 
-.modal-form {
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
+.login-prompt { padding-top: var(--espacio-4); text-align: center; }
+.login-prompt p { margin-bottom: var(--espacio-4); font-size: var(--texto-sm); line-height: 1.5; color: var(--color-texto-suave); }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* Valoraciones de expertos */
+.expert-reviews-section { max-width: 800px; }
+.reviews-header { margin-bottom: var(--espacio-6); padding-bottom: var(--espacio-5); border-bottom: 1px solid var(--color-borde-suave); }
+.reviews-header h2 { margin-bottom: var(--espacio-2); font-size: var(--texto-xl); color: var(--color-marca); }
+.reviews-subtitle { margin-bottom: var(--espacio-5); color: var(--color-texto-suave); }
+.reviews-list { display: flex; flex-direction: column; gap: var(--espacio-5); }
 
-.modal-header h3 {
-  font-size: 1.2rem;
-  color: var(--color-texto-fuerte);
-  margin: 0;
-}
-
-.btn-close {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: var(--color-texto-suave);
-  cursor: pointer;
-  line-height: 1;
-  transition: color 0.2s;
-}
-
-.btn-close:hover { color: var(--color-texto-fuerte); }
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-texto-suave);
-}
-
-.form-group textarea,
-.form-group input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--color-borde-fuerte);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 1rem;
-  box-sizing: border-box;
-  transition: all 0.2s;
-}
-
-.form-group textarea { min-height: 120px; resize: vertical; }
-.form-group textarea:focus, .form-group input:focus {
-  border-color: var(--color-marca);
-  box-shadow: 0 0 0 2px var(--color-marca-halo);
-  outline: none;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-top: 8px;
-}
-
-.btn-ghost {
-  background: none;
-  border: none;
-  color: var(--color-texto-suave);
-  font-weight: 600;
-  cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 8px;
-}
-
-.btn-ghost:hover { background-color: var(--color-superficie-alt); color: var(--color-texto-fuerte); }
-
-/* --- RESPONSIVO --- */
 @media (max-width: 900px) {
-  .product-hero-layout {
-    grid-template-columns: 1fr; /* Apila el producto arriba y la puja abajo en móviles */
-  }
-  
-  .sticky-card {
-    position: static; /* Quita el sticky en móviles para no comerse la pantalla */
-  }
-}
-/* --- ACCESIBILIDAD: foco visible y movimiento reducido --- */
-.btn-primary:focus-visible,
-.btn-secondary:focus-visible,
-.btn-ghost:focus-visible,
-.btn-close:focus-visible,
-.input-wrapper input:focus-visible,
-.form-group textarea:focus-visible,
-.form-group input:focus-visible {
-  outline: 3px solid var(--color-marca);
-  outline-offset: 2px;
-}
-
-.input-wrapper input[aria-invalid='true'],
-.form-group textarea[aria-invalid='true'],
-.form-group input[aria-invalid='true'] {
-  border-color: var(--color-error-fuerte);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .modal-card { animation: none; }
-  .btn-primary,
-  .btn-primary:hover,
-  .input-wrapper input,
-  .form-group textarea,
-  .form-group input { transition: none; transform: none; }
+  .product-hero-layout { grid-template-columns: 1fr; }
+  .sticky-card { position: static; }
 }
