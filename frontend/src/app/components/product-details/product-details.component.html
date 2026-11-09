@@ -5,7 +5,7 @@
       <span class="badge badge-auction">
         @if(tipo === 'ciega') { Subasta a Ciegas } @else { Subasta Activa }
       </span>
-      <img class="product-image" [src]="productoSubasta.imagen" [alt]="productoSubasta.nombreArticulo">
+      <img class="product-image" [src]="productoSubasta.imagen" [alt]="productoSubasta.nombreArticulo" fetchpriority="high" decoding="async">
     </div>
 
     <div class="product-info">
@@ -40,7 +40,7 @@
     
     <div class="product-gallery">
       <span class="badge badge-raffle">Sorteo Exclusivo</span>
-      <img class="product-image" [src]="productoSorteo.imagen" [alt]="productoSorteo.nombreArticulo">
+      <img class="product-image" [src]="productoSorteo.imagen" [alt]="productoSorteo.nombreArticulo" fetchpriority="high" decoding="async">
     </div>
 
     <div class="product-info">

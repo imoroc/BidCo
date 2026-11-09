@@ -1,4 +1,4 @@
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment'; // Añade la importación
 import { finDeDiaMs } from '../../utils/fechas';
@@ -6,7 +6,7 @@ import { finDeDiaMs } from '../../utils/fechas';
 @Component({
   selector: 'app-product-item',
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, NgOptimizedImage],
   templateUrl: './product-item.component.html',
   styleUrl: './product-item.component.css'
 })
