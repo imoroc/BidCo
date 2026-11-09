@@ -34,7 +34,7 @@ jobs:
       - name: Audit dependencies
         run: npm audit --omit=dev --audit-level=high
       - name: Unit tests
-        run: npx ng test --watch=false --browsers=ChromeHeadlessCI
+        run: npm test -- --watch=false --browsers=ChromeHeadlessCI
       - name: Production build
         run: npm run build -- --configuration production
 
