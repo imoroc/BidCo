@@ -44,6 +44,22 @@
     --color-exito-fondo: #e6f4ea;
     --color-scroll: #c4c7cc;
     --color-scroll-hover: #9aa0a6;
+    --color-borde-fuerte: #80868b;
+    --color-texto-medio: #3c4043;
+    --color-error-borde: #f28b82;
+    --color-error-fondo-hover: #fad2cf;
+    --color-exito-borde: #ceead6;
+    --color-destacado: #fbbc04;
+    --color-destacado-texto: #b07d00;
+    --color-info-fondo: #e8f0fe;
+    --color-realce: #f0f4ff;
+    --color-marca-halo: rgba(13, 0, 99, 0.12);
+    --color-sobre-oscuro: #ffffff;
+    --color-velo: rgba(32, 33, 36, 0.6);
+    --color-cabecera: rgba(255, 255, 255, 0.92);
+    --sombra-marca: 0 4px 12px rgba(13, 0, 99, 0.15);
+    --sombra-marca-alta: 0 8px 20px rgba(13, 0, 99, 0.2);
+    --sombra-tarjeta: 0 12px 32px rgba(0, 0, 0, 0.06);
 
     /* Tipografia */
     --fuente-base: 'Montserrat', Arial, sans-serif;
@@ -168,4 +184,399 @@ main {
 img {
     max-width: 100%;
     height: auto;
+}
+
+/* ==========================================================================
+   Kit de UI compartido
+   Botones, campos, alertas, insignias y estructura de las pantallas de acceso.
+   Las vistas solo añaden lo propio; los colores salen siempre de los tokens.
+   ========================================================================== */
+
+/* --- Botones --- */
+.btn-primary,
+.btn-admin {
+    --_bg: var(--btn-bg, var(--color-marca));
+    --_bg-hover: var(--btn-bg-hover, var(--color-marca-hover));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--espacio-2);
+    min-height: var(--objetivo-tactil);
+    padding: 0 var(--espacio-5);
+    font-family: inherit;
+    font-size: var(--texto-md);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--btn-fg, var(--color-sobre-marca));
+    background: var(--_bg);
+    border: 0;
+    border-radius: var(--radio-pill);
+    cursor: pointer;
+    transition: background var(--transicion), box-shadow var(--transicion);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-admin:hover:not(:disabled) {
+    background: var(--_bg-hover);
+    box-shadow: var(--sombra-marca);
+}
+
+.btn-primary:disabled,
+.btn-admin:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Variante neutra (experto y administracion) */
+.worker-card,
+.admin-card {
+    --btn-bg: var(--color-texto-fuerte);
+    --btn-bg-hover: var(--color-texto);
+    --btn-fg: var(--color-superficie);
+    --acento-tarjeta: var(--color-texto-fuerte);
+}
+
+.admin-card { --acento-tarjeta: var(--color-error); }
+
+/* --- Pantallas de acceso (login, registro, experto, admin, recuperar) --- */
+.auth-page-background {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 85vh;
+    padding: var(--espacio-7) var(--espacio-5);
+    background: var(--color-superficie-suave);
+    color: var(--color-texto-fuerte);
+}
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 460px;
+    padding: var(--espacio-6) var(--espacio-7);
+    background: var(--color-superficie);
+    border: 1px solid var(--color-borde-suave);
+    border-top: 4px solid var(--acento-tarjeta, var(--color-marca));
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-tarjeta);
+}
+
+.auth-header {
+    margin-bottom: var(--espacio-5);
+    text-align: center;
+}
+
+.auth-header h2 {
+    margin-bottom: var(--espacio-2);
+    font-size: var(--texto-lg);
+    color: var(--color-texto-fuerte);
+}
+
+.auth-header p {
+    font-size: var(--texto-sm);
+    line-height: 1.5;
+    color: var(--color-texto-suave);
+}
+
+.brand-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--espacio-3);
+    margin-bottom: var(--espacio-3);
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--color-marca);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-5);
+}
+
+.auth-form .btn-primary,
+.auth-form .btn-admin { width: 100%; }
+
+.auth-footer {
+    margin-top: var(--espacio-6);
+    padding-top: var(--espacio-5);
+    text-align: center;
+    border-top: 1px solid var(--color-borde-suave);
+}
+
+.back-link,
+.forgot-link {
+    font-size: var(--texto-sm);
+    font-weight: 600;
+    color: var(--color-marca);
+    text-decoration: none;
+}
+
+.back-link:hover,
+.forgot-link:hover { text-decoration: underline; }
+
+/* Pestañas iniciar sesion / crear cuenta */
+.auth-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--espacio-5);
+    border-bottom: 1px solid var(--color-borde-suave);
+}
+
+.auth-tab {
+    padding: var(--espacio-3) var(--espacio-5);
+    font-size: var(--texto-sm);
+    font-weight: 600;
+    color: var(--color-texto-suave);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color var(--transicion), background var(--transicion);
+}
+
+.auth-tab.active {
+    color: var(--color-marca);
+    border-bottom-color: var(--color-marca);
+}
+
+.auth-tab:hover:not(.active) {
+    color: var(--color-texto-fuerte);
+    background: var(--color-superficie-suave);
+}
+
+/* --- Campos de formulario --- */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-2);
+}
+
+.input-group label {
+    font-size: var(--texto-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-texto-suave);
+}
+
+.input-group input:not([type='checkbox']):not([type='radio']),
+.input-group select,
+.input-group textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: var(--espacio-3) var(--espacio-4);
+    font-family: inherit;
+    font-size: var(--texto-md);
+    color: var(--color-texto-fuerte);
+    background: var(--color-superficie);
+    border: 1px solid var(--color-borde-fuerte);
+    border-radius: var(--radio-md);
+    transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+
+.input-group textarea { resize: vertical; }
+
+.input-group input::placeholder,
+.input-group textarea::placeholder { color: var(--color-texto-suave); opacity: 0.8; }
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+    outline: none;
+    border-color: var(--color-marca);
+    box-shadow: 0 0 0 3px var(--color-marca-halo);
+}
+
+.input-group input[aria-invalid='true'],
+.input-group input.ng-invalid.ng-touched {
+    border-color: var(--color-error);
+}
+
+/* --- Casilla personalizada --- */
+.form-options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espacio-3);
+}
+
+.checkbox-group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--espacio-2);
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-group input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.custom-checkbox {
+    position: relative;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    background: var(--color-superficie);
+    border: 2px solid var(--color-borde-fuerte);
+    border-radius: var(--radio-sm);
+    transition: background var(--transicion), border-color var(--transicion);
+}
+
+.checkbox-group input:checked + .custom-checkbox {
+    background: var(--btn-bg, var(--color-marca));
+    border-color: var(--btn-bg, var(--color-marca));
+}
+
+.checkbox-group input:checked + .custom-checkbox::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--btn-fg, var(--color-sobre-marca));
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-group input:focus-visible + .custom-checkbox {
+    outline: var(--anillo-foco);
+    outline-offset: 2px;
+}
+
+.checkbox-label {
+    font-size: var(--texto-sm);
+    color: var(--color-texto-medio);
+}
+
+/* --- Alertas --- */
+.alert-error,
+.alert-success {
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-3);
+    padding: var(--espacio-3) var(--espacio-4);
+    font-size: var(--texto-sm);
+    font-weight: 600;
+    line-height: 1.4;
+    border: 1px solid;
+    border-radius: var(--radio-md);
+}
+
+.auth-card .alert-error,
+.auth-card .alert-success { margin-bottom: var(--espacio-5); }
+
+.alert-error svg,
+.alert-success svg { flex: none; }
+
+.alert-error {
+    color: var(--color-error-fuerte);
+    background: var(--color-error-fondo);
+    border-color: var(--color-error-borde);
+}
+
+.alert-success {
+    color: var(--color-exito-fuerte);
+    background: var(--color-exito-fondo);
+    border-color: var(--color-exito-borde);
+}
+
+/* --- Insignias de rol --- */
+.badge-admin,
+.badge-worker {
+    padding: var(--espacio-1) var(--espacio-2);
+    font-size: var(--texto-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-superficie);
+    background: var(--color-texto-fuerte);
+    border-radius: var(--radio-sm);
+}
+
+.badge-admin { background: var(--color-error); }
+
+@media (max-width: 600px) {
+    .auth-page-background { padding: var(--espacio-5) var(--espacio-4); }
+    .auth-card { padding: var(--espacio-5) var(--espacio-4); }
+}
+
+/* --- Formularios de administracion (alta de experto, nuevo sorteo) --- */
+.admin-form-card {
+    max-width: 520px;
+    margin: 0 auto;
+    overflow: hidden;
+    background: var(--color-superficie);
+    border: 1px solid var(--color-borde-suave);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-1);
+}
+
+.admin-form-card.wide-card { max-width: 800px; }
+
+.admin-form-card .card-header {
+    padding: var(--espacio-5);
+    text-align: center;
+    background: var(--color-superficie-suave);
+    border-bottom: 1px solid var(--color-borde-suave);
+}
+
+.admin-form-card .form-title {
+    margin-bottom: var(--espacio-2);
+    font-size: var(--texto-lg);
+    color: var(--color-texto-fuerte);
+}
+
+.admin-form-card .card-header p {
+    font-size: var(--texto-sm);
+    color: var(--color-texto-suave);
+}
+
+.admin-form-card .form-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-5);
+    padding: var(--espacio-6);
+}
+
+.admin-form-card .form-body .btn-admin { align-self: stretch; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--espacio-5);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--espacio-5);
+    border-top: 1px solid var(--color-borde-suave);
+}
+
+.form-actions .btn-admin { align-self: auto; }
+
+.file-input { background: var(--color-superficie-suave); cursor: pointer; }
+
+.input-group input.invalid-input { border-color: var(--color-error); }
+
+@media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; gap: var(--espacio-4); }
+    .admin-form-card .form-body { padding: var(--espacio-5) var(--espacio-4); }
 }
