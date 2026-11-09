@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
+import { RecuperacionService, mensajeDeRecuperacion } from '../../services/recuperacion.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,13 +13,28 @@ import { FooterComponent } from '../../components/footer/footer.component';
   styleUrl: './forgot-password.css'
 })
 export class ForgotPasswordComponent {
-  email: string = '';
-  enviado: boolean = false;
+  email = '';
+  readonly enviando = signal(false);
+  readonly enviado = signal(false);
+  readonly error = signal('');
+
+  constructor(private recuperacion: RecuperacionService) {}
 
   recoverPassword() {
-    if (this.email) {
-      // Aquí iría tu llamada al servicio backend: this.auth.recoverPassword(this.email)...
-      this.enviado = true; 
+    if (!this.email || this.enviando()) {
+      return;
     }
+    this.enviando.set(true);
+    this.error.set('');
+    this.recuperacion.solicitar(this.email.trim()).subscribe({
+      next: () => {
+        this.enviando.set(false);
+        this.enviado.set(true);
+      },
+      error: (err) => {
+        this.enviando.set(false);
+        this.error.set(mensajeDeRecuperacion(err));
+      }
+    });
   }
 }
