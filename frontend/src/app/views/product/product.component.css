@@ -174,37 +174,12 @@
 }
 
 /* Botones */
-.btn-primary {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--color-marca);
-  color: var(--color-sobre-marca);
-  padding: 12px 24px;
-  border: none;
-  border-radius: 24px;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(13, 0, 99, 0.15);
-}
-
 .btn-large {
   padding: 16px;
   font-size: 1.1rem;
   border-radius: 12px; /* Botón cuadrado redondeado para pujas */
   width: 100%;
 }
-
-.btn-primary:hover {
-  background-color: var(--color-marca-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(13, 0, 99, 0.25);
-}
-
-.btn-primary:active { transform: translateY(0); }
 
 .login-prompt {
   text-align: center;

@@ -212,6 +212,7 @@ img {
     border: 0;
     border-radius: var(--radio-pill);
     cursor: pointer;
+    text-decoration: none;
     transition: background var(--transicion), box-shadow var(--transicion);
 }
 
