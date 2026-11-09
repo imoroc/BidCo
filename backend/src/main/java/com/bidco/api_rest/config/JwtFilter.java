@@ -29,6 +29,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private static final List<String> PUBLIC_ROUTES = List.of(
             "POST:/api/usuarios",
             "POST:/api/usuarios/login",
+            "POST:/api/usuarios/recuperar-contrasena",
+            "POST:/api/usuarios/restablecer-contrasena",
             "POST:/api/trabajadores/login",
             "POST:/api/admin/login",
             "GET:/api/ping",
