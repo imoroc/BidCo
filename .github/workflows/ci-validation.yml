@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   frontend-checks:
     name: Frontend (Angular)
@@ -27,6 +31,10 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
+      - name: Audit dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Unit tests
+        run: npx ng test --watch=false --browsers=ChromeHeadlessCI
       - name: Production build
         run: npm run build -- --configuration production
 
@@ -47,3 +55,15 @@ jobs:
           cache: "maven"
       - name: Verify (compile + tests)
         run: mvn -B clean verify
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Review dependencies
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
