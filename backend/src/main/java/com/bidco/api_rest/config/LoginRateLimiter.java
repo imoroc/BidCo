@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * </ul>
  * Si se escala a más de una instancia, habría que mover el contador a un almacén
  * compartido (por ejemplo Redis o la propia base de datos).
+ * Ver docs/decisiones-tecnicas.md.
  */
 @Component
 public class LoginRateLimiter {
