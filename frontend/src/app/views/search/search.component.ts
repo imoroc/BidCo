@@ -11,6 +11,7 @@ import { ProductItemComponent } from '../../components/product-item/product-item
 import { FooterComponent } from "../../components/footer/footer.component";
 
 import { SubastaService, SubastaResponseDTO, Filtro } from '../../services/auction.service';
+import { ocultarVencidas } from '../../utils/fechas';
 import { AuthService } from '../../services/auth.service';
 import { AuthExpertService } from '../../services/auth.expert.service';
 ;
@@ -93,8 +94,8 @@ export class SearchComponent {
         
         this.subastaService.getSubastasFiltradasPorNombre(camposFiltro, this.searchTerm || '').subscribe({
             next: data => {
-                this.products = data;
-                if(data && data.length === 0) {
+                this.products = ocultarVencidas(data ?? [], p => p.fechaFinal, this.filtro.mostrarVencidas ?? false);
+                if (this.products.length === 0) {
                     this.noCoincidencias = true;
                 }
                 this.cargaDeProductos = false;

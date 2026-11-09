@@ -1,9 +1,10 @@
 import { DestroyRef, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpParams } from '@angular/common/http';
-import { Observable, Subject, catchError, of, retry, switchMap, tap, throwError, timer } from 'rxjs';
+import { Observable, Subject, catchError, map, of, retry, switchMap, tap, throwError, timer } from 'rxjs';
 
 import { Filtro } from '../services/auction.service';
+import { ocultarVencidas } from './fechas';
 
 /** Convierte el filtro de la interfaz en los parámetros de consulta que espera la API. */
 export function filtroAParams(filtro: Filtro): HttpParams {
@@ -41,16 +42,25 @@ export class ListadoFiltrado<T> {
     readonly cargando = signal(true);
     readonly errorCarga = signal(false);
 
-    private readonly peticiones$ = new Subject<HttpParams>();
+    private readonly peticiones$ = new Subject<{ params: HttpParams; mostrarVencidas: boolean }>();
 
-    constructor(cargador: (params: HttpParams) => Observable<T[]>, destroyRef: DestroyRef) {
+    /**
+     * @param fechaFinalDe si se indica, los elementos vencidos se ocultan salvo que el filtro
+     *        pida mostrarlos; sin él se muestra todo (historiales del usuario).
+     */
+    constructor(
+        cargador: (params: HttpParams) => Observable<T[]>,
+        destroyRef: DestroyRef,
+        private readonly fechaFinalDe?: (item: T) => string | null | undefined
+    ) {
         this.peticiones$.pipe(
             tap(() => {
                 this.cargando.set(true);
                 this.errorCarga.set(false);
             }),
-            switchMap(params => cargador(params).pipe(
+            switchMap(({ params, mostrarVencidas }) => cargador(params).pipe(
                 reintentarSiArranca<T[]>(),
+                map(items => this.fechaFinalDe ? ocultarVencidas(items, this.fechaFinalDe, mostrarVencidas) : items),
                 catchError(err => {
                     console.error('Error al obtener el listado: ', err);
                     this.errorCarga.set(true);
@@ -65,6 +75,6 @@ export class ListadoFiltrado<T> {
     }
 
     cargar(filtro: Filtro) {
-        this.peticiones$.next(filtroAParams(filtro));
+        this.peticiones$.next({ params: filtroAParams(filtro), mostrarVencidas: filtro.mostrarVencidas ?? false });
     }
 }

@@ -1,4 +1,4 @@
-import { MARGEN_CIERRE_MS, finDeDiaMs, hoyISO, mananaISO } from './fechas';
+import { MARGEN_CIERRE_MS, estaVencida, finDeDiaMs, hoyISO, mananaISO, ocultarVencidas } from './fechas';
 
 type Caso = [descripcion: string, entrada: string, esperado: string];
 
@@ -52,6 +52,36 @@ describe('fechas', () => {
 
         it('devuelve NaN si el formato no es válido', () => {
             expect(finDeDiaMs('15/01/2026')).toBeNaN();
+        });
+    });
+
+    describe('estaVencida', () => {
+        type CasoVencida = [descripcion: string, fechaFinal: string | null | undefined, esperado: boolean];
+        const casos: CasoVencida[] = [
+            ['es posterior a la fecha final', '2026-06-14', true],
+            ['el propio día de la fecha final sigue abierta', '2026-06-15', false],
+            ['una fecha futura no está vencida', '2026-06-16', false],
+            ['ignora la hora si la fecha la trae', '2026-06-14T10:00:00', true],
+            ['sin fecha no se considera vencida', undefined, false],
+        ];
+
+        casos.forEach(([descripcion, fechaFinal, esperado]) => {
+            it(descripcion, () => expect(estaVencida(fechaFinal, '2026-06-15')).toBe(esperado));
+        });
+    });
+
+    describe('ocultarVencidas', () => {
+        const hoy = hoyISO();
+        const ayer = new Date(Date.UTC(+hoy.slice(0, 4), +hoy.slice(5, 7) - 1, +hoy.slice(8, 10) - 1)).toISOString().slice(0, 10);
+        const items = [{ id: 1, fin: ayer }, { id: 2, fin: hoy }, { id: 3, fin: mananaISO() }];
+        const fin = (item: { fin: string }) => item.fin;
+
+        it('oculta los vencidos por defecto', () => {
+            expect(ocultarVencidas(items, fin, false).map(i => i.id)).toEqual([2, 3]);
+        });
+
+        it('los conserva cuando se piden', () => {
+            expect(ocultarVencidas(items, fin, true).map(i => i.id)).toEqual([1, 2, 3]);
         });
     });
 });

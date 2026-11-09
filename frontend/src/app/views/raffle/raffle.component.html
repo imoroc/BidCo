@@ -1,7 +1,7 @@
 <app-header></app-header>
 
 <div class="page-layout">
-  <app-filter (filterChanged)="handleFilterApplied($event)"></app-filter>
+  <app-filter [permiteVencidas]="true" (filterChanged)="handleFilterApplied($event)"></app-filter>
 
   <main class="main-content">
     

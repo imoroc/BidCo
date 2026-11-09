@@ -9,13 +9,16 @@ export interface SubastaResponseDTO {
     precioFinal: string;
     categoria: string;
     subastaNormal: boolean;
+    fechaFinal: string;
 }
 
 export interface Filtro {
     minPrice: number, 
     maxPrice: number, 
     categories: string[], 
-    dateOrder: string 
+    dateOrder: string,
+    /** Solo en el cliente: la API no lo recibe. Por defecto se ocultan las vencidas. */
+    mostrarVencidas?: boolean
 }
 
 @Injectable({

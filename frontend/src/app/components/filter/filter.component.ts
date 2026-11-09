@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -19,6 +19,10 @@ export class FilterComponent {
     categories: string[] = ['Tecnología', 'Hogar', 'Moda', 'Deportes', 'Juguetes', 'Otros'];
     selectedCategories: string[] = [];
     dateOrder: string = '';
+    mostrarVencidas: boolean = false;
+
+    /** Solo los listados públicos ofrecen ver los vencidos; los historiales ya los muestran. */
+    @Input() permiteVencidas: boolean = false;
 
     constructor(private subastaService: SubastaService) {}
 
@@ -28,7 +32,8 @@ export class FilterComponent {
         minPrice: 0, 
         maxPrice: 0, 
         categories: [], 
-        dateOrder: ""
+        dateOrder: "",
+        mostrarVencidas: false
     };
 
     ngOnInit() {
@@ -67,7 +72,8 @@ export class FilterComponent {
             minPrice: this.minPrice,
             maxPrice: this.maxPrice,
             categories: [...this.selectedCategories],
-            dateOrder: this.dateOrder
+            dateOrder: this.dateOrder,
+            mostrarVencidas: this.permiteVencidas && this.mostrarVencidas
         });
     }
 }

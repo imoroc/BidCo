@@ -13,12 +13,7 @@ export interface SorteoResponseDto {
     creadorId: number; 
 }
 
-export interface Filtro {
-    minPrice: number, 
-    maxPrice: number, 
-    categories: string[], 
-    dateOrder: string 
-}
+export type { Filtro } from './auction.service';
 
 @Injectable({
     providedIn: 'root'

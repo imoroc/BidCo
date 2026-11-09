@@ -89,5 +89,21 @@
                   </select>
                 </div>
               </fieldset>
+
+              @if (permiteVencidas) {
+                <fieldset>
+                  <legend>Estado</legend>
+                  <div class="checkbox-group">
+                    <input
+                      type="checkbox"
+                      id="mostrar-vencidas"
+                      name="mostrarVencidas"
+                      [(ngModel)]="mostrarVencidas"
+                      (change)="applyFilter()"
+                      />
+                    <label for="mostrar-vencidas">Mostrar vencidas</label>
+                  </div>
+                </fieldset>
+              }
             </form>
           </div>
