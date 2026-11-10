@@ -4,6 +4,20 @@
           [attr.aria-expanded]="abierto" (click)="abierto = !abierto">
     {{ abierto ? 'Ocultar filtros' : 'Mostrar filtros' }}@if (filtrosActivos > 0) { ({{ filtrosActivos }}) }
   </button>
+  @if (chips.length > 0) {
+    <ul class="chip-list" aria-label="Filtros activos">
+      @for (chip of chips; track chip.tipo + chip.valor) {
+        <li>
+          <button type="button" class="chip" (click)="quitarFiltro(chip)">
+            {{ chip.texto }}
+            <span aria-hidden="true">×</span>
+            <span class="sr-only">Quitar filtro</span>
+          </button>
+        </li>
+      }
+      <li><button type="button" class="btn-ghost chip-limpiar" (click)="limpiarFiltros()">Limpiar todo</button></li>
+    </ul>
+  }
   <form id="filtros-cuerpo" [class.abierto]="abierto">
     <!-- Filtro de Precio -->
     <fieldset>

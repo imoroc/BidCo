@@ -31,6 +31,37 @@ export class FilterComponent {
         return this.selectedCategories.length + (this.dateOrder ? 1 : 0) + (this.mostrarVencidas ? 1 : 0);
     }
 
+    /** Filtros activos como etiquetas que se pueden quitar de una en una. */
+    get chips(): { tipo: 'categoria' | 'fecha' | 'vencidas'; valor: string; texto: string }[] {
+        const chips: { tipo: 'categoria' | 'fecha' | 'vencidas'; valor: string; texto: string }[] =
+            this.selectedCategories.map(c => ({ tipo: 'categoria' as const, valor: c, texto: c }));
+        if (this.dateOrder) {
+            chips.push({ tipo: 'fecha', valor: this.dateOrder, texto: this.dateOrder === 'asc' ? 'Termina antes' : 'Termina después' });
+        }
+        if (this.mostrarVencidas) {
+            chips.push({ tipo: 'vencidas', valor: '', texto: 'Con vencidas' });
+        }
+        return chips;
+    }
+
+    quitarFiltro(chip: { tipo: string; valor: string }) {
+        if (chip.tipo === 'categoria') {
+            this.selectedCategories = this.selectedCategories.filter(c => c !== chip.valor);
+        } else if (chip.tipo === 'fecha') {
+            this.dateOrder = '';
+        } else {
+            this.mostrarVencidas = false;
+        }
+        this.applyFilter();
+    }
+
+    limpiarFiltros() {
+        this.selectedCategories = [];
+        this.dateOrder = '';
+        this.mostrarVencidas = false;
+        this.applyFilter();
+    }
+
     constructor(private subastaService: SubastaService) {}
 
     @Output() filterChanged = new EventEmitter<Filtro>();
