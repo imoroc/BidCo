@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 
 import { Filtro, SubastaService } from '../../services/auction.service';
+import { consultaAFiltro, filtroAConsulta } from '../../utils/filtro-url';
 
 @Component({
   selector: 'app-filter',
@@ -24,6 +25,8 @@ export class FilterComponent {
 
     /** Solo los listados públicos ofrecen ver los vencidos; los historiales ya los muestran. */
     @Input() permiteVencidas: boolean = false;
+    /** Refleja el filtro en la URL (y lo lee al abrir la página) para poder compartirlo o recargarlo. */
+    @Input() sincronizarUrl: boolean = false;
     /** Solo afecta a pantallas estrechas: en escritorio el panel está siempre visible. */
     abierto = false;
 
@@ -68,7 +71,7 @@ export class FilterComponent {
         this.applyFilter();
     }
 
-    constructor(private subastaService: SubastaService) {}
+    constructor(private subastaService: SubastaService, private location: Location) {}
 
     @Output() filterChanged = new EventEmitter<Filtro>();
 
@@ -81,7 +84,37 @@ export class FilterComponent {
     };
 
     ngOnInit() {
+        if (this.sincronizarUrl) {
+            this.leerDeLaUrl();
+        }
         this.applyFilter();
+    }
+
+    private consultaActual(): string {
+        return this.location.path().split('#')[0].split('?')[1] ?? '';
+    }
+
+    private leerDeLaUrl() {
+        const filtro = consultaAFiltro(this.consultaActual(), this.categories, this.permiteVencidas);
+        this.minPrice = filtro.minPrice;
+        this.maxPrice = filtro.maxPrice;
+        this.selectedCategories = filtro.categories;
+        this.dateOrder = filtro.dateOrder;
+        this.mostrarVencidas = filtro.mostrarVencidas ?? false;
+    }
+
+    /**
+     * Escribe el filtro en la URL con `replaceState` y no con el router: así un cambio solo de consulta
+     * no abre una navegación (ni transición de vista, ni cambio de título o canonical) ni añade entradas al historial.
+     */
+    private escribirEnLaUrl(filtro: Filtro) {
+        const actual = this.consultaActual();
+        const nueva = filtroAConsulta(filtro, actual);
+        if (nueva === actual) {
+            return;
+        }
+        const ruta = this.location.path().split('#')[0].split('?')[0];
+        this.location.replaceState(ruta, nueva, history.state);
     }
 
     updateCategoryFilter(event: any) {
@@ -112,12 +145,16 @@ export class FilterComponent {
         if (this.minPrice > this.maxPossible) this.minPrice = this.maxPossible; 
         if (this.maxPrice < this.minPossible) this.maxPrice = this.minPossible;
         
-        this.filterChanged.emit({
+        const filtro: Filtro = {
             minPrice: this.minPrice,
             maxPrice: this.maxPrice,
             categories: [...this.selectedCategories],
             dateOrder: this.dateOrder,
             mostrarVencidas: this.permiteVencidas && this.mostrarVencidas
-        });
+        };
+        if (this.sincronizarUrl) {
+            this.escribirEnLaUrl(filtro);
+        }
+        this.filterChanged.emit(filtro);
     }
 }
