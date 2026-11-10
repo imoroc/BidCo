@@ -57,6 +57,12 @@ jobs:
           cache: "maven"
       - name: Verify (compile + tests)
         run: mvn -B clean verify
+      - name: Resumen de pruebas del backend
+        if: always()
+        run: |
+          cat target/surefire-reports/*.txt 2>/dev/null | grep -h "^Tests run:" | awk -F'[:,]' '{t+=$2; f+=$4; e+=$6; s+=$8} END {printf "::notice title=Pruebas del backend::%d ejecutadas, %d fallos, %d errores, %d omitidas\n", t, f, e, s}'
+          for f in target/surefire-reports/*RepositoryTest.txt; do [ -f "$f" ] && echo "::notice title=Pruebas de repositorio::$(sed -n 2p "$f") | $(sed -n 4p "$f")"; done
+          true
       - name: Subir informe de cobertura
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
