@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * {@code CASE WHEN} sobre el precio y {@code ORDER BY CASE} con parámetros, que una base en
  * memoria no reproduce fielmente. Necesita Docker.
  */
-@DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
+@DataJpaTest(properties = {"spring.jpa.hibernate.ddl-auto=create-drop", "spring.flyway.enabled=false"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class SubastaRepositoryTest {
 
