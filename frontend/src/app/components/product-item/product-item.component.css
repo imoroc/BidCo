@@ -15,7 +15,7 @@
 /* Efecto hover: se levanta y proyecta sombra (Nivel premium) */
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(13, 0, 99, 0.08); /* Sombra con un ligerísimo tono de tu azul */
+  box-shadow: var(--sombra-marca-suave); /* Sombra con un ligerísimo tono de la marca */
 }
 
 /* --- ZONA DE LA IMAGEN --- */
@@ -59,7 +59,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   z-index: 2;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: var(--sombra-elevada);
 }
 
 .badge-blind { background-color: var(--color-texto-fuerte); color: var(--color-superficie); }

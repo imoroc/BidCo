@@ -5,7 +5,7 @@
   border-radius: 12px;
   padding: 20px 24px;
   margin: 16px 0;
-  box-shadow: 0 2px 8px rgba(13, 0, 99, 0.04);
+  box-shadow: var(--sombra-tenue);
   font-family: 'Montserrat', sans-serif;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
@@ -26,7 +26,7 @@
 }
 
 .expert-comment-card:hover {
-  box-shadow: 0 6px 16px rgba(13, 0, 99, 0.08);
+  box-shadow: var(--sombra-marca-suave);
   transform: translateY(-2px); /* Se levanta un poquito */
 }
 

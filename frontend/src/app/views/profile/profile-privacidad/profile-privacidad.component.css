@@ -2,7 +2,7 @@
 .settings-header h2 { font-size: 1.8rem; color: var(--color-texto-fuerte); margin: 0 0 8px 0; }
 .settings-header p { color: var(--color-texto-suave); margin: 0; }
 
-.settings-card { background: var(--color-superficie); border-radius: 12px; border: 1px solid var(--color-borde-suave); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 0; overflow: hidden; }
+.settings-card { background: var(--color-superficie); border-radius: 12px; border: 1px solid var(--color-borde-suave); box-shadow: var(--sombra-tenue); padding: 0; overflow: hidden; }
 
 .loading-state { padding: 40px; text-align: center; color: var(--color-texto-suave); font-weight: 600; }
 
@@ -40,7 +40,7 @@
   background-color: var(--color-sobre-oscuro);
   border-radius: 50%;
   transition: .3s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: var(--sombra-control);
 }
 
 .modern-switch input:checked + .switch-slider {
