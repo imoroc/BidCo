@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -56,7 +56,7 @@ public class CierreAutomaticoTask {
     }
 
     int cerrarSubastasVencidas() {
-        List<Long> ids = subastaRepository.findIdsVencidasConPujasSinGanador(LocalDate.now(clock));
+        List<Long> ids = subastaRepository.findIdsVencidasConPujasSinGanador(Instant.now(clock));
         int cerradas = 0;
         for (Long id : ids) {
             try {
@@ -70,7 +70,7 @@ public class CierreAutomaticoTask {
     }
 
     int cerrarSorteosVencidos() {
-        List<Long> ids = sorteoRepository.findIdsVencidosConParticipacionesSinGanador(LocalDate.now(clock));
+        List<Long> ids = sorteoRepository.findIdsVencidosConParticipacionesSinGanador(Instant.now(clock));
         int cerrados = 0;
         for (Long id : ids) {
             try {

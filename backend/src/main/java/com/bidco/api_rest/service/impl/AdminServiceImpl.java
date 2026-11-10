@@ -9,6 +9,7 @@ import com.bidco.api_rest.repository.TrabajadorRepository;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.service.contract.AdminService;
 import com.bidco.api_rest.service.contract.CloudinaryService;
+import com.bidco.api_rest.util.FechasCierre;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,12 +17,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Clock;
+import java.time.Instant;
+
 @Service
 public class AdminServiceImpl implements AdminService {
 
     private final TrabajadorRepository trabajadorRepo;
     private final SorteoRepository sorteoRepo;
     private final CloudinaryService cloudinaryService;
+    private final Clock clock;
     private static final String CREDENCIALES_INCORRECTAS = "Credenciales incorrectas";
     private static final BCryptPasswordEncoder STATIC_ENCODER = new BCryptPasswordEncoder();
     private static final String DUMMY_HASH = STATIC_ENCODER.encode("contraseña-inexistente");
@@ -30,11 +35,13 @@ public class AdminServiceImpl implements AdminService {
     public AdminServiceImpl(
         TrabajadorRepository trabajadorRepo,
         SorteoRepository sorteoRepo,
-        CloudinaryService cloudinaryService
+        CloudinaryService cloudinaryService,
+        Clock clock
     ) {
         this.trabajadorRepo = trabajadorRepo;
         this.sorteoRepo = sorteoRepo;
         this.cloudinaryService = cloudinaryService;
+        this.clock = clock;
     }
 
     @Override
@@ -64,7 +71,9 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("No autenticado como admin");
         }
 
-        if (dto.getFechaInicio().isAfter(dto.getFechaFin())) {
+        Instant fechaFin = FechasCierre.parsear(dto.getFechaFin(), clock.getZone());
+        if (dto.getFechaInicio() == null
+                || !fechaFin.isAfter(dto.getFechaInicio().atStartOfDay(clock.getZone()).toInstant())) {
             throw new IllegalArgumentException("Fecha inicio debe ser anterior a fin");
         }
 
@@ -72,7 +81,7 @@ public class AdminServiceImpl implements AdminService {
         sorteo.setNombreArticulo(dto.getNombreArticulo());
         sorteo.setDescripcion(dto.getDescripcion());
         sorteo.setFechaInicio(dto.getFechaInicio());
-        sorteo.setFechaFin(dto.getFechaFin());
+        sorteo.setFechaFin(fechaFin);
         sorteo.setPuntosNecesarios(dto.getPuntosNecesarios());
         sorteo.setPuntosFinales(0);
         sorteo.setCategoria(dto.getCategoria());

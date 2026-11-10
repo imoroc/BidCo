@@ -1,13 +1,14 @@
 package com.bidco.api_rest.dto.subasta;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 
 public class SubastaResponseDTO {
 
     private Long subastaID;
     private LocalDate fechaInicial;
-    private LocalDate fechaFinal;
+    private Instant fechaFinal;
     private BigDecimal precioInicial;
     private BigDecimal precioFinal;
     private boolean subastaNormal;
@@ -18,7 +19,7 @@ public class SubastaResponseDTO {
     private String categoria;
     private Long ganador;
 
-    public SubastaResponseDTO(Long subastaID, LocalDate fechaInicial, LocalDate fechaFinal, BigDecimal precioInicial,
+    public SubastaResponseDTO(Long subastaID, LocalDate fechaInicial, Instant fechaFinal, BigDecimal precioInicial,
                                BigDecimal precioFinal, boolean subastaNormal, String nombreArticulo,
                                String descripcion, Long creadorId, String imagen, String categoria, Long ganador) {
         this.subastaID = subastaID;
@@ -51,11 +52,11 @@ public class SubastaResponseDTO {
         this.fechaInicial = fechaInicial;
     }
 
-    public LocalDate getFechaFinal() {
+    public Instant getFechaFinal() {
         return fechaFinal;
     }
 
-    public void setFechaFinal(LocalDate fechaFinal) {
+    public void setFechaFinal(Instant fechaFinal) {
         this.fechaFinal = fechaFinal;
     }
 

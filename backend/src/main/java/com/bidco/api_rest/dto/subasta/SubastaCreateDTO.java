@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class SubastaCreateDTO {
     private Long subastaID;
     private LocalDate fechaInicial;
-    private LocalDate fechaFinal;
+    private String fechaFinal;
     private BigDecimal precioInicial;
     private BigDecimal precioFinal;
     private boolean subastaNormal;
@@ -19,7 +19,7 @@ public class SubastaCreateDTO {
     private String categoria;
     private Long ganador;
 
-    public SubastaCreateDTO(LocalDate fechaInicial, LocalDate fechaFinal, BigDecimal precioInicial,
+    public SubastaCreateDTO(LocalDate fechaInicial, String fechaFinal, BigDecimal precioInicial,
                             boolean subastaNormal, String nombreArticulo, String descripcion,Long creadorId, 
                             String imagen, String categoria, Long ganador) {
         this.fechaInicial = fechaInicial;
@@ -50,11 +50,11 @@ public class SubastaCreateDTO {
         this.fechaInicial = fechaInicial;
     }
 
-    public LocalDate getFechaFinal() {
+    public String getFechaFinal() {
         return fechaFinal;
     }
 
-    public void setFechaFinal(LocalDate fechaFinal) {
+    public void setFechaFinal(String fechaFinal) {
         this.fechaFinal = fechaFinal;
     }
 

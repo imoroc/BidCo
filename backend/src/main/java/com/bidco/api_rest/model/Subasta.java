@@ -3,6 +3,7 @@ package com.bidco.api_rest.model;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class Subasta {
     private LocalDate fechaInicial;
 
     @Column(name = "fecha_final",nullable = false)
-    private LocalDate fechaFinal;
+    private Instant fechaFinal;
 
     @Column(name = "precio_inicial")
     private BigDecimal precioInicial;
@@ -57,7 +58,7 @@ public class Subasta {
     private List<Comentario> comentarios;
     
 
-    public Subasta(Long subastaID, LocalDate fechaInicial, LocalDate fechaFinal, BigDecimal precioInicial, boolean subastaNormal, String nombreArticulo, String descripcion,Usuario creador, String imagen, String categoria) {
+    public Subasta(Long subastaID, LocalDate fechaInicial, Instant fechaFinal, BigDecimal precioInicial, boolean subastaNormal, String nombreArticulo, String descripcion,Usuario creador, String imagen, String categoria) {
         this.subastaID = subastaID;
         this.fechaInicial = fechaInicial;
         this.fechaFinal = fechaFinal;
@@ -86,7 +87,7 @@ public class Subasta {
         return comentarios;
     }
 
-    public LocalDate getFechaFinal() {
+    public Instant getFechaFinal() {
         return fechaFinal;
     }
 
@@ -134,7 +135,7 @@ public class Subasta {
         this.fechaInicial = fechaInicial;
     }
 
-    public void setFechaFinal(LocalDate fechaFinal) {
+    public void setFechaFinal(Instant fechaFinal) {
         this.fechaFinal = fechaFinal;
     }
 

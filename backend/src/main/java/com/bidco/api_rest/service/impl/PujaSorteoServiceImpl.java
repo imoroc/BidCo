@@ -58,7 +58,7 @@ public class PujaSorteoServiceImpl implements PujaSorteoService {
 
         // La fecha la decide el servidor; la que envía el cliente no es de fiar.
         LocalDate hoy = LocalDate.now(clock);
-        if (sorteo.getGanador() != null || hoy.isAfter(sorteo.getFechaFin())) {
+        if (sorteo.getGanador() != null || !clock.instant().isBefore(sorteo.getFechaFin())) {
             throw new IllegalStateException("El sorteo ya ha finalizado");
         }
         if (hoy.isBefore(sorteo.getFechaInicio())) {

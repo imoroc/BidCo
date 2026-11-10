@@ -13,8 +13,7 @@ public class SorteoCreateDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaInicio;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate fechaFin;
+    private String fechaFin;
 
     private Integer puntosNecesarios;
     private MultipartFile imagen;
@@ -29,8 +28,8 @@ public class SorteoCreateDTO {
     public LocalDate getFechaInicio() { return fechaInicio; }
     public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
 
-    public LocalDate getFechaFin() { return fechaFin; }
-    public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
+    public String getFechaFin() { return fechaFin; }
+    public void setFechaFin(String fechaFin) { this.fechaFin = fechaFin; }
 
     public Integer getPuntosNecesarios() { return puntosNecesarios; }
     public void setPuntosNecesarios(Integer puntosNecesarios) { this.puntosNecesarios = puntosNecesarios; }
