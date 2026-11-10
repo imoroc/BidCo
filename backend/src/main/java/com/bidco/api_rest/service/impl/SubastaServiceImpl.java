@@ -8,6 +8,7 @@ import com.bidco.api_rest.mapper.SubastaMapper;
 import com.bidco.api_rest.mapper.UsuarioMapper;
 import com.bidco.api_rest.model.Puja;
 import com.bidco.api_rest.model.Subasta;
+import com.bidco.api_rest.exception.CorreoNoVerificadoException;
 import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
@@ -70,6 +71,9 @@ public class SubastaServiceImpl implements SubastaService {
         Usuario user = usuarioRepository.findById(subasta.getCreador().getUsuarioID())
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         
+        if (!user.isCorreoVerificado()) {
+            throw new CorreoNoVerificadoException();
+        }
         user.setPuntos(user.getPuntos() + 50);
 
         if(imagen != null && !imagen.isEmpty()) {

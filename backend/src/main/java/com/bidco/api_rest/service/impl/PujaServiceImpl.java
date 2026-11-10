@@ -10,6 +10,7 @@ import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
 import com.bidco.api_rest.service.contract.PujaService;
+import com.bidco.api_rest.exception.CorreoNoVerificadoException;
 import com.bidco.api_rest.exception.ForbiddenException;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -150,6 +151,9 @@ public class PujaServiceImpl implements PujaService {
             anterior.setSaldo(anterior.getSaldo().add(pujaAnterior.getImporte()));
         }
 
+        if (!pujador.isCorreoVerificado()) {
+            throw new CorreoNoVerificadoException();
+        }
         if (pujador.getSaldo().compareTo(importe) < 0) {
             // La transacción se revierte y la devolución anterior no llega a persistirse.
             throw new IllegalArgumentException("Saldo insuficiente");
