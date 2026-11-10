@@ -289,6 +289,8 @@ El flujo es: el usuario pide el enlace en `/forgot-password`, la API genera un t
 
 Sin `BREVO_API_KEY` y `MAIL_FROM` la función queda desactivada y la API responde 503 en lugar de simular el envío.
 
+El mismo correo se usa para verificar la cuenta. Al registrarse, o al cambiar de correo, se envía un enlace a `/verificar-correo` (hash del token guardado, válido 24 horas y de un solo uso). Mientras no se confirme, la cuenta puede entrar y navegar pero no pujar, participar en sorteos ni crear subastas; el aviso de la parte superior permite reenviar el enlace. Las cuentas anteriores a esta función se consideran verificadas, y si no hay Brevo configurado las cuentas nuevas nacen verificadas para no quedar bloqueadas.
+
 ## Pruebas y CI
 
 ```bash
