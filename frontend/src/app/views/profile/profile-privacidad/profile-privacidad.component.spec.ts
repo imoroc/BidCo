@@ -86,4 +86,36 @@ describe('ProfilePrivacidadComponent', () => {
       expect(component.contrasenaEliminar).toBe('');
     });
   });
+
+  describe('descargar datos', () => {
+    let http: HttpTestingController;
+
+    beforeEach(() => {
+      http = TestBed.inject(HttpTestingController);
+      TestBed.inject(AuthService).currentUser.next({ usuarioID: 5 } as never);
+    });
+
+    it('pide la exportación y guarda el archivo recibido', () => {
+      const guardar = spyOn(component, 'guardarArchivo');
+      component.descargarDatos();
+
+      const req = http.expectOne(r => r.method === 'GET' && r.url.endsWith('/usuarios/5/exportar'));
+      expect(req.request.responseType).toBe('blob');
+      const contenido = new Blob(['{}'], { type: 'application/json' });
+      req.flush(contenido);
+
+      expect(guardar).toHaveBeenCalledWith(contenido, 'bidco-mis-datos.json');
+      expect(component.descargando).toBeFalse();
+    });
+
+    it('no guarda nada y permite reintentar si falla la descarga', () => {
+      const guardar = spyOn(component, 'guardarArchivo');
+      component.descargarDatos();
+
+      http.expectOne(r => r.method === 'GET').flush(new Blob(), { status: 500, statusText: 'Error' });
+
+      expect(guardar).not.toHaveBeenCalled();
+      expect(component.descargando).toBeFalse();
+    });
+  });
 });
