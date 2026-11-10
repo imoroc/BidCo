@@ -28,7 +28,8 @@ describe('SearchComponent', () => {
   });
 
   it('pide la primera página de resultados con el filtro', () => {
-    TestBed.inject(HttpTestingController).expectOne(r =>
+    const peticion = TestBed.inject(HttpTestingController).expectOne(r =>
       r.url.endsWith('/filtro-nombre') && r.params.get('page') === '0' && r.params.get('size') === '12');
+    expect(peticion.request.method).toBe('GET');
   });
 });

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { HeaderComponent } from '../../components/header/header.component';
@@ -31,7 +31,7 @@ import { ListadoFiltrado, TAMANO_PAGINA } from '../../utils/listado-filtrado';
   templateUrl: './historial.component.html',
   styleUrl: './historial.component.css'
 })
-export class HistorialComponent {
+export class HistorialComponent implements OnInit {
     private readonly authService = inject(AuthService);
     private readonly subastaService = inject(SubastaService);
     private readonly deSubastas = inject(ActivatedRoute).snapshot.data['historial'] === 'subastas';
