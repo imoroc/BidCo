@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.List;
 
@@ -19,6 +20,11 @@ public interface SubastaRepository extends JpaRepository<Subasta, Long> {
     Optional<Subasta> findByIdForUpdate(@Param("id") Long id);
 
     List<Subasta> findBySubastaNormalOrderByFechaInicialDesc(boolean subastaNormal);
+
+    /** Subastas ya vencidas que recibieron pujas y todavía no tienen ganador asignado. */
+    @Query("SELECT s.subastaID FROM Subasta s WHERE s.fechaFinal < :hoy AND s.ganador IS NULL "
+            + "AND EXISTS (SELECT 1 FROM Puja p WHERE p.subasta = s) ORDER BY s.fechaFinal ASC")
+    List<Long> findIdsVencidasConPujasSinGanador(@Param("hoy") LocalDate hoy);
     
     @Query("SELECT s FROM Subasta s WHERE s.creador.id = :id ORDER BY s.fechaInicial DESC")
     List<Subasta> findByCreadorId(@Param("id") Long id);
