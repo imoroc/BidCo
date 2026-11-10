@@ -1,4 +1,4 @@
-import { MARGEN_CIERRE_MS, estaVencida, finDeDiaMs, hoyISO, mananaISO, ocultarVencidas } from './fechas';
+import { MARGEN_CIERRE_MS, ahoraMs, estaVencida, finDeDiaMs, hoyISO, mananaISO, ocultarVencidas, reiniciarReloj, sincronizarReloj } from './fechas';
 
 type Caso = [descripcion: string, entrada: string, esperado: string];
 
@@ -82,6 +82,30 @@ describe('fechas', () => {
 
         it('los conserva cuando se piden', () => {
             expect(ocultarVencidas(items, fin, true).map(i => i.id)).toEqual([1, 2, 3]);
+        });
+    });
+    describe('reloj del servidor', () => {
+        afterEach(() => reiniciarReloj());
+
+        it('sin sincronizar usa el reloj del dispositivo', () => {
+            const antes = Date.now();
+            expect(ahoraMs()).toBeGreaterThanOrEqual(antes);
+            expect(ahoraMs() - antes).toBeLessThan(1000);
+        });
+
+        it('se adelanta si el servidor va por delante del dispositivo', () => {
+            const ahora = Date.now();
+            const servidor = new Date(ahora + 60_000).toUTCString();
+            expect(sincronizarReloj(servidor, ahora, ahora)).toBeTrue();
+            expect(ahoraMs() - ahora).toBeGreaterThan(59_000);
+            expect(ahoraMs() - ahora).toBeLessThan(62_000);
+        });
+
+        it('ignora una cabecera inválida o una respuesta demasiado lenta', () => {
+            const ahora = Date.now();
+            expect(sincronizarReloj(null, ahora, ahora)).toBeFalse();
+            expect(sincronizarReloj('no es una fecha', ahora, ahora)).toBeFalse();
+            expect(sincronizarReloj(new Date(ahora).toUTCString(), ahora, ahora + 10_000)).toBeFalse();
         });
     });
 });

@@ -7,6 +7,7 @@ import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angul
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { errorInterceptor } from './interceptors/error.interceptor';
+import { relojInterceptor } from './interceptors/reloj.interceptor';
 import { cloudinaryLoader } from './utils/cloudinary-loader';
 import { environment } from '../environments/environment';
 
@@ -21,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withViewTransitions({ skipInitialTransition: true })),
     // XHR y no fetch (el valor por defecto en Angular 22): zone.js vigila XHR, así que las respuestas
     // repintan la vista. Con fetch, los campos de los componentes no se actualizaban hasta un clic.
-    provideHttpClient(withXhr(), withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([authInterceptor, errorInterceptor, relojInterceptor])),
     // Despierta el backend (el plan gratuito de Render lo duerme) sin bloquear el arranque.
     provideAppInitializer(() => {
       inject(HttpClient).get(`${environment.apiUrl}/ping`, { responseType: 'text' }).subscribe({ error: () => {} });

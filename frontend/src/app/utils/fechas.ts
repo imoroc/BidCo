@@ -15,6 +15,36 @@ export const MARGEN_CIERRE_MS = 5000;
 
 const FECHA_ISO = /^(\d{4})-(\d{2})-(\d{2})$/;
 
+/** Diferencia entre el reloj del servidor y el del dispositivo; 0 hasta que llega la primera respuesta. */
+let desfaseServidorMs = 0;
+
+/** Una respuesta que tarda más que esto no permite estimar bien la hora del servidor. */
+const MAX_IDA_Y_VUELTA_MS = 5000;
+
+/**
+ * Ajusta el reloj con la cabecera Date de una respuesta del servidor. La cabecera solo tiene
+ * precisión de segundos, así que se suma medio segundo y se compara con el punto medio de la petición.
+ * Devuelve false (sin cambiar nada) si la cabecera no es válida o la respuesta tardó demasiado.
+ */
+export function sincronizarReloj(cabeceraDate: string | null, enviadoMs: number, recibidoMs: number): boolean {
+    const servidorMs = cabeceraDate ? Date.parse(cabeceraDate) : NaN;
+    if (Number.isNaN(servidorMs) || recibidoMs < enviadoMs || recibidoMs - enviadoMs > MAX_IDA_Y_VUELTA_MS) {
+        return false;
+    }
+    desfaseServidorMs = servidorMs + 500 - (enviadoMs + recibidoMs) / 2;
+    return true;
+}
+
+/** Vuelve a confiar en el reloj del dispositivo (para pruebas). */
+export function reiniciarReloj(): void {
+    desfaseServidorMs = 0;
+}
+
+/** Hora actual (ms desde epoch) según el servidor, con el reloj del dispositivo como respaldo. */
+export function ahoraMs(): number {
+    return Date.now() + desfaseServidorMs;
+}
+
 /** Descompone un instante en sus componentes de calendario en la zona del servidor. */
 function componentesEnZona(instante: number): { year: number; month: number; day: number; hour: number; minute: number; second: number } {
     const partes = new Intl.DateTimeFormat('en-US', {
@@ -31,13 +61,13 @@ function componentesEnZona(instante: number): { year: number; month: number; day
 }
 
 /** Fecha de hoy como YYYY-MM-DD en la zona del servidor (no en UTC ni en la del navegador). */
-export function hoyISO(ahora: Date = new Date()): string {
+export function hoyISO(ahora: Date = new Date(ahoraMs())): string {
     const { year, month, day } = componentesEnZona(ahora.getTime());
     return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
 /** Fecha de mañana como YYYY-MM-DD en la zona del servidor. */
-export function mananaISO(ahora: Date = new Date()): string {
+export function mananaISO(ahora: Date = new Date(ahoraMs())): string {
     const [year, month, day] = hoyISO(ahora).split('-').map(Number);
     return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().split('T')[0];
 }
