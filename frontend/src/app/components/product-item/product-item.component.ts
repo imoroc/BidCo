@@ -1,7 +1,7 @@
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment'; // Añade la importación
-import { finDeDiaMs } from '../../utils/fechas';
+import { ahoraMs, finDeDiaMs } from '../../utils/fechas';
 
 @Component({
   selector: 'app-product-item',
@@ -49,7 +49,7 @@ export class ProductItemComponent implements OnInit, OnDestroy {
         const endDate = finDeDiaMs(endDateString);
 
         const actualizar = () => {
-            const distance = endDate - new Date().getTime();
+            const distance = endDate - ahoraMs();
 
             if (distance < 0) {
                 this.countdown = "Finalizada";

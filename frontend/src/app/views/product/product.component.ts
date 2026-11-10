@@ -12,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
 import { ProductoService, PujaCreateDTO, PujaResponseDTO, PujaSorteoCreateDTO } from '../../services/product.service';
 import { CommentService } from '../../services/comment.service';
 import { AuthExpertService } from '../../services/auth.expert.service';
-import { finDeDiaMs, hoyISO } from '../../utils/fechas';
+import { ahoraMs, finDeDiaMs, hoyISO } from '../../utils/fechas';
 
 @Component({
   selector: 'app-product',
@@ -219,7 +219,7 @@ export class ProductComponent implements OnDestroy {
 
         this.detenerCuentaAtras();
         const interval = setInterval(() => {
-            const now = new Date().getTime();
+            const now = ahoraMs();
             const distance = endDate - now;
             if (distance <= 0) {
                 const estabaEnCurso = this.countdown !== '' && this.countdown !== 'Finalizada';
