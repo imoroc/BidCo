@@ -14,7 +14,9 @@ import java.util.regex.Pattern;
 /**
  * Limita las peticiones a la API por dirección IP: un tope general para todas las rutas y topes más
  * estrictos para las que escriben datos o consumen recursos externos (registro, pujas, recarga de
- * saldo y subida de imágenes). Se ejecuta tras CORS y antes de la autenticación, de modo que el 429
+ * saldo, subida de imágenes, restablecimiento y cambio de contraseña, y comentarios). La solicitud de
+ * recuperación de contraseña se limita aparte, por correo e IP, en su controlador. Se ejecuta tras
+ * CORS y antes de la autenticación, de modo que el 429
  * también llega legible al navegador.
  *
  * <p>La IP se toma de {@code getRemoteAddr()}; con {@code server.forward-headers-strategy=framework}
@@ -35,7 +37,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
             new Regla("registro", "POST", Pattern.compile("^/api/usuarios$"), 5, HORA),
             new Regla("pujas", "POST", Pattern.compile("^/api/pujas(-sorteo)?$"), 30, MINUTO),
             new Regla("recarga", "PATCH", Pattern.compile("^/api/usuarios/\\d+/recargar-saldo$"), 10, HORA),
-            new Regla("imagenes", "POST", Pattern.compile("^/api/subastas$"), 10, HORA)
+            new Regla("imagenes", "POST", Pattern.compile("^/api/(subastas|admin/sorteos)$"), 10, HORA),
+            new Regla("restablecer", "POST", Pattern.compile("^/api/usuarios/restablecer-contrasena$"), 10, HORA),
+            new Regla("password", "PATCH", Pattern.compile("^/api/usuarios/\\d+/password$"), 10, HORA),
+            new Regla("comentarios", "POST", Pattern.compile("^/api/comentarios/nuevo$"), 20, MINUTO)
     );
 
     private final RequestRateLimiter limiter;
