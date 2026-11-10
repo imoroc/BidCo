@@ -2,18 +2,24 @@ package com.bidco.api_rest.service;
 
 import com.bidco.api_rest.config.JwtUtil;
 import com.bidco.api_rest.dto.usuario.UsuarioCreateDTO;
+import com.bidco.api_rest.exception.ContrasenaActualIncorrectaException;
 import com.bidco.api_rest.mapper.UsuarioMapper;
 import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.PujaSorteoRepository;
 import com.bidco.api_rest.repository.SorteoRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
+import com.bidco.api_rest.repository.TokenRecuperacionRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
 import com.bidco.api_rest.service.impl.UsuarioServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,19 +29,27 @@ import static org.mockito.Mockito.*;
 class UsuarioServiceImplTest {
 
     private UsuarioRepository usuarioRepository;
+    private SubastaRepository subastaRepository;
+    private SorteoRepository sorteoRepository;
+    private TokenRecuperacionRepository tokenRecuperacionRepository;
     private UsuarioServiceImpl service;
 
     @BeforeEach
     void setUp() {
         usuarioRepository = mock(UsuarioRepository.class);
+        subastaRepository = mock(SubastaRepository.class);
+        sorteoRepository = mock(SorteoRepository.class);
+        tokenRecuperacionRepository = mock(TokenRecuperacionRepository.class);
         service = new UsuarioServiceImpl(
                 usuarioRepository,
                 mock(UsuarioMapper.class),
                 mock(PujaRepository.class),
-                mock(SubastaRepository.class),
+                subastaRepository,
                 mock(PujaSorteoRepository.class),
-                mock(SorteoRepository.class),
-                mock(JwtUtil.class));
+                sorteoRepository,
+                mock(JwtUtil.class),
+                tokenRecuperacionRepository,
+                Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC));
     }
 
     private UsuarioCreateDTO nuevoUsuario() {
@@ -81,5 +95,90 @@ class UsuarioServiceImplTest {
     void recargarSaldoRechazaCantidadesNoPositivas() {
         assertThrows(IllegalArgumentException.class, () -> service.recargarSaldo(1L, BigDecimal.ZERO));
         verifyNoInteractions(usuarioRepository);
+    }
+
+    private Usuario usuarioConClave(String clave) {
+        Usuario usuario = new Usuario();
+        usuario.setUsuarioID(7L);
+        usuario.setNombreUsuario("ana");
+        usuario.setCorreoElectronico("ana@example.com");
+        usuario.setContrasena(new BCryptPasswordEncoder().encode(clave));
+        usuario.setSaldo(new BigDecimal("40"));
+        usuario.setPuntos(120);
+        usuario.setPais("España");
+        usuario.setCiudad("Madrid");
+        usuario.setCodigoPostal("28001");
+        usuario.setCalle("Calle Mayor");
+        usuario.setNumeroPiso(3);
+        usuario.setLetraPiso("B");
+        return usuario;
+    }
+
+    @Test
+    void eliminarCuentaConContrasenaIncorrectaNoModificaNada() {
+        String clave = "k".repeat(12);
+        when(usuarioRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(usuarioConClave(clave)));
+
+        assertThrows(ContrasenaActualIncorrectaException.class,
+                () -> service.eliminarCuenta(7L, "z".repeat(12)));
+
+        verify(usuarioRepository, never()).save(any());
+        verify(tokenRecuperacionRepository, never()).eliminarPorUsuario(any());
+    }
+
+    @Test
+    void eliminarCuentaConSubastasPendientesSeRechaza() {
+        String clave = "k".repeat(12);
+        when(usuarioRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(usuarioConClave(clave)));
+        when(subastaRepository.countPendientesPorCreador(eq(7L), any())).thenReturn(1L);
+
+        assertThrows(IllegalStateException.class, () -> service.eliminarCuenta(7L, clave));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void eliminarCuentaConPujasPendientesSeRechaza() {
+        String clave = "k".repeat(12);
+        when(usuarioRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(usuarioConClave(clave)));
+        when(subastaRepository.countPendientesConPujasDe(7L)).thenReturn(1L);
+
+        assertThrows(IllegalStateException.class, () -> service.eliminarCuenta(7L, clave));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void eliminarCuentaConSorteosPendientesSeRechaza() {
+        String clave = "k".repeat(12);
+        when(usuarioRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(usuarioConClave(clave)));
+        when(sorteoRepository.countPendientesConParticipacionDe(7L)).thenReturn(1L);
+
+        assertThrows(IllegalStateException.class, () -> service.eliminarCuenta(7L, clave));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void eliminarCuentaAnonimizaLosDatosPersonalesYBorraLosTokens() {
+        String clave = "k".repeat(12);
+        Usuario usuario = usuarioConClave(clave);
+        String hashAnterior = usuario.getContrasena();
+        when(usuarioRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(usuario));
+
+        service.eliminarCuenta(7L, clave);
+
+        assertEquals("usuario-eliminado-7", usuario.getNombreUsuario());
+        assertEquals("eliminado-7@anonimo.invalid", usuario.getCorreoElectronico());
+        assertNotEquals(hashAnterior, usuario.getContrasena());
+        assertFalse(new BCryptPasswordEncoder().matches(clave, usuario.getContrasena()));
+        assertEquals(0, BigDecimal.ZERO.compareTo(usuario.getSaldo()));
+        assertEquals(0, usuario.getPuntos());
+        assertEquals("-", usuario.getCalle());
+        assertNull(usuario.getLetraPiso());
+        assertTrue(usuario.getPrivacidadAnonimoPujas());
+        assertFalse(usuario.getPrivacidadPerfilVisible());
+        verify(usuarioRepository).save(usuario);
+        verify(tokenRecuperacionRepository).eliminarPorUsuario(7L);
     }
 }
