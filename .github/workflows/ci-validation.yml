@@ -57,6 +57,14 @@ jobs:
           cache: "maven"
       - name: Verify (compile + tests)
         run: mvn -B clean verify
+      - name: Subir informe de cobertura
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: cobertura-backend
+          path: backend/target/site/jacoco
+          if-no-files-found: ignore
+          retention-days: 14
 
   dependency-review:
     name: Dependency review
