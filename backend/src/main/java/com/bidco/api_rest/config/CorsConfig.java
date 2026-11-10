@@ -54,7 +54,7 @@ public class CorsConfig {
         FilterRegistrationBean<JwtFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(jwtFilter);
         registration.addUrlPatterns("/api/*");
-        registration.setOrder(1);
+        registration.setOrder(2);
         return registration;
     }
 }
