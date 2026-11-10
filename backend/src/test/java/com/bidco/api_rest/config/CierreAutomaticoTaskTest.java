@@ -60,7 +60,7 @@ class CierreAutomaticoTaskTest {
     }
 
     @Test
-    void cierraLosSorteosVencidosYTolteraErrores() {
+    void cierraLosSorteosVencidosYToleraErrores() {
         when(sorteoRepository.findIdsVencidosConParticipacionesSinGanador(HOY)).thenReturn(List.of(5L, 6L));
         doThrow(new IllegalStateException("fallo simulado")).when(sorteoService).asignarGanadorYActualizarPrecioFinal(5L);
 
