@@ -1,14 +1,21 @@
 package com.bidco.api_rest.dto;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.Locale;
 
 public class FiltroDTO {
+    public static final int TAMANO_MAXIMO = 100;
+
     private int minPrice;
     private int maxPrice;
     private String[] categorias;
     private String dateOrder;
+    private int page;
+    private int size;
 
     public FiltroDTO() {}
 
@@ -67,6 +74,33 @@ public class FiltroDTO {
 
     public void setDateOrder(String dateOrder) {
         this.dateOrder = dateOrder;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    /**
+     * Paginación opcional: sin {@code size} (o con un valor no positivo) no se pagina, como antes.
+     * La página empieza en 0 y el tamaño se limita a {@link #TAMANO_MAXIMO}.
+     */
+    public Pageable paginacion() {
+        if (size <= 0) {
+            return Pageable.unpaged();
+        }
+        return PageRequest.of(Math.max(page, 0), Math.min(size, TAMANO_MAXIMO));
     }
 
     @Override
