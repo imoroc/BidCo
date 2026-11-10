@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 
 import { CreateSubastaService, SubastaCreateDTO } from '../../services/create-auction.service';
 import { AuthService } from '../../services/auth.service';
-import { hoyISO, mananaISO } from '../../utils/fechas';
+import { estaVencida, hoyISO } from '../../utils/fechas';
 
 const TIPOS_IMAGEN_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp'];
 const TAMANO_MAXIMO_IMAGEN = 8 * 1024 * 1024;
@@ -42,7 +42,8 @@ export class CreateAuctionComponent {
     errores: string[] = [];
     errorImagen = '';
     enviando = false;
-    fechaMinima = this.calcularFechaMinima();
+    horaFinal = '';
+    fechaMinima = hoyISO();
 
     constructor(private crearSubastaService: CreateSubastaService, private router: Router, private authService: AuthService) {}
 
@@ -68,7 +69,8 @@ export class CreateAuctionComponent {
         this.subasta.creadorId = user.usuarioID;
 
         const formData = new FormData();
-        formData.append('subasta', new Blob([JSON.stringify(this.subasta)], { type: 'application/json' }));
+        const datos = { ...this.subasta, fechaFinal: this.cierreElegido() };
+        formData.append('subasta', new Blob([JSON.stringify(datos)], { type: 'application/json' }));
         if (this.imagen) {
             formData.append('imagen', this.imagen);
         }
@@ -135,8 +137,10 @@ export class CreateAuctionComponent {
         }
         if (!this.subasta.fechaFinal) {
             errores.push('Indica la fecha de finalización.');
-        } else if (this.subasta.fechaFinal < this.fechaMinima) {
-            errores.push('La fecha de finalización debe ser posterior a hoy.');
+        } else if (estaVencida(this.cierreElegido())) {
+            errores.push('La fecha y la hora de finalización deben ser posteriores a este momento.');
+        } else if (!this.horaFinal && this.subasta.fechaFinal <= this.fechaMinima) {
+            errores.push('Sin hora de cierre, la fecha de finalización debe ser posterior a hoy.');
         }
         if (this.imagenPreview === null) {
             errores.push(this.errorImagen || 'Añade una imagen del artículo.');
@@ -173,7 +177,8 @@ export class CreateAuctionComponent {
         setTimeout(() => this.resumenErrores?.nativeElement.focus());
     }
 
-    private calcularFechaMinima(): string {
-        return mananaISO();
+    /** Día elegido más la hora de cierre, si se indicó; sin hora cierra a la medianoche de ese día. */
+    private cierreElegido(): string {
+        return this.horaFinal ? `${this.subasta.fechaFinal}T${this.horaFinal}` : this.subasta.fechaFinal;
     }
 }

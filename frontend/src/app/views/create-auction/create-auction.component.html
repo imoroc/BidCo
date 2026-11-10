@@ -101,6 +101,12 @@
           <input type="date" id="fecha_fin" [(ngModel)]="subasta.fechaFinal" name="fechaFinal" [min]="fechaMinima" required>
         </div>
 
+        <div class="input-group">
+          <label for="hora_fin">Hora de cierre (opcional, hora de Madrid)</label>
+          <input type="time" id="hora_fin" [(ngModel)]="horaFinal" name="horaFinal" aria-describedby="ayuda-hora-fin">
+          <small id="ayuda-hora-fin">Si no indicas la hora, la subasta cierra a medianoche del día elegido.</small>
+        </div>
+
         <div class="form-actions">
           <button type="submit" class="btn-primary" [disabled]="enviando" [attr.aria-busy]="enviando">{{ enviando ? 'Publicando…' : 'Publicar Subasta' }}</button>
         </div>
