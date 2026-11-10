@@ -41,8 +41,11 @@ export class ListadoFiltrado<T> {
     readonly items = signal<T[]>([]);
     readonly cargando = signal(true);
     readonly errorCarga = signal(false);
+    /** Cuántos elementos vencidos se han ocultado en la última carga. */
+    readonly ocultas = signal(0);
 
     private readonly peticiones$ = new Subject<{ params: HttpParams; mostrarVencidas: boolean }>();
+    private totalRecibido = 0;
 
     /**
      * @param fechaFinalDe si se indica, los elementos vencidos se ocultan salvo que el filtro
@@ -60,6 +63,7 @@ export class ListadoFiltrado<T> {
             }),
             switchMap(({ params, mostrarVencidas }) => cargador(params).pipe(
                 reintentarSiArranca<T[]>(),
+                tap(items => this.totalRecibido = items.length),
                 map(items => this.fechaFinalDe ? ocultarVencidas(items, this.fechaFinalDe, mostrarVencidas) : items),
                 catchError(err => {
                     console.error('Error al obtener el listado: ', err);
@@ -70,6 +74,7 @@ export class ListadoFiltrado<T> {
             takeUntilDestroyed(destroyRef)
         ).subscribe(items => {
             this.items.set(items);
+            this.ocultas.set(this.fechaFinalDe ? Math.max(this.totalRecibido - items.length, 0) : 0);
             this.cargando.set(false);
         });
     }
