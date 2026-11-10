@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { ListadoFiltrado } from '../../utils/listado-filtrado';
+import { ListadoFiltrado, TAMANO_PAGINA } from '../../utils/listado-filtrado';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FilterComponent } from '../../components/filter/filter.component';
 import { EstadoListadoComponent } from '../../components/estado-listado/estado-listado.component';
+import { CargarMasComponent } from '../../components/cargar-mas/cargar-mas.component';
 import { ProductItemComponent } from '../../components/product-item/product-item.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 
@@ -22,13 +23,14 @@ import { AuthExpertService } from '../../services/auth.expert.service';
     FilterComponent,
     ProductItemComponent,
     EstadoListadoComponent,
+    CargarMasComponent,
     FooterComponent
 ],
   templateUrl: './raffle.component.html',
   styleUrl: './raffle.component.css'
 })
 export class RaffleComponent {
-    listado = new ListadoFiltrado<SorteoResponseDto>(params => this.sorteoService.getSorteosPorFiltro(params), inject(DestroyRef), s => s.fechaFin);
+    listado = new ListadoFiltrado<SorteoResponseDto>(params => this.sorteoService.getSorteosPorFiltro(params), inject(DestroyRef), s => s.fechaFin, TAMANO_PAGINA);
     isLoggedIn = false;
     isExpert = false;
     userPoints = 0;

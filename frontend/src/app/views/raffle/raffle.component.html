@@ -32,6 +32,8 @@
       }
     </section>
 
+    <app-cargar-mas [hayMas]="listado.hayMas() && !listado.cargando()" [cargando]="listado.cargandoMas()" (cargarMas)="listado.cargarMas()"></app-cargar-mas>
+
   </main>
 </div>
 
