@@ -61,7 +61,7 @@ Usuario y experto se identifican con un token JWT y tienen su propio acceso (`/l
 - En una subasta **a ciegas**, basta con superar el precio base. El precio no se actualiza ni se muestran las pujas hasta el cierre, para no revelar la máxima. Una puja que no supera a la líder se registra sin retener saldo.
 - Un usuario no puede gastar el mismo saldo dos veces en paralelo: la fila del usuario se bloquea durante la puja.
 
-**Cierre de subastas.** Pasada la fecha final, gana la puja más alta y el ganador recibe 100 puntos (normal) o 200 (a ciegas). En las ciegas el precio definitivo se publica en ese momento. El cierre es **idempotente**: si ya hay ganador, repetir la petición no vuelve a repartir puntos, y dos cierres simultáneos no pueden puntuar dos veces.
+**Cierre de subastas.** Pasada la fecha final, gana la puja más alta y el ganador recibe 100 puntos (normal) o 200 (a ciegas). En las ciegas el precio definitivo se publica en ese momento. El cierre es **idempotente**: si ya hay ganador, repetir la petición no vuelve a repartir puntos, y dos cierres simultáneos no pueden puntuar dos veces. Un proceso programado del servidor revisa cada minuto las subastas y los sorteos vencidos con pujas o participaciones y los cierra, de modo que no hace falta que nadie abra su ficha (se ajusta con `CIERRE_INTERVALO_MS` y se desactiva con `CIERRE_ACTIVO=false`).
 
 **Sorteos.**
 
