@@ -3,6 +3,7 @@ package com.bidco.api_rest.repository;
 import com.bidco.api_rest.model.Sorteo;
 
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -31,5 +32,5 @@ public interface SorteoRepository extends JpaRepository<Sorteo, Long> {
     int countWonDrawsByUsuarioId(Long usuarioID);
 
     @Query("SELECT s FROM Sorteo s WHERE s.puntosNecesarios >= :minPrice AND s.puntosNecesarios <= :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFin END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFin END DESC, s.fechaInicio DESC")
-    List<Sorteo> findByFiltro(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder);
+    List<Sorteo> findByFiltro(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder, Pageable pageable);
 }

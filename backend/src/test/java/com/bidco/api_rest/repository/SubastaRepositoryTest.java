@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -74,7 +76,7 @@ class SubastaRepositoryTest {
         subasta("movil ciego", false, "tecnologia", "70", HOY.plusDays(5));
 
         List<Subasta> resultado = subastas.findByFiltroNormal(
-                0, 1000, new String[]{"tecnologia"}, false, "asc");
+                0, 1000, new String[]{"tecnologia"}, false, "asc", Pageable.unpaged());
 
         assertEquals(List.of("portatil"), nombres(resultado));
     }
@@ -87,7 +89,7 @@ class SubastaRepositoryTest {
         subastas.save(cara);
 
         List<Subasta> resultado = subastas.findByFiltroNormal(
-                0, 100, SIN_CATEGORIAS, true, "asc");
+                0, 100, SIN_CATEGORIAS, true, "asc", Pageable.unpaged());
 
         assertEquals(List.of("barata"), nombres(resultado));
     }
@@ -98,9 +100,21 @@ class SubastaRepositoryTest {
         subasta("pronto", true, "moda", "10", HOY.plusDays(2));
 
         assertEquals(List.of("pronto", "tarde"),
-                nombres(subastas.findByFiltroNormal(0, 1000, SIN_CATEGORIAS, true, "asc")));
+                nombres(subastas.findByFiltroNormal(0, 1000, SIN_CATEGORIAS, true, "asc", Pageable.unpaged())));
         assertEquals(List.of("tarde", "pronto"),
-                nombres(subastas.findByFiltroNormal(0, 1000, SIN_CATEGORIAS, true, "desc")));
+                nombres(subastas.findByFiltroNormal(0, 1000, SIN_CATEGORIAS, true, "desc", Pageable.unpaged())));
+    }
+
+    @Test
+    void paginaLosResultadosManteniendoElOrden() {
+        subasta("a", true, "moda", "10", HOY.plusDays(1));
+        subasta("b", true, "moda", "10", HOY.plusDays(2));
+        subasta("c", true, "moda", "10", HOY.plusDays(3));
+
+        assertEquals(List.of("a", "b"),
+                nombres(subastas.findByFiltroNormal(0, 1000, SIN_CATEGORIAS, true, "asc", PageRequest.of(0, 2))));
+        assertEquals(List.of("c"),
+                nombres(subastas.findByFiltroNormal(0, 1000, SIN_CATEGORIAS, true, "asc", PageRequest.of(1, 2))));
     }
 
     @Test
@@ -109,7 +123,7 @@ class SubastaRepositoryTest {
         subasta("Lámpara", true, "hogar", "30", HOY.plusDays(5));
 
         List<Subasta> resultado = subastas.findByFiltroNombre(
-                "TELÉF", 0, 1000, SIN_CATEGORIAS, true, "asc");
+                "TELÉF", 0, 1000, SIN_CATEGORIAS, true, "asc", Pageable.unpaged());
 
         assertEquals(List.of("Teléfono Antiguo"), nombres(resultado));
     }
@@ -123,7 +137,7 @@ class SubastaRepositoryTest {
                 "ajena", "Descripción", otro, null, "moda"));
 
         List<Subasta> resultado = subastas.findByFiltroMisSubastas(
-                creador.getUsuarioID().intValue(), 0, 1000, SIN_CATEGORIAS, true, "asc");
+                creador.getUsuarioID().intValue(), 0, 1000, SIN_CATEGORIAS, true, "asc", Pageable.unpaged());
 
         assertEquals(List.of("mia"), nombres(resultado));
     }

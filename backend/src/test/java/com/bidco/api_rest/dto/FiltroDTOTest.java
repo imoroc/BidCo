@@ -30,4 +30,29 @@ class FiltroDTOTest {
     void elOrdenPorFechaNuncaEsNulo() {
         assertEquals("", new FiltroDTO().getDateOrder());
     }
+
+    @Test
+    void sinTamanoNoSePagina() {
+        assertTrue(new FiltroDTO().paginacion().isUnpaged());
+    }
+
+    @Test
+    void conTamanoSePaginaDesdeCero() {
+        FiltroDTO filtro = new FiltroDTO();
+        filtro.setPage(2);
+        filtro.setSize(12);
+
+        assertEquals(2, filtro.paginacion().getPageNumber());
+        assertEquals(12, filtro.paginacion().getPageSize());
+    }
+
+    @Test
+    void elTamanoSeLimitaYLaPaginaNuncaEsNegativa() {
+        FiltroDTO filtro = new FiltroDTO();
+        filtro.setPage(-3);
+        filtro.setSize(100000);
+
+        assertEquals(0, filtro.paginacion().getPageNumber());
+        assertEquals(FiltroDTO.TAMANO_MAXIMO, filtro.paginacion().getPageSize());
+    }
 }

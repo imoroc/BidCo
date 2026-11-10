@@ -151,7 +151,7 @@ public class SubastaServiceImpl implements SubastaService {
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroNormal(FiltroDTO filtro) {
         String[] queryCategorias = filtro.categoriasNormalizadas();
-        List<Subasta> subastas = subastaRepository.findByFiltroNormal(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder());
+        List<Subasta> subastas = subastaRepository.findByFiltroNormal(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder(), filtro.paginacion());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
                 .toList();
@@ -160,7 +160,7 @@ public class SubastaServiceImpl implements SubastaService {
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroCiega(FiltroDTO filtro) {
         String[] queryCategorias = filtro.categoriasNormalizadas();
-        List<Subasta> subastas = subastaRepository.findByFiltroCiega(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder());
+        List<Subasta> subastas = subastaRepository.findByFiltroCiega(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder(), filtro.paginacion());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
                 .toList();
@@ -169,7 +169,7 @@ public class SubastaServiceImpl implements SubastaService {
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroMisSubastas(FiltroDTO filtro, int id) {
         String[] queryCategorias = filtro.categoriasNormalizadas();
-        List<Subasta> subastas = subastaRepository.findByFiltroMisSubastas(id, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder());
+        List<Subasta> subastas = subastaRepository.findByFiltroMisSubastas(id, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder(), filtro.paginacion());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
                 .toList();
@@ -178,7 +178,7 @@ public class SubastaServiceImpl implements SubastaService {
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroMisPujas(FiltroDTO filtro, int id) {
         String[] queryCategorias = filtro.categoriasNormalizadas();
-        List<Subasta> subastas = subastaRepository.findByFiltroMisPujas(id, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder());
+        List<Subasta> subastas = subastaRepository.findByFiltroMisPujas(id, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder(), filtro.paginacion());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
                 .toList();
@@ -187,7 +187,7 @@ public class SubastaServiceImpl implements SubastaService {
     @Override
     public List<SubastaResponseDTO> buscarPorFiltroYNombre(FiltroDTO filtro, String searchTerm) {
         String[] queryCategorias = filtro.categoriasNormalizadas();
-        List<Subasta> subastas = subastaRepository.findByFiltroNombre(searchTerm, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder());
+        List<Subasta> subastas = subastaRepository.findByFiltroNombre(searchTerm, filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder(), filtro.paginacion());
         return subastas.stream()
                 .map(subastaMapper::subastaToSubastaResponseDTO)
                 .toList();
