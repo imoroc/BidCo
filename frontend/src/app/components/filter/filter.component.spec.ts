@@ -70,7 +70,8 @@ describe('FilterComponent con la URL', () => {
   }
 
   it('lee el filtro de la URL al abrir la página sin reescribirla', () => {
-    const componente = crear('/subastas?cat=Moda&orden=asc&min=20', true);
+    // Orden canónico de los parámetros (min, max, cat, orden, vencidas): no hay nada que reescribir.
+    const componente = crear('/subastas?min=20&cat=Moda&orden=asc', true);
     expect(componente.selectedCategories).toEqual(['Moda']);
     expect(componente.dateOrder).toBe('asc');
     expect(componente.minPrice).toBe(20);
