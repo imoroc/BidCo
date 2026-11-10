@@ -25,3 +25,16 @@
   y el límite efectivo sería mayor.
 - Si se escala a varias instancias habría que moverlo a un almacén compartido (Redis o una tabla
   en PostgreSQL) o a un limitador en el proxy.
+
+## Límite general de peticiones (`RateLimitFilter`)
+
+- Filtro que cuenta las peticiones a `/api/*` por IP en ventanas fijas. Se ejecuta después de CORS
+  y antes del filtro JWT, así que el `429` (con cabecera `Retry-After`) llega legible al navegador.
+- Tope general de 300 peticiones por minuto y topes propios más estrictos: registro (5 por hora),
+  pujas de subasta y de sorteo (30 por minuto), recarga de saldo (10 por hora) y creación de
+  subastas, que sube imágenes (10 por hora). `GET /api/ping` y el preflight `OPTIONS` no cuentan.
+- Se ajusta con `RATE_LIMIT_GENERAL_PER_MINUTE` y se desactiva con `RATE_LIMIT_ENABLED=false`.
+- Mismas limitaciones que `LoginRateLimiter`: estado en memoria, se reinicia al redesplegar y no se
+  comparte entre instancias. Por IP solamente: varios usuarios tras una misma IP comparten cupo.
+- Se usó un contador propio para no añadir una dependencia; si se escala a varias instancias, el
+  siguiente paso es un almacén compartido o el limitador del proxy.
