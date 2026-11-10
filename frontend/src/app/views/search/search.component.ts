@@ -1,19 +1,18 @@
 import { CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-
-import { HttpParams } from '@angular/common/http';
 
 import { map, distinctUntilChanged, tap } from 'rxjs/operators';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { EstadoListadoComponent } from '../../components/estado-listado/estado-listado.component';
 import { FilterComponent } from '../../components/filter/filter.component';
+import { CargarMasComponent } from '../../components/cargar-mas/cargar-mas.component';
 import { ProductItemComponent } from '../../components/product-item/product-item.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 
 import { SubastaService, SubastaResponseDTO, Filtro } from '../../services/auction.service';
-import { ocultarVencidas } from '../../utils/fechas';
+import { ListadoFiltrado, TAMANO_PAGINA } from '../../utils/listado-filtrado';
 import { AuthService } from '../../services/auth.service';
 import { AuthExpertService } from '../../services/auth.expert.service';
 ;
@@ -29,6 +28,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
     FilterComponent,
     ProductItemComponent,
     EstadoListadoComponent,
+    CargarMasComponent,
     FooterComponent
 ],
   templateUrl: './search.component.html',
@@ -36,20 +36,12 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 })
 
 export class SearchComponent {
-    products: SubastaResponseDTO[] = [];
+    listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasPorNombre(params, this.searchTerm || ''), inject(DestroyRef), p => p.fechaFinal, TAMANO_PAGINA);
     isLoggedIn = false;
     isExpert = false;
     saldoUser = 0;
-    filtro: Filtro = {
-        minPrice: 0, 
-        maxPrice: 0, 
-        categories: [], 
-        dateOrder: ""
-    };
+    private filtro?: Filtro;
     searchTerm: string|null = "";
-    cargaDeProductos = false;
-    noCoincidencias = false;
-    primeraCarga = false;
 
     constructor(private authService: AuthService, private expertAuthService: AuthExpertService, private subastaService: SubastaService, private activatedRoute: ActivatedRoute) {}
 
@@ -75,41 +67,12 @@ export class SearchComponent {
             distinctUntilChanged(),
             tap(searchTerm => this.searchTerm = searchTerm)
         ).subscribe(() => {
-            if (this.primeraCarga) this.buscarSubastasPorFiltroYNombre();
+            if (this.filtro) this.listado.cargar(this.filtro);
         })
     }
 
     handleFilterApplied(filtro: Filtro) {
         this.filtro = filtro;
-        this.buscarSubastasPorFiltroYNombre();
-    }
-
-    buscarSubastasPorFiltroYNombre() {
-        this.cargaDeProductos = true;
-        this.noCoincidencias = false;
-        this.primeraCarga = true;
-
-        var camposFiltro = new HttpParams()
-        camposFiltro = camposFiltro.append("minPrice", this.filtro.minPrice);
-        camposFiltro = camposFiltro.append("maxPrice", this.filtro.maxPrice);
-        this.filtro.categories.forEach(categoria => {
-            camposFiltro = camposFiltro.append("categorias", categoria);
-        })
-        camposFiltro = camposFiltro.append("dateOrder", this.filtro.dateOrder)
-        
-        this.subastaService.getSubastasFiltradasPorNombre(camposFiltro, this.searchTerm || '').subscribe({
-            next: data => {
-                this.products = ocultarVencidas(data ?? [], p => p.fechaFinal, this.filtro.mostrarVencidas ?? false);
-                if (this.products.length === 0) {
-                    this.noCoincidencias = true;
-                }
-                this.cargaDeProductos = false;
-            },
-            error: err => {
-                this.noCoincidencias = true;
-                this.cargaDeProductos = false;
-                console.error("Error al obtener subastas filtradas: ", err);
-            }
-        });
+        this.listado.cargar(filtro);
     }
 }

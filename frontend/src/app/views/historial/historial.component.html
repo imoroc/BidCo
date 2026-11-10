@@ -7,7 +7,7 @@
     
     <header class="content-header">
       <div class="header-titles">
-        <h1>Tus Pujas</h1>
+        <h1>{{ titulo }}</h1>
       </div>
 
       <div class="user-actions">
@@ -15,8 +15,10 @@
       </div>
     </header>
 
+    <app-estado-listado [cargando]="listado.cargando()" [errorCarga]="listado.errorCarga()" [total]="listado.items().length" mensajeVacio="No hay subastas que coincidan con los filtros."></app-estado-listado>
+
     <section class="products-grid">
-      @for (product of products; track product.subastaID) {
+      @for (product of listado.items(); track product.subastaID) {
         <article class="product-wrapper">
           <a [routerLink]="[product.subastaNormal ? '/auction/product' : '/blind-auctions/product', product.subastaID]" class="product-link">
             <app-product-item [product]="product"></app-product-item>
@@ -24,6 +26,8 @@
         </article>
       }
     </section>
+
+    <app-cargar-mas [hayMas]="listado.hayMas() && !listado.cargando()" [cargando]="listado.cargandoMas()" (cargarMas)="listado.cargarMas()"></app-cargar-mas>
 
   </main>
 </div>

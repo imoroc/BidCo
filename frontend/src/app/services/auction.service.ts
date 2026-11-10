@@ -26,17 +26,8 @@ export interface Filtro {
 })
 export class SubastaService {
     private subastasUrl = `${environment.apiUrl}/subastas`;
-    private pujasSubastasUrl = `${environment.apiUrl}/pujas`;
 
     constructor(private http: HttpClient) {}
-
-    getSubastasPorCreador(id: number): Observable<SubastaResponseDTO[]> {
-        return this.http.get<SubastaResponseDTO[]>(`${this.subastasUrl}/filtrar-creador`, {params: { id: id }});
-    }   
-
-    getSubastasPujasUsuaroId(id: number): Observable<SubastaResponseDTO[]> {
-        return this.http.get<SubastaResponseDTO[]>(`${this.pujasSubastasUrl}/subastas-usuario/${id}`);
-    }
 
     getSubastasFiltradasNormal(filtro: HttpParams): Observable<SubastaResponseDTO[]> {
         return this.http.get<SubastaResponseDTO[]>(`${this.subastasUrl}/filtro-normal`, {params: filtro});
