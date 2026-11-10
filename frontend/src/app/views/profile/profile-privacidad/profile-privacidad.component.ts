@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserService, Privacidad } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
@@ -20,11 +21,15 @@ export class ProfilePrivacidadComponent implements OnInit {
     privacidadPerfilVisible: true
   };
   cargando = true;
+  mostrandoEliminar = false;
+  contrasenaEliminar = '';
+  eliminando = false;
 
   constructor(
     private userService: UserService,
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -60,5 +65,33 @@ export class ProfilePrivacidadComponent implements OnInit {
         }
       });
     }
+  }
+
+  abrirEliminar() {
+    this.mostrandoEliminar = true;
+  }
+
+  cancelarEliminar() {
+    this.mostrandoEliminar = false;
+    this.contrasenaEliminar = '';
+  }
+
+  confirmarEliminar() {
+    const userId = this.authService.currentUser.value?.usuarioID;
+    if (!userId || !this.contrasenaEliminar || this.eliminando) {
+      return;
+    }
+    this.eliminando = true;
+    this.userService.eliminarCuenta(userId, this.contrasenaEliminar).subscribe({
+      next: () => {
+        this.authService.logout();
+        this.toastService.exito('Tu cuenta se ha eliminado');
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.eliminando = false;
+        this.toastService.error(err.error?.message || 'No se ha podido eliminar la cuenta');
+      }
+    });
   }
 }

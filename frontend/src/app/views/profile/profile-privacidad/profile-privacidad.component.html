@@ -44,4 +44,36 @@
 
     </div>
   </section>
+
+  <section class="settings-card zona-peligro">
+    <div class="toggle-item">
+      <div class="toggle-info">
+        <h3>Eliminar mi cuenta</h3>
+        <p>Borramos tus datos personales (nombre, correo, dirección y saldo) y ya no podrás entrar. Tus pujas
+          pasadas se conservan sin ningún dato que te identifique. No se puede deshacer, y no es posible mientras
+          tengas subastas o sorteos sin cerrar.</p>
+      </div>
+      @if (!mostrandoEliminar) {
+        <button type="button" class="btn-primary btn-peligro" (click)="abrirEliminar()">Eliminar cuenta</button>
+      }
+    </div>
+
+    @if (mostrandoEliminar) {
+      <div class="eliminar-form">
+        <div class="input-group">
+          <label for="contrasena-eliminar">Confirma con tu contraseña</label>
+          <input id="contrasena-eliminar" type="password" autocomplete="current-password"
+                 [(ngModel)]="contrasenaEliminar" (keyup.enter)="confirmarEliminar()">
+        </div>
+        <div class="eliminar-acciones">
+          <button type="button" class="btn-primary btn-peligro" (click)="confirmarEliminar()"
+                  [disabled]="!contrasenaEliminar || eliminando">
+            {{ eliminando ? 'Eliminando...' : 'Eliminar definitivamente' }}
+          </button>
+          <button type="button" class="btn-primary btn-secundario" (click)="cancelarEliminar()"
+                  [disabled]="eliminando">Cancelar</button>
+        </div>
+      </div>
+    }
+  </section>
 }
