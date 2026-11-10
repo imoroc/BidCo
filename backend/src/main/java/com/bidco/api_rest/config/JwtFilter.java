@@ -159,7 +159,8 @@ public class JwtFilter extends OncePerRequestFilter {
             return "GET".equalsIgnoreCase(method)
                     || ("PUT".equalsIgnoreCase(method) && path.matches("/api/sorteos/final/\\d+") && "USER".equals(role));
         }
-        return true;
+        // Denegar por defecto: una ruta nueva sin regla explícita no queda abierta a cualquier token.
+        return false;
     }
 
     private boolean isPublic(String method, String path) {
