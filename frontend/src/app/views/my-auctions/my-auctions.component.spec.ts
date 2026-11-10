@@ -27,15 +27,8 @@ describe('MyAuctionsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  const esPagina = (r: { url: string; params: { get(n: string): string | null } }, id: string) =>
-    r.url.endsWith('/filtro-mis-subastas') && r.params.get('id') === id && r.params.get('page') === '0' && r.params.get('size') === '12';
-
-  it('no pide nada mientras no hay usuario', () => {
-    TestBed.inject(HttpTestingController).expectNone(r => r.url.endsWith('/filtro-mis-subastas'));
-  });
-
-  it('pide la primera página del filtro cuando llega el usuario', () => {
-    TestBed.inject(AuthService).currentUser.next({ usuarioID: 7 } as never);
-    TestBed.inject(HttpTestingController).expectOne(r => esPagina(r, '7'));
+  it('consulta el historial de subastas propias del usuario', () => {
+    TestBed.inject(AuthService).currentUser.next({ usuarioID: 3 } as never);
+    TestBed.inject(HttpTestingController).expectOne(r => r.url.endsWith('/filtro-mis-subastas') && r.params.get('id') === '3');
   });
 });

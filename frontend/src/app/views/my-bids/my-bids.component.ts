@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { HeaderComponent } from '../../components/header/header.component';
@@ -8,9 +9,8 @@ import { CargarMasComponent } from '../../components/cargar-mas/cargar-mas.compo
 import { ProductItemComponent } from '../../components/product-item/product-item.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 
-import { AuthService } from '../../services/auth.service';
-import { SubastaService, SubastaResponseDTO, Filtro } from '../../services/auction.service';
-import { ListadoFiltrado, TAMANO_PAGINA } from '../../utils/listado-filtrado';
+import { SubastaService } from '../../services/auction.service';
+import { HistorialSubastas } from '../../utils/historial-subastas';
 
 @Component({
   selector: 'app-my-bids',
@@ -28,25 +28,10 @@ import { ListadoFiltrado, TAMANO_PAGINA } from '../../utils/listado-filtrado';
   templateUrl: './my-bids.component.html',
   styleUrls: ['./my-bids.component.css']
 })
-export class MyBidsComponent {
-    listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasMisPujas(params, this.userId!), inject(DestroyRef), undefined, TAMANO_PAGINA);
-    userId: number | null = null;
-    private filtro?: Filtro;
+export class MyBidsComponent extends HistorialSubastas {
+    private readonly subastaService = inject(SubastaService);
 
-    constructor(private authService: AuthService, private subastaService: SubastaService) {}
-
-    ngOnInit() {
-        this.authService.currentUser$.subscribe((user) => {
-            if (user && user.usuarioID !== this.userId) {
-                this.userId = user.usuarioID;
-                // El filtro puede haber llegado antes que el usuario.
-                if (this.filtro) this.listado.cargar(this.filtro);
-            }
-        })
-    }
-
-    handleFilterApplied(filtro: Filtro) {
-        this.filtro = filtro;
-        if (this.userId !== null) this.listado.cargar(filtro);
+    protected pedir(params: HttpParams, usuarioId: number) {
+        return this.subastaService.getSubastasFiltradasMisPujas(params, usuarioId);
     }
 }
