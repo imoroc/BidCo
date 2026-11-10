@@ -40,6 +40,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
             new Regla("imagenes", "POST", Pattern.compile("^/api/(subastas|admin/sorteos)$"), 10, HORA),
             new Regla("restablecer", "POST", Pattern.compile("^/api/usuarios/restablecer-contrasena$"), 10, HORA),
             new Regla("password", "PATCH", Pattern.compile("^/api/usuarios/\\d+/password$"), 10, HORA),
+            new Regla("verificar-correo", "POST", Pattern.compile("^/api/usuarios/verificar-correo$"), 10, HORA),
+            new Regla("reenviar-verificacion", "POST", Pattern.compile("^/api/usuarios/\\d+/reenviar-verificacion$"), 5, HORA),
             new Regla("exportar-datos", "GET", Pattern.compile("^/api/usuarios/\\d+/exportar$"), 10, HORA),
             new Regla("eliminar-cuenta", "DELETE", Pattern.compile("^/api/usuarios/\\d+$"), 10, HORA),
             new Regla("comentarios", "POST", Pattern.compile("^/api/comentarios/nuevo$"), 20, MINUTO)

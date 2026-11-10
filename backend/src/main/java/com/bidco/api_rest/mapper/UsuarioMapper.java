@@ -15,5 +15,6 @@ public interface UsuarioMapper {
     @Mapping(target = "saldo", ignore = true)
     @Mapping(target = "puntos", ignore = true)
     @Mapping(target = "usuarioID", ignore = true)
+    @Mapping(target = "correoVerificado", ignore = true)
     Usuario usuarioCreateDTOToUsuario(UsuarioCreateDTO usuario);
 }

@@ -31,6 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "POST:/api/usuarios/login",
             "POST:/api/usuarios/recuperar-contrasena",
             "POST:/api/usuarios/restablecer-contrasena",
+            "POST:/api/usuarios/verificar-correo",
             "POST:/api/trabajadores/login",
             "POST:/api/admin/login",
             "GET:/api/ping",

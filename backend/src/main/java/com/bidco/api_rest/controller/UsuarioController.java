@@ -12,10 +12,12 @@ import com.bidco.api_rest.dto.usuario.StatsDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioCreateDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioResponseDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioUpdateDTO;
+import com.bidco.api_rest.dto.usuario.VerificarCorreoDTO;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.exception.ContrasenaActualIncorrectaException;
 import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.service.contract.UsuarioService;
+import com.bidco.api_rest.service.contract.VerificacionCorreoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +35,14 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final LoginRateLimiter loginRateLimiter;
+    private final VerificacionCorreoService verificacionCorreoService;
 
     @Autowired
-    public UsuarioController(UsuarioService usuarioService, LoginRateLimiter loginRateLimiter) {
+    public UsuarioController(UsuarioService usuarioService, LoginRateLimiter loginRateLimiter,
+                             VerificacionCorreoService verificacionCorreoService) {
         this.usuarioService = usuarioService;
         this.loginRateLimiter = loginRateLimiter;
+        this.verificacionCorreoService = verificacionCorreoService;
     }
 
     @PostMapping
@@ -141,6 +146,21 @@ public class UsuarioController {
             @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
         requireOwner(id, authenticatedUserId);
         return ResponseEntity.ok(usuarioService.recargarSaldo(id, body.getCantidad()));
+    }
+
+    @PostMapping("/verificar-correo")
+    public ResponseEntity<Void> verificarCorreo(@Valid @RequestBody VerificarCorreoDTO body) {
+        verificacionCorreoService.verificar(body.getToken());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/reenviar-verificacion")
+    public ResponseEntity<Void> reenviarVerificacion(
+            @PathVariable Long id,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        requireOwner(id, authenticatedUserId);
+        verificacionCorreoService.reenviar(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/exportar")
