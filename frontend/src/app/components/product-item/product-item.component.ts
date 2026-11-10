@@ -1,6 +1,7 @@
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { environment } from '../../../environments/environment'; // Añade la importación
+import { TickerService } from '../../services/ticker.service';
 import { ahoraMs, finDeDiaMs } from '../../utils/fechas';
 
 @Component({
@@ -11,12 +12,30 @@ import { ahoraMs, finDeDiaMs } from '../../utils/fechas';
   templateUrl: './product-item.component.html',
   styleUrl: './product-item.component.css'
 })
-export class ProductItemComponent implements OnInit, OnDestroy {
+export class ProductItemComponent implements OnInit {
     @Input() product: any;
     isBlindAuction: boolean = false;
     isRaffle: boolean = false;
-    countdown: string = '';
-    private intervalId: ReturnType<typeof setInterval> | null = null;
+
+    private readonly ticker = inject(TickerService);
+    private readonly finMs = signal(NaN);
+
+    /** Se recalcula con el reloj compartido del listado, sin un temporizador propio por tarjeta. */
+    readonly countdown = computed(() => {
+        this.ticker.tick();
+        const fin = this.finMs();
+        if (Number.isNaN(fin)) {
+            return '';
+        }
+        const distance = fin - ahoraMs();
+        if (distance < 0) {
+            return 'Finalizada';
+        }
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        return `${days}d ${hours}h ${minutes}m`;
+    });
 
     ngOnInit() {
         if (this.product) {
@@ -30,45 +49,7 @@ export class ProductItemComponent implements OnInit, OnDestroy {
 
         const fechaFin = this.isRaffle ? this.product?.fechaFin : this.product?.fechaFinal;
         if (fechaFin) {
-            this.setupCountdown(fechaFin);
-        }
-    }
-
-    ngOnDestroy() {
-        this.detenerCuentaAtras();
-    }
-
-    private detenerCuentaAtras() {
-        if (this.intervalId !== null) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
-        }
-    }
-
-    setupCountdown(endDateString: string) {
-        const endDate = finDeDiaMs(endDateString);
-
-        const actualizar = () => {
-            const distance = endDate - ahoraMs();
-
-            if (distance < 0) {
-                this.countdown = "Finalizada";
-                this.detenerCuentaAtras();
-                return;
-            }
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-
-            this.countdown = `${days}d ${hours}h ${minutes}m`;
-        };
-
-        // Se calcula al instante para que la tarjeta no aparezca con el contador vacío.
-        this.detenerCuentaAtras();
-        actualizar();
-        if (this.countdown !== "Finalizada") {
-            this.intervalId = setInterval(actualizar, 1000);
+            this.finMs.set(finDeDiaMs(fechaFin));
         }
     }
 }

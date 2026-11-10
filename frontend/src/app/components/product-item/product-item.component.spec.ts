@@ -33,4 +33,8 @@ describe('ProductItemComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('muestra la cuenta atrás en días, horas y minutos', () => {
+    expect(component.countdown()).toMatch(/^\d+d \d+h \d+m$/);
+  });
 });
