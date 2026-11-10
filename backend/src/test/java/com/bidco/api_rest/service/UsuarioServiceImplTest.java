@@ -1,9 +1,14 @@
 package com.bidco.api_rest.service;
 
 import com.bidco.api_rest.config.JwtUtil;
+import com.bidco.api_rest.dto.usuario.ExportacionDatosDTO;
 import com.bidco.api_rest.dto.usuario.UsuarioCreateDTO;
 import com.bidco.api_rest.exception.ContrasenaActualIncorrectaException;
 import com.bidco.api_rest.mapper.UsuarioMapper;
+import com.bidco.api_rest.model.Puja;
+import com.bidco.api_rest.model.PujaSorteo;
+import com.bidco.api_rest.model.Sorteo;
+import com.bidco.api_rest.model.Subasta;
 import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.PujaSorteoRepository;
@@ -19,7 +24,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,6 +36,8 @@ import static org.mockito.Mockito.*;
 class UsuarioServiceImplTest {
 
     private UsuarioRepository usuarioRepository;
+    private PujaRepository pujaRepository;
+    private PujaSorteoRepository pujaSorteoRepository;
     private SubastaRepository subastaRepository;
     private SorteoRepository sorteoRepository;
     private TokenRecuperacionRepository tokenRecuperacionRepository;
@@ -37,15 +46,17 @@ class UsuarioServiceImplTest {
     @BeforeEach
     void setUp() {
         usuarioRepository = mock(UsuarioRepository.class);
+        pujaRepository = mock(PujaRepository.class);
+        pujaSorteoRepository = mock(PujaSorteoRepository.class);
         subastaRepository = mock(SubastaRepository.class);
         sorteoRepository = mock(SorteoRepository.class);
         tokenRecuperacionRepository = mock(TokenRecuperacionRepository.class);
         service = new UsuarioServiceImpl(
                 usuarioRepository,
                 mock(UsuarioMapper.class),
-                mock(PujaRepository.class),
+                pujaRepository,
                 subastaRepository,
-                mock(PujaSorteoRepository.class),
+                pujaSorteoRepository,
                 sorteoRepository,
                 mock(JwtUtil.class),
                 tokenRecuperacionRepository,
@@ -180,5 +191,51 @@ class UsuarioServiceImplTest {
         assertFalse(usuario.getPrivacidadPerfilVisible());
         verify(usuarioRepository).save(usuario);
         verify(tokenRecuperacionRepository).eliminarPorUsuario(7L);
+    }
+
+    @Test
+    void exportarDatosDeUnUsuarioInexistenteFalla() {
+        when(usuarioRepository.findById(9L)).thenReturn(Optional.empty());
+
+        assertThrows(jakarta.persistence.EntityNotFoundException.class, () -> service.exportarDatos(9L));
+    }
+
+    @Test
+    void exportarDatosIncluyeElPerfilYLaActividadDelUsuario() {
+        Usuario usuario = usuarioConClave("k".repeat(12));
+        Instant fin = Instant.parse("2026-02-01T10:00:00Z");
+        Subasta subasta = new Subasta(3L, LocalDate.of(2026, 1, 1), fin, new BigDecimal("10"), true,
+                "Reloj", "Reloj antiguo", usuario, "img", "moda");
+        Sorteo sorteo = new Sorteo(4L, "Cámara", "Cámara digital", LocalDate.of(2026, 1, 1), fin, 50,
+                null, "img", "tecnologia");
+        Puja puja = new Puja(11L, subasta, new BigDecimal("25"), LocalDate.of(2026, 1, 5), usuario);
+        PujaSorteo participacion = new PujaSorteo(12L, sorteo, new BigDecimal("30"), LocalDate.of(2026, 1, 6), usuario);
+        when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
+        when(pujaRepository.findByUsuarioIdOrdenadas(7L)).thenReturn(List.of(puja));
+        when(pujaSorteoRepository.findByUsuarioIdOrdenadas(7L)).thenReturn(List.of(participacion));
+        when(subastaRepository.findByCreadorId(7L)).thenReturn(List.of(subasta));
+
+        ExportacionDatosDTO datos = service.exportarDatos(7L);
+
+        assertEquals(Instant.parse("2026-01-01T00:00:00Z"), datos.generadoEn());
+        assertEquals("ana", datos.perfil().nombreUsuario());
+        assertEquals("ana@example.com", datos.perfil().correoElectronico());
+        assertEquals(1, datos.pujas().size());
+        assertEquals("Reloj", datos.pujas().get(0).articulo());
+        assertEquals(3L, datos.pujas().get(0).subastaId());
+        assertEquals(1, datos.participacionesEnSorteos().size());
+        assertEquals("Cámara", datos.participacionesEnSorteos().get(0).articulo());
+        assertEquals(1, datos.subastasCreadas().size());
+        assertEquals(fin, datos.subastasCreadas().get(0).fechaFinal());
+    }
+
+    @Test
+    void exportarDatosNoIncluyeLaContrasena() {
+        Usuario usuario = usuarioConClave("k".repeat(12));
+        when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
+
+        ExportacionDatosDTO datos = service.exportarDatos(7L);
+
+        assertFalse(datos.toString().contains(usuario.getContrasena()));
     }
 }
