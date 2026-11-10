@@ -43,6 +43,12 @@ class FechasCierreTest {
     }
 
     @Test
+    void unaHoraSinOffsetSeInterpretaEnLaZonaIndicada() {
+        assertEquals(Instant.parse("2026-12-01T17:30:00Z"), FechasCierre.parsear("2026-12-01T18:30", MADRID));
+        assertEquals(Instant.parse("2026-07-01T16:30:00Z"), FechasCierre.parsear("2026-07-01T18:30", MADRID));
+    }
+
+    @Test
     void losEspaciosAlrededorSeIgnoran() {
         assertEquals(Instant.parse("2026-12-01T23:00:00Z"), FechasCierre.parsear(" 2026-12-01 ", MADRID));
     }
