@@ -55,6 +55,12 @@ export class FilterComponent {
         this.applyFilter();
     }
 
+    /** Activa "Mostrar vencidas" desde fuera, por ejemplo desde el aviso de un listado vacío. */
+    mostrarFinalizadas() {
+        this.mostrarVencidas = true;
+        this.applyFilter();
+    }
+
     limpiarFiltros() {
         this.selectedCategories = [];
         this.dateOrder = '';
