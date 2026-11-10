@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
 
@@ -50,7 +49,7 @@ class SubastaServiceImplCierreTest {
 
         subasta = new Subasta();
         subasta.setSubastaNormal(true);
-        subasta.setFechaFinal(LocalDate.of(2026, 11, 9));
+        subasta.setFechaFinal(Instant.parse("2026-11-09T23:00:00Z"));
         when(subastaRepository.findByIdForUpdate(ID)).thenReturn(Optional.of(subasta));
     }
 
@@ -67,9 +66,24 @@ class SubastaServiceImplCierreTest {
 
     @Test
     void unaSubastaTodaviaEnCursoSigueRechazandoElCierre() {
-        subasta.setFechaFinal(LocalDate.of(2026, 11, 10));
+        subasta.setFechaFinal(Instant.parse("2026-11-10T23:00:00Z"));
 
         assertThrows(IllegalStateException.class, () -> servicio.asignarGanadorYActualizarPrecioFinal(ID));
+    }
+
+    @Test
+    void unSegundoAntesDeLaHoraDeCierreSigueRechazandoElCierre() {
+        subasta.setFechaFinal(Instant.parse("2026-11-10T10:00:01Z"));
+
+        assertThrows(IllegalStateException.class, () -> servicio.asignarGanadorYActualizarPrecioFinal(ID));
+    }
+
+    @Test
+    void aLaHoraExactaDeCierreYaSePuedeCerrar() {
+        subasta.setFechaFinal(Instant.parse("2026-11-10T10:00:00Z"));
+        when(pujaRepository.findTopBySubastaIdOrderByImporteDesc(ID)).thenReturn(null);
+
+        assertDoesNotThrow(() -> servicio.asignarGanadorYActualizarPrecioFinal(ID));
     }
 
     @Test

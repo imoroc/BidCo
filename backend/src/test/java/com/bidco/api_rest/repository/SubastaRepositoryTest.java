@@ -15,7 +15,9 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,6 +46,11 @@ class SubastaRepositoryTest {
 
     private static final String[] SIN_CATEGORIAS = {""};
     private static final LocalDate HOY = LocalDate.of(2026, 11, 10);
+    private static final Instant AHORA = HOY.atTime(10, 0).toInstant(ZoneOffset.UTC);
+
+    private static Instant finDeDia(LocalDate dia) {
+        return dia.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+    }
 
     @Autowired
     private SubastaRepository subastas;
@@ -61,7 +68,7 @@ class SubastaRepositoryTest {
     }
 
     private Subasta subasta(String nombre, boolean normal, String categoria, String precio, LocalDate fin) {
-        return subastas.save(new Subasta(null, HOY.minusDays(10), fin, new BigDecimal(precio), normal,
+        return subastas.save(new Subasta(null, HOY.minusDays(10), finDeDia(fin), new BigDecimal(precio), normal,
                 nombre, "Descripción", creador, null, categoria));
     }
 
@@ -133,7 +140,7 @@ class SubastaRepositoryTest {
         subasta("mia", true, "moda", "10", HOY.plusDays(5));
         Usuario otro = usuarios.save(new Usuario(null, "otro", "otro@example.com", "y".repeat(60),
                 new BigDecimal("0"), 0, "España", "Madrid", "28002", "Calle Sol", 2, null));
-        subastas.save(new Subasta(null, HOY, HOY.plusDays(5), new BigDecimal("10"), true,
+        subastas.save(new Subasta(null, HOY, finDeDia(HOY.plusDays(5)), new BigDecimal("10"), true,
                 "ajena", "Descripción", otro, null, "moda"));
 
         List<Subasta> resultado = subastas.findByFiltroMisSubastas(
@@ -154,7 +161,7 @@ class SubastaRepositoryTest {
             pujas.save(new Puja(null, s, new BigDecimal("15"), HOY.minusDays(3), creador));
         }
 
-        List<Long> ids = subastas.findIdsVencidasConPujasSinGanador(HOY);
+        List<Long> ids = subastas.findIdsVencidasConPujasSinGanador(AHORA);
 
         assertEquals(List.of(conPujas.getSubastaID()), ids);
     }

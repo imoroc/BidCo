@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -18,7 +17,7 @@ import static org.mockito.Mockito.*;
 
 class CierreAutomaticoTaskTest {
 
-    private static final LocalDate HOY = LocalDate.of(2026, 11, 10);
+    private static final Instant AHORA = Instant.parse("2026-11-10T10:00:00Z");
 
     private SubastaRepository subastaRepository;
     private SorteoRepository sorteoRepository;
@@ -32,13 +31,13 @@ class CierreAutomaticoTaskTest {
         sorteoRepository = mock(SorteoRepository.class);
         subastaService = mock(SubastaService.class);
         sorteoService = mock(SorteoService.class);
-        Clock reloj = Clock.fixed(Instant.parse("2026-11-10T10:00:00Z"), ZoneId.of("Europe/Madrid"));
+        Clock reloj = Clock.fixed(AHORA, ZoneId.of("Europe/Madrid"));
         tarea = new CierreAutomaticoTask(subastaRepository, sorteoRepository, subastaService, sorteoService, reloj);
     }
 
     @Test
-    void cierraCadaSubastaVencidaConLaFechaDelServidor() {
-        when(subastaRepository.findIdsVencidasConPujasSinGanador(HOY)).thenReturn(List.of(1L, 2L, 3L));
+    void cierraCadaSubastaVencidaConLaHoraDelServidor() {
+        when(subastaRepository.findIdsVencidasConPujasSinGanador(AHORA)).thenReturn(List.of(1L, 2L, 3L));
 
         int cerradas = tarea.cerrarSubastasVencidas();
 
@@ -50,7 +49,7 @@ class CierreAutomaticoTaskTest {
 
     @Test
     void siUnaSubastaFallaSeSiguenProcesandoLasDemas() {
-        when(subastaRepository.findIdsVencidasConPujasSinGanador(HOY)).thenReturn(List.of(1L, 2L, 3L));
+        when(subastaRepository.findIdsVencidasConPujasSinGanador(AHORA)).thenReturn(List.of(1L, 2L, 3L));
         doThrow(new IllegalStateException("fallo simulado")).when(subastaService).asignarGanadorYActualizarPrecioFinal(2L);
 
         int cerradas = tarea.cerrarSubastasVencidas();
@@ -61,7 +60,7 @@ class CierreAutomaticoTaskTest {
 
     @Test
     void cierraLosSorteosVencidosYToleraErrores() {
-        when(sorteoRepository.findIdsVencidosConParticipacionesSinGanador(HOY)).thenReturn(List.of(5L, 6L));
+        when(sorteoRepository.findIdsVencidosConParticipacionesSinGanador(AHORA)).thenReturn(List.of(5L, 6L));
         doThrow(new IllegalStateException("fallo simulado")).when(sorteoService).asignarGanadorYActualizarPrecioFinal(5L);
 
         int cerrados = tarea.cerrarSorteosVencidos();
@@ -72,8 +71,8 @@ class CierreAutomaticoTaskTest {
 
     @Test
     void sinPendientesNoLlamaAlosServicios() {
-        when(subastaRepository.findIdsVencidasConPujasSinGanador(HOY)).thenReturn(List.of());
-        when(sorteoRepository.findIdsVencidosConParticipacionesSinGanador(HOY)).thenReturn(List.of());
+        when(subastaRepository.findIdsVencidasConPujasSinGanador(AHORA)).thenReturn(List.of());
+        when(sorteoRepository.findIdsVencidosConParticipacionesSinGanador(AHORA)).thenReturn(List.of());
 
         tarea.cerrarVencidas();
 

@@ -28,7 +28,7 @@ class AdminServiceImplTest {
     void setUp() {
         trabajadorRepository = mock(TrabajadorRepository.class);
         session = mock(HttpSession.class);
-        service = new AdminServiceImpl(trabajadorRepository, mock(SorteoRepository.class), mock(CloudinaryService.class));
+        service = new AdminServiceImpl(trabajadorRepository, mock(SorteoRepository.class), mock(CloudinaryService.class), java.time.Clock.systemUTC());
         clave = "a".repeat(12);
     }
 
