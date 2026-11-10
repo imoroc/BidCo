@@ -6,7 +6,7 @@
   background: var(--color-superficie);
   border-radius: 12px;
   border: 1px solid var(--color-borde-suave);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  box-shadow: var(--sombra-tenue);
   padding: 32px;
   margin-bottom: 24px;
 }

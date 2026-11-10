@@ -36,7 +36,7 @@ import { FooterComponent } from '../footer/footer.component';
       padding: 32px;
       background: var(--color-superficie);
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      box-shadow: var(--sombra-elevada);
       line-height: 1.65;
       color: var(--color-texto-fuerte);
     }
