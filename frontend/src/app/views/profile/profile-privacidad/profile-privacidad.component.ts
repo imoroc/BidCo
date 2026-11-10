@@ -24,6 +24,7 @@ export class ProfilePrivacidadComponent implements OnInit {
   mostrandoEliminar = false;
   contrasenaEliminar = '';
   eliminando = false;
+  descargando = false;
 
   constructor(
     private userService: UserService,
@@ -65,6 +66,33 @@ export class ProfilePrivacidadComponent implements OnInit {
         }
       });
     }
+  }
+
+  descargarDatos() {
+    const userId = this.authService.currentUser.value?.usuarioID;
+    if (!userId || this.descargando) {
+      return;
+    }
+    this.descargando = true;
+    this.userService.exportarDatos(userId).subscribe({
+      next: (blob) => {
+        this.descargando = false;
+        this.guardarArchivo(blob, 'bidco-mis-datos.json');
+      },
+      error: (err) => {
+        this.descargando = false;
+        this.toastService.error(err.error?.message || 'No se han podido descargar tus datos');
+      }
+    });
+  }
+
+  guardarArchivo(blob: Blob, nombre: string) {
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = nombre;
+    enlace.click();
+    URL.revokeObjectURL(url);
   }
 
   abrirEliminar() {

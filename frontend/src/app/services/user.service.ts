@@ -79,6 +79,15 @@ export class UserService {
     }));
   }
 
+  // Copia en JSON de los datos del usuario (derecho de acceso y portabilidad).
+  exportarDatos(id: number): Observable<Blob> {
+    const token = localStorage.getItem('authToken');
+    return this.http.get(`${this.apiUrl}/${id}/exportar`, {
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+      responseType: 'blob'
+    });
+  }
+
   // La contraseña viaja en el cuerpo (nunca en la URL). Anonimiza la cuenta; el backend rechaza el borrado
   // si quedan subastas o sorteos sin cerrar.
   eliminarCuenta(id: number, contrasena: string): Observable<void> {

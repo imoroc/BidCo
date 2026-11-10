@@ -3,6 +3,7 @@ package com.bidco.api_rest.controller;
 import com.bidco.api_rest.config.LoginRateLimiter;
 import com.bidco.api_rest.dto.usuario.CambiarContrasenaDTO;
 import com.bidco.api_rest.dto.usuario.EliminarCuentaDTO;
+import com.bidco.api_rest.dto.usuario.ExportacionDatosDTO;
 import com.bidco.api_rest.dto.usuario.LoginDTO;
 import com.bidco.api_rest.dto.usuario.PerfilPublicoDTO;
 import com.bidco.api_rest.dto.usuario.PrivacidadDTO;
@@ -18,6 +19,7 @@ import com.bidco.api_rest.service.contract.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -139,6 +141,17 @@ public class UsuarioController {
             @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
         requireOwner(id, authenticatedUserId);
         return ResponseEntity.ok(usuarioService.recargarSaldo(id, body.getCantidad()));
+    }
+
+    @GetMapping("/{id}/exportar")
+    public ResponseEntity<ExportacionDatosDTO> exportarDatos(
+            @PathVariable Long id,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        requireOwner(id, authenticatedUserId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"bidco-mis-datos.json\"")
+                .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                .body(usuarioService.exportarDatos(id));
     }
 
     @DeleteMapping("/{id}")

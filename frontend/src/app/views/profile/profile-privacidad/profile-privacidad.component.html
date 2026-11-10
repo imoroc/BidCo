@@ -45,6 +45,19 @@
     </div>
   </section>
 
+  <section class="settings-card seccion-datos">
+    <div class="toggle-item">
+      <div class="toggle-info">
+        <h3>Descargar mis datos</h3>
+        <p>Obtén un archivo JSON con tu perfil, tus pujas, tu participación en sorteos y las subastas que has
+          creado. No incluye tu contraseña.</p>
+      </div>
+      <button type="button" class="btn-primary boton-fijo" (click)="descargarDatos()" [disabled]="descargando">
+        {{ descargando ? 'Preparando...' : 'Descargar' }}
+      </button>
+    </div>
+  </section>
+
   <section class="settings-card zona-peligro">
     <div class="toggle-item">
       <div class="toggle-info">
