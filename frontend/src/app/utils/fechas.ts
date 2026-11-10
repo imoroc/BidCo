@@ -1,10 +1,11 @@
 /**
  * Fechas de subastas y sorteos.
  *
- * El servidor trabaja con días naturales (LocalDate) calculados en Europe/Madrid, y solo
- * permite cerrar una subasta o un sorteo a partir del día siguiente a su fecha final.
- * Estas funciones aplican el mismo criterio en el navegador, sea cual sea la zona
- * horaria del dispositivo.
+ * El cierre es un instante exacto. La API lo devuelve como ISO-8601 con zona (p. ej.
+ * "2026-12-01T22:59:00Z"); al crear se puede enviar un día completo ("2026-12-01", que cierra
+ * a la medianoche siguiente en la zona del servidor) o una hora de pared en esa zona
+ * ("2026-12-01T18:30"). Estas funciones aplican en el navegador el mismo criterio que el
+ * servidor, sea cual sea la zona horaria del dispositivo.
  */
 
 /** Zona en la que el servidor calcula "hoy" (propiedad app.timezone del backend). */
@@ -14,6 +15,7 @@ export const ZONA_HORARIA = 'Europe/Madrid';
 export const MARGEN_CIERRE_MS = 5000;
 
 const FECHA_ISO = /^(\d{4})-(\d{2})-(\d{2})$/;
+const FECHA_HORA_LOCAL = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/;
 
 /** Diferencia entre el reloj del servidor y el del dispositivo; 0 hasta que llega la primera respuesta. */
 let desfaseServidorMs = 0;
@@ -79,32 +81,53 @@ function desfaseZona(instante: number): number {
 }
 
 /**
- * Instante (ms desde epoch) en el que termina el último día de la subasta o sorteo:
- * la medianoche siguiente en la zona del servidor, más un pequeño margen.
- * Si el valor trae hora (contiene "T") se interpreta tal cual.
- * Devuelve NaN si el formato no es válido.
+ * Instante (ms desde epoch) correspondiente a una hora de pared de la zona del servidor.
+ * La hora se localiza a partir de su equivalente en UTC; los cambios de hora ocurren de madrugada,
+ * así que el desfase de ese instante es el correcto salvo entre la 1:00 y las 3:00 de esos días.
  */
-export function finDeDiaMs(fechaFinal: string): number {
-    if (fechaFinal.includes('T')) {
-        return new Date(fechaFinal).getTime();
-    }
-    const m = FECHA_ISO.exec(fechaFinal);
-    if (!m) {
-        return NaN;
-    }
-    const [, year, month, day] = m.map(Number);
-    // La medianoche local del día siguiente se localiza a partir de su equivalente en UTC;
-    // los cambios de hora ocurren de madrugada, así que el desfase de ese instante es el correcto.
-    const medianocheUtc = Date.UTC(year, month - 1, day + 1, 0, 0, 0);
-    return medianocheUtc - desfaseZona(medianocheUtc) + MARGEN_CIERRE_MS;
+function instanteEnZona(year: number, month: number, day: number, hour: number, minute: number, second: number): number {
+    const nominalUtc = Date.UTC(year, month - 1, day, hour, minute, second);
+    return nominalUtc - desfaseZona(nominalUtc);
 }
 
 /**
- * Indica si una subasta o un sorteo está vencido: el día actual es posterior a su fecha final.
- * El propio día de la fecha final sigue abierto, igual que en el servidor.
+ * Instante (ms desde epoch) en el que cierra una subasta o un sorteo, sin margen. Acepta:
+ * "YYYY-MM-DD" (día completo: cierra a la medianoche siguiente en la zona del servidor),
+ * un instante ISO-8601 con zona u offset (se interpreta tal cual) y "YYYY-MM-DDTHH:mm[:ss]"
+ * sin offset (hora de pared en la zona del servidor). Devuelve NaN si el formato no es válido.
  */
-export function estaVencida(fechaFinal: string | null | undefined, hoy: string = hoyISO()): boolean {
-    return !!fechaFinal && fechaFinal.slice(0, 10) < hoy;
+function instanteCierreMs(fechaFinal: string): number {
+    const dia = FECHA_ISO.exec(fechaFinal);
+    if (dia) {
+        const [, year, month, day] = dia.map(Number);
+        return instanteEnZona(year, month, day + 1, 0, 0, 0);
+    }
+    const local = FECHA_HORA_LOCAL.exec(fechaFinal);
+    if (local) {
+        const [, year, month, day, hour, minute] = local.map(Number);
+        return instanteEnZona(year, month, day, hour, minute, Number(local[6] ?? 0));
+    }
+    return fechaFinal.includes('T') ? Date.parse(fechaFinal) : NaN;
+}
+
+/**
+ * Instante en el que hay que pedir el cierre: el del plazo más un pequeño margen, para no
+ * adelantarse al servidor. Devuelve NaN si el formato no es válido.
+ */
+export function cierreMs(fechaFinal: string): number {
+    return instanteCierreMs(fechaFinal) + MARGEN_CIERRE_MS;
+}
+
+/**
+ * Indica si una subasta o un sorteo está vencido: ya se alcanzó su hora de cierre.
+ * Un valor sin fecha o con un formato no válido no se considera vencido.
+ */
+export function estaVencida(fechaFinal: string | null | undefined, ahora: number = ahoraMs()): boolean {
+    if (!fechaFinal) {
+        return false;
+    }
+    const cierre = instanteCierreMs(fechaFinal);
+    return !Number.isNaN(cierre) && cierre <= ahora;
 }
 
 /** Quita los vencidos de un listado, salvo que se pida mostrarlos. */
@@ -116,6 +139,6 @@ export function ocultarVencidas<T>(
     if (mostrarVencidas) {
         return items;
     }
-    const hoy = hoyISO();
-    return items.filter(item => !estaVencida(fechaFinalDe(item), hoy));
+    const ahora = ahoraMs();
+    return items.filter(item => !estaVencida(fechaFinalDe(item), ahora));
 }
