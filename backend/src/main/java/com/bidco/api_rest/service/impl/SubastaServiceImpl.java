@@ -114,8 +114,10 @@ public class SubastaServiceImpl implements SubastaService {
 
         Puja puja = pujaRepository.findTopBySubastaIdOrderByImporteDesc(id);
 
+        // Subasta desierta: vencida sin pujas. Es un cierre válido sin ganador, no un error;
+        // no hay nadie a quien puntuar y no se modifica nada.
         if (puja == null) {
-            throw new IllegalStateException("No hubo ninguna puja en la subasta.");
+            return;
         }
 
         Usuario user = usuarioRepository.findById(puja.getPujador().getUsuarioID())
