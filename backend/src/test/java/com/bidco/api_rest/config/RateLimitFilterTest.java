@@ -114,6 +114,52 @@ class RateLimitFilterTest {
     }
 
     @Test
+    void laSubidaDeImagenesDelAdminCompartenCupoConLaCreacionDeSubastas() throws Exception {
+        filtro = new RateLimitFilter(new RequestRateLimiter(reloj), true, 1000);
+        for (int i = 0; i < 5; i++) {
+            enviar("POST", "/api/subastas", "10.0.0.1");
+            enviar("POST", "/api/admin/sorteos", "10.0.0.1");
+        }
+
+        assertEquals(429, enviar("POST", "/api/admin/sorteos", "10.0.0.1").getStatus());
+        assertEquals(429, enviar("POST", "/api/subastas", "10.0.0.1").getStatus());
+    }
+
+    @Test
+    void elRestablecimientoDeContrasenaAdmiteDiezIntentosPorHora() throws Exception {
+        filtro = new RateLimitFilter(new RequestRateLimiter(reloj), true, 1000);
+        for (int i = 0; i < 10; i++) {
+            assertEquals(200, enviar("POST", "/api/usuarios/restablecer-contrasena", "10.0.0.1").getStatus());
+        }
+
+        assertEquals(429, enviar("POST", "/api/usuarios/restablecer-contrasena", "10.0.0.1").getStatus());
+        assertEquals(200, enviar("POST", "/api/usuarios/restablecer-contrasena", "10.0.0.2").getStatus());
+    }
+
+    @Test
+    void elCambioDeContrasenaSeLimitaPorIpAunqueCambieElIdDeUsuario() throws Exception {
+        filtro = new RateLimitFilter(new RequestRateLimiter(reloj), true, 1000);
+        for (int i = 0; i < 10; i++) {
+            assertEquals(200, enviar("PATCH", "/api/usuarios/" + (i + 1) + "/password", "10.0.0.1").getStatus());
+        }
+
+        assertEquals(429, enviar("PATCH", "/api/usuarios/99/password", "10.0.0.1").getStatus());
+    }
+
+    @Test
+    void losComentariosAdmitenVeintePorMinutoYSeLiberanDespues() throws Exception {
+        filtro = new RateLimitFilter(new RequestRateLimiter(reloj), true, 1000);
+        for (int i = 0; i < 20; i++) {
+            assertEquals(200, enviar("POST", "/api/comentarios/nuevo", "10.0.0.1").getStatus());
+        }
+        assertEquals(429, enviar("POST", "/api/comentarios/nuevo", "10.0.0.1").getStatus());
+
+        reloj.avanzar(Duration.ofMinutes(2));
+
+        assertEquals(200, enviar("POST", "/api/comentarios/nuevo", "10.0.0.1").getStatus());
+    }
+
+    @Test
     void lasPujasDeSubastaYDeSorteoCompartenCupo() throws Exception {
         // Tope general alto para que solo actúe la regla de pujas (30 por minuto).
         filtro = new RateLimitFilter(new RequestRateLimiter(reloj), true, 1000);
