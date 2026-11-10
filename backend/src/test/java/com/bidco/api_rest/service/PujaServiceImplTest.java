@@ -41,7 +41,7 @@ class PujaServiceImplTest {
         subastaRepository = mock(SubastaRepository.class);
         usuarioRepository = mock(UsuarioRepository.class);
         Clock clock = Clock.fixed(Instant.parse("2026-06-15T10:00:00Z"), ZoneOffset.UTC);
-        service = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, clock);
+        service = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, clock, 5L);
     }
 
     private static Instant finDeDia(LocalDate dia) {
@@ -67,6 +67,14 @@ class PujaServiceImplTest {
         u.setUsuarioID(id);
         u.setSaldo(new BigDecimal(saldo));
         return u;
+    }
+
+    /** Hace una puja válida de 20 sobre la subasta dada (precio base 10, pujador con saldo de sobra). */
+    private void pujaValidaSobre(Subasta s) {
+        when(subastaRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(s));
+        when(usuarioRepository.findByIdForUpdate(5L)).thenReturn(Optional.of(usuario(5L, "100")));
+        when(pujaMapper.pujaCreateDTOToPuja(any())).thenReturn(new Puja());
+        service.crearPuja(dto("20"));
     }
 
     private PujaCreateDTO dto(String importe) {
@@ -145,6 +153,59 @@ class PujaServiceImplTest {
         assertEquals(new BigDecimal("80"), pujador.getSaldo());
         assertEquals(new BigDecimal("20"), s.getPrecioFinal());
         verify(pujaRepository).save(any(Puja.class));
+    }
+
+    @Test
+    void unaPujaEnLosUltimosMinutosProlongaElCierre() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY);
+        s.setFechaFinal(Instant.parse("2026-06-15T10:02:00Z"));
+        pujaValidaSobre(s);
+
+        // La puja entra a las 10:00: el cierre pasa a ser 5 minutos después.
+        assertEquals(Instant.parse("2026-06-15T10:05:00Z"), s.getFechaFinal());
+        verify(subastaRepository).save(s);
+    }
+
+    @Test
+    void unaPujaConTiempoDeSobraNoCambiaElCierre() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY);
+        s.setFechaFinal(Instant.parse("2026-06-15T10:30:00Z"));
+        pujaValidaSobre(s);
+
+        assertEquals(Instant.parse("2026-06-15T10:30:00Z"), s.getFechaFinal());
+    }
+
+    @Test
+    void unaPujaJustoEnElLimiteDeLaVentanaNoCambiaElCierre() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY);
+        s.setFechaFinal(Instant.parse("2026-06-15T10:05:00Z"));
+        pujaValidaSobre(s);
+
+        assertEquals(Instant.parse("2026-06-15T10:05:00Z"), s.getFechaFinal());
+    }
+
+    @Test
+    void enSubastaACiegasElCierreNoSeProrroga() {
+        Subasta s = subasta(false, HOY.minusDays(1), HOY);
+        s.setFechaFinal(Instant.parse("2026-06-15T10:02:00Z"));
+        pujaValidaSobre(s);
+
+        assertEquals(Instant.parse("2026-06-15T10:02:00Z"), s.getFechaFinal());
+    }
+
+    @Test
+    void conLaVentanaACeroElAntisnipingEstaDesactivado() {
+        Clock clock = Clock.fixed(Instant.parse("2026-06-15T10:00:00Z"), ZoneOffset.UTC);
+        PujaServiceImpl sinAntisniping = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, clock, 0L);
+        Subasta s = subasta(true, HOY.minusDays(1), HOY);
+        s.setFechaFinal(Instant.parse("2026-06-15T10:02:00Z"));
+        when(subastaRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(s));
+        when(usuarioRepository.findByIdForUpdate(5L)).thenReturn(Optional.of(usuario(5L, "100")));
+        when(pujaMapper.pujaCreateDTOToPuja(any())).thenReturn(new Puja());
+
+        sinAntisniping.crearPuja(dto("20"));
+
+        assertEquals(Instant.parse("2026-06-15T10:02:00Z"), s.getFechaFinal());
     }
 
     @Test

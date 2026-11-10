@@ -15,9 +15,12 @@ import jakarta.persistence.EntityNotFoundException;
 
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +32,16 @@ public class PujaServiceImpl implements PujaService {
     private final SubastaRepository subastaRepository;
     private final UsuarioRepository usuarioRepository;
     private final Clock clock;
+    private final Duration ventanaAntisniping;
 
-    public PujaServiceImpl(PujaRepository pujaRepository, PujaMapper pujaMapper, SubastaRepository subastaRepository, UsuarioRepository usuarioRepository, Clock clock) {
+    public PujaServiceImpl(PujaRepository pujaRepository, PujaMapper pujaMapper, SubastaRepository subastaRepository, UsuarioRepository usuarioRepository, Clock clock,
+                           @Value("${app.antisniping.minutos:5}") long minutosAntisniping) {
         this.pujaRepository = pujaRepository;
         this.pujaMapper = pujaMapper;
         this.subastaRepository = subastaRepository;
         this.usuarioRepository = usuarioRepository;
         this.clock = clock;
+        this.ventanaAntisniping = Duration.ofMinutes(Math.max(minutosAntisniping, 0));
     }
 
     @Override
@@ -93,6 +99,7 @@ public class PujaServiceImpl implements PujaService {
             // el listado público revelaría la puja máxima.
             if (subasta.isSubastaNormal()) {
                 subasta.setPrecioFinal(importe);
+                prolongarPlazoSiHaceFalta(subasta);
                 subastaRepository.save(subasta);
             }
         }
@@ -100,6 +107,21 @@ public class PujaServiceImpl implements PujaService {
 
         pujaRepository.save(puja);
         return pujaMapper.pujaToPujaResponseDTO(puja);
+    }
+
+    /**
+     * Anti-sniping: si una puja pasa a liderar con menos de la ventana configurada para el cierre,
+     * el cierre se retrasa hasta esa ventana después de la puja, para que los demás puedan responder.
+     * Nunca se adelanta un cierre. Con una ventana de 0 minutos queda desactivado.
+     */
+    private void prolongarPlazoSiHaceFalta(Subasta subasta) {
+        if (ventanaAntisniping.isZero()) {
+            return;
+        }
+        Instant minimo = clock.instant().plus(ventanaAntisniping);
+        if (subasta.getFechaFinal().isBefore(minimo)) {
+            subasta.setFechaFinal(minimo);
+        }
     }
 
     /**
