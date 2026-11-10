@@ -2,6 +2,7 @@ package com.bidco.api_rest.service.contract;
 
 import java.math.BigDecimal;
 
+import com.bidco.api_rest.dto.usuario.ExportacionDatosDTO;
 import com.bidco.api_rest.dto.usuario.LoginDTO;
 import com.bidco.api_rest.dto.usuario.PerfilPublicoDTO;
 import com.bidco.api_rest.dto.usuario.PrivacidadDTO;
@@ -25,4 +26,5 @@ public interface UsuarioService {
     BigDecimal recargarSaldo(Long usuarioId, BigDecimal cantidad);
     String login(LoginDTO loginDTO);
     void eliminarCuenta(Long id, String contrasena);
+    ExportacionDatosDTO exportarDatos(Long id);
 }

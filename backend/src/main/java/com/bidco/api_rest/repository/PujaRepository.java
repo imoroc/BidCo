@@ -21,6 +21,9 @@ public interface PujaRepository extends JpaRepository<Puja, Long> {
     @Query("SELECT p FROM Puja p WHERE p.subasta.subastaID = :subastaId ORDER BY p.importe DESC LIMIT 1")
     Puja findTopBySubastaIdOrderByImporteDesc(Long subastaId);
 
+    @Query("SELECT p FROM Puja p WHERE p.pujador.usuarioID = :usuarioID ORDER BY p.fecha DESC, p.pujaID DESC")
+    List<Puja> findByUsuarioIdOrdenadas(@Param("usuarioID") Long usuarioID);
+
     @Query("SELECT p.subasta FROM Puja p WHERE p.pujador.id = :usuarioId")
     List<Subasta> findSubastasByUsuarioId(@Param("usuarioId") Long usuarioId);
 }

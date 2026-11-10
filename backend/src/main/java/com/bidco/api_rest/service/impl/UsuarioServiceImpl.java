@@ -2,6 +2,7 @@ package com.bidco.api_rest.service.impl;
 
 import com.bidco.api_rest.config.JwtUtil;
 import com.bidco.api_rest.exception.ContrasenaActualIncorrectaException;
+import com.bidco.api_rest.dto.usuario.ExportacionDatosDTO;
 import com.bidco.api_rest.dto.usuario.LoginDTO;
 import com.bidco.api_rest.dto.usuario.PerfilPublicoDTO;
 import com.bidco.api_rest.dto.usuario.PrivacidadDTO;
@@ -267,5 +268,41 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.save(usuario);
 
         tokenRecuperacionRepository.eliminarPorUsuario(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ExportacionDatosDTO exportarDatos(Long id) {
+        Usuario u = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        ExportacionDatosDTO.Perfil perfil = new ExportacionDatosDTO.Perfil(
+                u.getNombreUsuario(), u.getCorreoElectronico(), u.getPais(), u.getCiudad(),
+                u.getCodigoPostal(), u.getCalle(), u.getNumeroPiso(), u.getLetraPiso(),
+                u.getSaldo(), u.getPuntos(),
+                Boolean.TRUE.equals(u.getPrivacidadAnonimoPujas()),
+                Boolean.TRUE.equals(u.getPrivacidadEstadisticas()),
+                Boolean.TRUE.equals(u.getPrivacidadPerfilVisible()));
+
+        var pujas = pujaRepository.findByUsuarioIdOrdenadas(id).stream()
+                .map(p -> new ExportacionDatosDTO.PujaExportada(
+                        p.getPujaID(), p.getFecha(), p.getImporte(), p.isGanadora(),
+                        p.getSubasta().getSubastaID(), p.getSubasta().getNombreArticulo()))
+                .toList();
+
+        var participaciones = pujaSorteoRepository.findByUsuarioIdOrdenadas(id).stream()
+                .map(ps -> new ExportacionDatosDTO.ParticipacionSorteoExportada(
+                        ps.getPujaID(), ps.getFecha(), ps.getPuntos(),
+                        ps.getSorteo().getSorteoID(), ps.getSorteo().getNombreArticulo()))
+                .toList();
+
+        var subastas = subastaRepository.findByCreadorId(id).stream()
+                .map(s -> new ExportacionDatosDTO.SubastaCreadaExportada(
+                        s.getSubastaID(), s.getNombreArticulo(), s.getDescripcion(), s.getCategoria(),
+                        s.getFechaInicial(), s.getFechaFinal(), s.getPrecioInicial(), s.getPrecioFinal(),
+                        s.isSubastaNormal()))
+                .toList();
+
+        return new ExportacionDatosDTO(clock.instant(), perfil, pujas, participaciones, subastas);
     }
 }
