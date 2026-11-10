@@ -46,6 +46,17 @@ class CorsConfigTest {
     }
 
     @Test
+    void exponeLaCabeceraDateParaSincronizarElReloj() throws Exception {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filtro.doFilter(peticion("GET", ORIGEN), response, new MockFilterChain());
+
+        String expuestas = response.getHeader("Access-Control-Expose-Headers");
+        assertNotNull(expuestas);
+        assertTrue(expuestas.contains("Date"));
+    }
+
+    @Test
     void permiteLosPreviewsDeVercel() throws Exception {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
