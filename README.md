@@ -347,7 +347,7 @@ BidCo/
 - [ ] Paginación de listados y orden y filtros reflejados en la URL.
 - [ ] Favoritos y aviso al terminar una subasta.
 - [ ] Cabeceras de seguridad y CSP también en el frontend.
-- [ ] Limitador de peticiones general y compartido entre instancias.
+- [ ] Limitador de peticiones compartido entre instancias (hoy hay uno general por IP, en memoria).
 - [ ] Endpoint de salud con Actuator y logs estructurados.
 - [ ] Interfaz en varios idiomas.
 
