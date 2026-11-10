@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 /** Mensaje de estado de un listado: cargando, error o sin resultados. No muestra nada si hay datos. */
 @Component({
@@ -19,6 +19,12 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
       </div>
     } @else if (errorCarga) {
       <p class="estado-listado estado-error" role="alert">No se han podido cargar los productos. Inténtalo de nuevo en unos instantes.</p>
+    } @else if (total === 0 && ocultas > 0) {
+      <div class="estado-listado" role="status">
+        <p>Ahora mismo no hay nada en curso.</p>
+        <p>{{ ocultas === 1 ? 'Hay 1 finalizada' : 'Hay ' + ocultas + ' finalizadas' }} que puedes consultar.</p>
+        <button type="button" class="btn-secondary" (click)="verOcultas.emit()">Ver finalizadas</button>
+      </div>
     } @else if (total === 0) {
       <p class="estado-listado" role="status">{{ mensajeVacio }}</p>
     }
@@ -29,6 +35,14 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
       text-align: center;
       color: var(--color-texto-suave);
       font-size: 1rem;
+    }
+
+    .estado-listado p + p {
+      margin-top: var(--espacio-2);
+    }
+
+    .estado-listado button {
+      margin-top: var(--espacio-4);
     }
 
     .estado-error {
@@ -79,4 +93,7 @@ export class EstadoListadoComponent {
   @Input() errorCarga = false;
   @Input() total = 0;
   @Input() mensajeVacio = 'No hay resultados.';
+  /** Elementos vencidos que el listado tiene ocultos; si hay y no queda nada, se ofrece verlos. */
+  @Input() ocultas = 0;
+  @Output() verOcultas = new EventEmitter<void>();
 }

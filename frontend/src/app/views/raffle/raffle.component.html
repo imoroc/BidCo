@@ -1,7 +1,7 @@
 <app-header></app-header>
 
 <div class="page-layout">
-  <app-filter [permiteVencidas]="true" (filterChanged)="handleFilterApplied($event)"></app-filter>
+  <app-filter #filtro [permiteVencidas]="true" (filterChanged)="handleFilterApplied($event)"></app-filter>
 
   <main class="main-content">
     
@@ -20,7 +20,7 @@
       }
     </header>
 
-    <app-estado-listado [cargando]="listado.cargando()" [errorCarga]="listado.errorCarga()" [total]="listado.items().length" mensajeVacio="No hay sorteos que coincidan con los filtros."></app-estado-listado>
+    <app-estado-listado [cargando]="listado.cargando()" [errorCarga]="listado.errorCarga()" [total]="listado.items().length" [ocultas]="listado.ocultas()" (verOcultas)="filtro.mostrarFinalizadas()" mensajeVacio="No hay sorteos que coincidan con los filtros."></app-estado-listado>
 
     <section class="products-grid">
       @for (product of listado.items(); track product.sorteoID) {
