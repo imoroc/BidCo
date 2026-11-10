@@ -70,9 +70,9 @@ import { PaginaInformativaComponent } from '../../components/pagina-informativa/
       <h2>8. Tus derechos</h2>
       <p>
         Puedes eliminar tu cuenta tú mismo desde tu perfil, en el apartado de Privacidad (no es posible
-        mientras tengas subastas o sorteos sin cerrar). Puedes además solicitar el acceso, la rectificación,
-        la limitación, la oposición y la portabilidad de tus datos, y retirar tu consentimiento en
-        cualquier momento. Para ejercerlos escribe desde la página de <a routerLink="/contacto">contacto</a>, sin publicar datos personales
+        mientras tengas subastas o sorteos sin cerrar) y descargar una copia de tus datos en JSON desde el
+        mismo apartado. Puedes además solicitar la rectificación, la limitación y la oposición, y retirar
+        tu consentimiento en cualquier momento. Para ejercerlos escribe desde la página de <a routerLink="/contacto">contacto</a>, sin publicar datos personales
         en canales abiertos. Si consideras que no se han respetado, puedes reclamar ante la Agencia
         Española de Protección de Datos (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">aepd.es</a>).
       </p>
