@@ -33,4 +33,9 @@ public interface SorteoRepository extends JpaRepository<Sorteo, Long> {
 
     @Query("SELECT s FROM Sorteo s WHERE s.puntosNecesarios >= :minPrice AND s.puntosNecesarios <= :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFin END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFin END DESC, s.fechaInicio DESC")
     List<Sorteo> findByFiltro(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder, Pageable pageable);
+
+    // Sorteos sin cerrar en los que el usuario ha participado.
+    @Query("SELECT COUNT(DISTINCT s) FROM Sorteo s JOIN s.pujasSorteos p WHERE p.pujador.usuarioID = :usuarioID "
+            + "AND s.ganador IS NULL")
+    long countPendientesConParticipacionDe(@Param("usuarioID") Long usuarioID);
 }

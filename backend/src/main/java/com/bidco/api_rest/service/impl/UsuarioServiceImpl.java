@@ -15,6 +15,7 @@ import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.PujaSorteoRepository;
 import com.bidco.api_rest.repository.SorteoRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
+import com.bidco.api_rest.repository.TokenRecuperacionRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.service.contract.UsuarioService;
@@ -24,7 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -38,6 +41,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final SorteoRepository sorteoRepository;
     private final JwtUtil jwtUtil;
+    private final TokenRecuperacionRepository tokenRecuperacionRepository;
+    private final Clock clock;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UsuarioServiceImpl(
@@ -47,7 +52,9 @@ public class UsuarioServiceImpl implements UsuarioService {
             SubastaRepository subastaRepository,
             PujaSorteoRepository pujaSorteoRepository,
             SorteoRepository sorteoRepository,
-            JwtUtil jwtUtil) {
+            JwtUtil jwtUtil,
+            TokenRecuperacionRepository tokenRecuperacionRepository,
+            Clock clock) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
         this.pujaRepository = pujaRepository;
@@ -55,6 +62,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.pujaSorteoRepository = pujaSorteoRepository;
         this.sorteoRepository = sorteoRepository;
         this.jwtUtil = jwtUtil;
+        this.tokenRecuperacionRepository = tokenRecuperacionRepository;
+        this.clock = clock;
     }
 
     @Override
@@ -214,5 +223,49 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setSaldo(usuario.getSaldo().add(cantidad));
         usuarioRepository.save(usuario);
         return usuario.getSaldo();
+    }
+
+    /**
+     * Elimina la cuenta anonimizándola: se borran los datos personales y se conserva la fila para no romper
+     * las pujas, subastas y sorteos ya cerrados. No se permite mientras haya algo sin cerrar en lo que el
+     * usuario participa, porque su resultado dependería de una persona que ya no existe.
+     */
+    @Override
+    @Transactional
+    public void eliminarCuenta(Long id, String contrasena) {
+        Usuario usuario = usuarioRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        if (contrasena == null || !passwordEncoder.matches(contrasena, usuario.getContrasena())) {
+            throw new ContrasenaActualIncorrectaException("Contraseña incorrecta");
+        }
+
+        long pendientes = subastaRepository.countPendientesPorCreador(id, clock.instant())
+                + subastaRepository.countPendientesConPujasDe(id)
+                + sorteoRepository.countPendientesConParticipacionDe(id);
+        if (pendientes > 0) {
+            throw new IllegalStateException(
+                    "No puedes eliminar la cuenta mientras tengas subastas o sorteos sin cerrar");
+        }
+
+        // El nombre y el correo son únicos y obligatorios: se sustituyen por valores derivados del id.
+        // La contraseña pasa a un hash de un valor aleatorio que nadie conoce, así que no se puede entrar.
+        usuario.setNombreUsuario("usuario-eliminado-" + id);
+        usuario.setCorreoElectronico("eliminado-" + id + "@anonimo.invalid");
+        usuario.setContrasena(passwordEncoder.encode(UUID.randomUUID().toString()));
+        usuario.setSaldo(BigDecimal.ZERO);
+        usuario.setPuntos(0);
+        usuario.setPais("-");
+        usuario.setCiudad("-");
+        usuario.setCodigoPostal("-");
+        usuario.setCalle("-");
+        usuario.setNumeroPiso(0);
+        usuario.setLetraPiso(null);
+        usuario.setPrivacidadAnonimoPujas(true);
+        usuario.setPrivacidadEstadisticas(false);
+        usuario.setPrivacidadPerfilVisible(false);
+        usuarioRepository.save(usuario);
+
+        tokenRecuperacionRepository.eliminarPorUsuario(id);
     }
 }
