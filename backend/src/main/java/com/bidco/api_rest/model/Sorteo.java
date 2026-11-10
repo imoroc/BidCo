@@ -2,6 +2,7 @@ package com.bidco.api_rest.model;
 
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class Sorteo {
     @Column(nullable = false,name = "fecha_inicio")
     private LocalDate fechaInicio;
     @Column(nullable = false,name = "fecha_fin")
-    private LocalDate fechaFin;
+    private Instant fechaFin;
     @Column(nullable = false,name= "puntos_necesarios")
     private int puntosNecesarios;
 
@@ -43,7 +44,7 @@ public class Sorteo {
     @JoinColumn(name = "trabajador_id")
     private Trabajador creador;
 
-    public Sorteo(Long sorteoID, String nombreArticulo, String descripcion, LocalDate fechaInicio, LocalDate fechaFin, int puntosNecesarios,Trabajador creador, String imagen, String categoria) {
+    public Sorteo(Long sorteoID, String nombreArticulo, String descripcion, LocalDate fechaInicio, Instant fechaFin, int puntosNecesarios,Trabajador creador, String imagen, String categoria) {
         this.sorteoID = sorteoID;
         this.nombreArticulo = nombreArticulo;
         this.descripcion = descripcion;
@@ -93,11 +94,11 @@ public class Sorteo {
         this.fechaInicio = fechaInicio;
     }
 
-    public LocalDate getFechaFin() {
+    public Instant getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(LocalDate fechaFin) {
+    public void setFechaFin(Instant fechaFin) {
         this.fechaFin = fechaFin;
     }
 

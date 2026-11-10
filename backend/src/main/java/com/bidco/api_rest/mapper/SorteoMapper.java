@@ -16,7 +16,7 @@ public interface SorteoMapper {
 // 1. Convertir SorteoCreateDTO a Sorteo
     @Mapping(target = "creador", source = "creadorId", qualifiedByName = "longToTrabajador")
     @Mapping(source = "fechaInicio", target = "fechaInicio")
-    @Mapping(source = "fechaFin", target = "fechaFin")
+    @Mapping(target = "fechaFin", ignore = true)
     @Mapping(source = "descripcion", target = "descripcion")
     @Mapping(source = "puntosNecesarios", target = "puntosNecesarios")
     @Mapping(source = "nombreArticulo", target = "nombreArticulo")

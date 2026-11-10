@@ -1,5 +1,6 @@
 package com.bidco.api_rest.dto.sorteo;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 public class SorteoResponseDTO {
@@ -8,7 +9,7 @@ public class SorteoResponseDTO {
     private String nombreArticulo;
     private String descripcion;
     private LocalDate fechaInicio;
-    private LocalDate fechaFin;
+    private Instant fechaFin;
     private int puntosNecesarios;
     private int puntosFinales;
     private Long creadorId;
@@ -18,7 +19,7 @@ public class SorteoResponseDTO {
 
 
     // Constructor
-    public SorteoResponseDTO(Long sorteoID, String nombreArticulo, String descripcion, LocalDate fechaInicio, LocalDate fechaFin,
+    public SorteoResponseDTO(Long sorteoID, String nombreArticulo, String descripcion, LocalDate fechaInicio, Instant fechaFin,
                            int puntosNecesarios, int puntosFinales, Long creadorId, String imagen, String categoria, Long ganador) {
         this.sorteoID = sorteoID;
         this.nombreArticulo = nombreArticulo;
@@ -82,11 +83,11 @@ public class SorteoResponseDTO {
         this.fechaInicio = fechaInicio;
     }
 
-    public LocalDate getFechaFin() {
+    public Instant getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(LocalDate fechaFin) {
+    public void setFechaFin(Instant fechaFin) {
         this.fechaFin = fechaFin;
     }
 

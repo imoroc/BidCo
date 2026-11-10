@@ -44,12 +44,16 @@ class PujaServiceImplTest {
         service = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, clock);
     }
 
+    private static Instant finDeDia(LocalDate dia) {
+        return dia.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+    }
+
     private Subasta subasta(boolean normal, LocalDate inicio, LocalDate fin) {
         Subasta s = new Subasta();
         s.setSubastaID(1L);
         s.setSubastaNormal(normal);
         s.setFechaInicial(inicio);
-        s.setFechaFinal(fin);
+        s.setFechaFinal(finDeDia(fin));
         s.setPrecioInicial(new BigDecimal("10"));
         s.setPrecioFinal(new BigDecimal("10"));
         Usuario creador = new Usuario();
@@ -77,6 +81,26 @@ class PujaServiceImplTest {
 
         assertThrows(IllegalStateException.class, () -> service.crearPuja(dto("20")));
         verify(pujaRepository, never()).save(any());
+    }
+
+    @Test
+    void aLaHoraExactaDeCierreYaNoSePuedePujar() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY);
+        s.setFechaFinal(Instant.parse("2026-06-15T10:00:00Z"));
+        when(subastaRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(s));
+
+        assertThrows(IllegalStateException.class, () -> service.crearPuja(dto("20")));
+        verify(pujaRepository, never()).save(any());
+    }
+
+    @Test
+    void unSegundoAntesDelCierreTodaviaSePuedePujar() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY);
+        s.setFechaFinal(Instant.parse("2026-06-15T10:00:01Z"));
+        when(subastaRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(s));
+
+        // El importe no supera el precio actual: falla la validación de la puja, no el plazo.
+        assertThrows(IllegalArgumentException.class, () -> service.crearPuja(dto("10")));
     }
 
     @Test

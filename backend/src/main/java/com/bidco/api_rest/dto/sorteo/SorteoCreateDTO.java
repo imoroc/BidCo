@@ -13,7 +13,7 @@ public class SorteoCreateDTO {
     private String nombreArticulo;
     private String descripcion;
     private LocalDate fechaInicio;
-    private LocalDate fechaFin;
+    private String fechaFin;
     private int puntosNecesarios;
     private Long creadorId;
     private String categoria;
@@ -21,7 +21,7 @@ public class SorteoCreateDTO {
     private MultipartFile imagen;
 
     // Constructor
-    public SorteoCreateDTO(String nombreArticulo, String descripcion, LocalDate fechaInicio, LocalDate fechaFin,
+    public SorteoCreateDTO(String nombreArticulo, String descripcion, LocalDate fechaInicio, String fechaFin,
                            int puntosNecesarios, Long creadorId, MultipartFile imagen, String categoria,
                             Long ganador) {
         this.nombreArticulo = nombreArticulo;
@@ -60,11 +60,11 @@ public class SorteoCreateDTO {
         this.fechaInicio = fechaInicio;
     }
 
-    public LocalDate getFechaFin() {
+    public String getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(LocalDate fechaFin) {
+    public void setFechaFin(String fechaFin) {
         this.fechaFin = fechaFin;
     }
 

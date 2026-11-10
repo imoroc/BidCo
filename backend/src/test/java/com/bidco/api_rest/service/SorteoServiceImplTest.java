@@ -48,10 +48,14 @@ class SorteoServiceImplTest {
         when(sorteoMapper.sorteoToSorteoResponseDTO(any(Sorteo.class))).thenReturn(mock(SorteoResponseDTO.class));
     }
 
+    private static Instant finDeDia(LocalDate dia) {
+        return dia.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+    }
+
     private Sorteo sorteo(LocalDate fechaFin, Long ganador) {
         Sorteo s = new Sorteo();
         s.setSorteoID(ID);
-        s.setFechaFin(fechaFin);
+        s.setFechaFin(finDeDia(fechaFin));
         s.setGanador(ganador);
         when(sorteoRepository.findByIdForUpdate(ID)).thenReturn(Optional.of(s));
         return s;

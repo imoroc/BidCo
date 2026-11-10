@@ -42,7 +42,7 @@ public interface SubastaMapper {
     @Mapping(source = "subastaID", target = "subastaID")
     @Mapping(source = "creadorId", target = "creador", qualifiedByName = "longToUsuario")
     @Mapping(source = "fechaInicial", target = "fechaInicial")
-    @Mapping(source = "fechaFinal", target = "fechaFinal")
+    @Mapping(target = "fechaFinal", ignore = true)
     @Mapping(source = "precioInicial", target = "precioInicial")
     @Mapping(source = "subastaNormal", target = "subastaNormal")
     @Mapping(source = "nombreArticulo", target = "nombreArticulo")

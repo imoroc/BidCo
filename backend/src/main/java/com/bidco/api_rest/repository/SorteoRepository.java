@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,9 +24,9 @@ public interface SorteoRepository extends JpaRepository<Sorteo, Long> {
     List<Sorteo> findAllByOrderByFechaInicioDesc();
 
     /** Sorteos ya vencidos con participaciones y todavía sin ganador asignado. */
-    @Query("SELECT s.sorteoID FROM Sorteo s WHERE s.fechaFin < :hoy AND s.ganador IS NULL "
+    @Query("SELECT s.sorteoID FROM Sorteo s WHERE s.fechaFin <= :ahora AND s.ganador IS NULL "
             + "AND EXISTS (SELECT 1 FROM PujaSorteo p WHERE p.sorteo = s) ORDER BY s.fechaFin ASC")
-    List<Long> findIdsVencidosConParticipacionesSinGanador(@Param("hoy") LocalDate hoy);
+    List<Long> findIdsVencidosConParticipacionesSinGanador(@Param("ahora") Instant ahora);
 
     @Query("SELECT COUNT(s) FROM Sorteo s WHERE s.ganador = :usuarioID")
     int countWonDrawsByUsuarioId(Long usuarioID);

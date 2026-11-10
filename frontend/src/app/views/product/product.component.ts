@@ -12,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
 import { ProductoService, PujaCreateDTO, PujaResponseDTO, PujaSorteoCreateDTO } from '../../services/product.service';
 import { CommentService } from '../../services/comment.service';
 import { AuthExpertService } from '../../services/auth.expert.service';
-import { ahoraMs, finDeDiaMs, hoyISO } from '../../utils/fechas';
+import { ahoraMs, cierreMs, hoyISO } from '../../utils/fechas';
 
 @Component({
   selector: 'app-product',
@@ -213,9 +213,9 @@ export class ProductComponent implements OnDestroy {
     }
 
     setupCountdown(endDateString: string) {
-        // La subasta/sorteo termina al acabar el último día; el servidor solo permite
-        // finalizarlo a partir del día siguiente, así que se espera unos segundos de margen.
-        const endDate = finDeDiaMs(endDateString);
+        // El servidor solo permite finalizarlo a partir de su hora de cierre,
+        // así que se espera unos segundos de margen.
+        const endDate = cierreMs(endDateString);
 
         this.detenerCuentaAtras();
         const interval = setInterval(() => {

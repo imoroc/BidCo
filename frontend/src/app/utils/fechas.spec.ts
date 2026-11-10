@@ -1,4 +1,4 @@
-import { MARGEN_CIERRE_MS, ahoraMs, estaVencida, finDeDiaMs, hoyISO, mananaISO, ocultarVencidas, reiniciarReloj, sincronizarReloj } from './fechas';
+import { MARGEN_CIERRE_MS, ahoraMs, cierreMs, estaVencida, hoyISO, mananaISO, ocultarVencidas, reiniciarReloj, sincronizarReloj } from './fechas';
 
 type Caso = [descripcion: string, entrada: string, esperado: string];
 
@@ -28,7 +28,7 @@ describe('fechas', () => {
         });
     });
 
-    describe('finDeDiaMs', () => {
+    describe('cierreMs', () => {
         // Cada caso: fecha final y el instante UTC de la medianoche de Madrid que la cierra.
         const casos: Caso[] = [
             ['termina a la medianoche de Madrid en invierno', '2026-01-15', '2026-01-15T23:00:00Z'],
@@ -38,52 +38,74 @@ describe('fechas', () => {
             ['es correcto el día anterior al cambio a horario de invierno', '2026-10-24', '2026-10-24T22:00:00Z'],
             ['es correcto el mismo día del cambio a horario de invierno', '2026-10-25', '2026-10-25T23:00:00Z'],
             ['resuelve el cambio de mes y de año', '2026-12-31', '2026-12-31T23:00:00Z'],
+            ['una hora de pared sin offset es la de Madrid en invierno', '2026-01-15T18:30', '2026-01-15T17:30:00Z'],
+            ['una hora de pared sin offset es la de Madrid en verano', '2026-07-15T18:30', '2026-07-15T16:30:00Z'],
+            ['admite segundos en la hora de pared', '2026-01-15T18:30:15', '2026-01-15T17:30:15Z'],
         ];
 
         casos.forEach(([descripcion, fecha, cierreUtc]) => {
             it(descripcion, () => {
-                expect(finDeDiaMs(fecha)).toBe(new Date(cierreUtc).getTime() + MARGEN_CIERRE_MS);
+                expect(cierreMs(fecha)).toBe(new Date(cierreUtc).getTime() + MARGEN_CIERRE_MS);
             });
         });
 
-        it('interpreta tal cual los valores que ya traen hora', () => {
-            expect(finDeDiaMs('2026-05-01T10:00:00Z')).toBe(new Date('2026-05-01T10:00:00Z').getTime());
+        it('interpreta tal cual los instantes con zona y suma el margen', () => {
+            expect(cierreMs('2026-05-01T10:00:00Z')).toBe(new Date('2026-05-01T10:00:00Z').getTime() + MARGEN_CIERRE_MS);
+            expect(cierreMs('2026-05-01T12:00:00+02:00')).toBe(new Date('2026-05-01T10:00:00Z').getTime() + MARGEN_CIERRE_MS);
         });
 
         it('devuelve NaN si el formato no es válido', () => {
-            expect(finDeDiaMs('15/01/2026')).toBeNaN();
+            expect(cierreMs('15/01/2026')).toBeNaN();
+            expect(cierreMs('mañana T tarde')).toBeNaN();
         });
     });
 
     describe('estaVencida', () => {
+        // 2026-06-15 12:00 en Madrid.
+        const ahora = Date.parse('2026-06-15T10:00:00Z');
         type CasoVencida = [descripcion: string, fechaFinal: string | null | undefined, esperado: boolean];
         const casos: CasoVencida[] = [
-            ['es posterior a la fecha final', '2026-06-14', true],
-            ['el propio día de la fecha final sigue abierta', '2026-06-15', false],
+            ['un día completo anterior está vencido', '2026-06-14', true],
+            ['el propio día de la fecha final sigue abierto', '2026-06-15', false],
             ['una fecha futura no está vencida', '2026-06-16', false],
-            ['ignora la hora si la fecha la trae', '2026-06-14T10:00:00', true],
+            ['una hora de hoy que ya pasó está vencida', '2026-06-15T11:00:00+02:00', true],
+            ['una hora de hoy que falta por llegar no lo está', '2026-06-15T13:00:00+02:00', false],
+            ['justo a la hora de cierre ya está vencida', '2026-06-15T12:00:00+02:00', true],
+            ['la hora sin offset se interpreta en Madrid (ya pasada)', '2026-06-15T11:00', true],
+            ['la hora sin offset se interpreta en Madrid (por llegar)', '2026-06-15T13:00', false],
             ['sin fecha no se considera vencida', undefined, false],
+            ['un formato inválido no se considera vencido', '15/01/2026', false],
         ];
 
         casos.forEach(([descripcion, fechaFinal, esperado]) => {
-            it(descripcion, () => expect(estaVencida(fechaFinal, '2026-06-15')).toBe(esperado));
+            it(descripcion, () => expect(estaVencida(fechaFinal, ahora)).toBe(esperado));
         });
     });
 
     describe('ocultarVencidas', () => {
-        const hoy = hoyISO();
-        const ayer = new Date(Date.UTC(+hoy.slice(0, 4), +hoy.slice(5, 7) - 1, +hoy.slice(8, 10) - 1)).toISOString().slice(0, 10);
-        const items = [{ id: 1, fin: ayer }, { id: 2, fin: hoy }, { id: 3, fin: mananaISO() }];
         const fin = (item: { fin: string }) => item.fin;
+        // Se calculan al ejecutar cada prueba, para no depender del reloj sincronizado por otras.
+        const crearItems = () => {
+            const hoy = hoyISO();
+            const ayer = new Date(Date.UTC(+hoy.slice(0, 4), +hoy.slice(5, 7) - 1, +hoy.slice(8, 10) - 1)).toISOString().slice(0, 10);
+            return [
+                { id: 1, fin: ayer },
+                { id: 2, fin: hoy },
+                { id: 3, fin: mananaISO() },
+                { id: 4, fin: new Date(ahoraMs() - 3600000).toISOString() },
+                { id: 5, fin: new Date(ahoraMs() + 3600000).toISOString() },
+            ];
+        };
 
         it('oculta los vencidos por defecto', () => {
-            expect(ocultarVencidas(items, fin, false).map(i => i.id)).toEqual([2, 3]);
+            expect(ocultarVencidas(crearItems(), fin, false).map(i => i.id)).toEqual([2, 3, 5]);
         });
 
         it('los conserva cuando se piden', () => {
-            expect(ocultarVencidas(items, fin, true).map(i => i.id)).toEqual([1, 2, 3]);
+            expect(ocultarVencidas(crearItems(), fin, true).map(i => i.id)).toEqual([1, 2, 3, 4, 5]);
         });
     });
+
     describe('reloj del servidor', () => {
         afterEach(() => reiniciarReloj());
 

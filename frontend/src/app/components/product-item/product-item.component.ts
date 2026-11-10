@@ -2,7 +2,7 @@ import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { environment } from '../../../environments/environment'; // Añade la importación
 import { TickerService } from '../../services/ticker.service';
-import { ahoraMs, finDeDiaMs } from '../../utils/fechas';
+import { ahoraMs, cierreMs } from '../../utils/fechas';
 
 @Component({
   selector: 'app-product-item',
@@ -49,7 +49,7 @@ export class ProductItemComponent implements OnInit {
 
         const fechaFin = this.isRaffle ? this.product?.fechaFin : this.product?.fechaFinal;
         if (fechaFin) {
-            this.finMs.set(finDeDiaMs(fechaFin));
+            this.finMs.set(cierreMs(fechaFin));
         }
     }
 }

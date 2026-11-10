@@ -57,7 +57,7 @@ public class PujaServiceImpl implements PujaService {
         if (hoy.isBefore(subasta.getFechaInicial())) {
             throw new IllegalStateException("La subasta todavía no ha comenzado");
         }
-        if (hoy.isAfter(subasta.getFechaFinal())) {
+        if (!clock.instant().isBefore(subasta.getFechaFinal())) {
             throw new IllegalStateException("La subasta ya cerró");
         }
 
@@ -147,7 +147,7 @@ public class PujaServiceImpl implements PujaService {
 
     /** En una subasta a ciegas las pujas no se muestran hasta que termina el plazo. */
     private void comprobarPujasVisibles(Subasta subasta) {
-        if (!subasta.isSubastaNormal() && !LocalDate.now(clock).isAfter(subasta.getFechaFinal())) {
+        if (!subasta.isSubastaNormal() && clock.instant().isBefore(subasta.getFechaFinal())) {
             throw new ForbiddenException("Las pujas de una subasta a ciegas no son visibles hasta que termina");
         }
     }

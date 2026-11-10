@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import com.bidco.api_rest.util.FechasCierre;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +54,7 @@ public class SorteoServiceImpl implements SorteoService {
         }
         
         Sorteo sorteo = sorteoMapper.sorteoCreateDTOToSorteo(sorteoCreateDTO);
+        sorteo.setFechaFin(FechasCierre.parsear(sorteoCreateDTO.getFechaFin(), clock.getZone()));
 
         if (sorteoCreateDTO.getImagen() != null && !sorteoCreateDTO.getImagen().isEmpty()) {
             try {
@@ -89,7 +90,7 @@ public class SorteoServiceImpl implements SorteoService {
             return sorteoMapper.sorteoToSorteoResponseDTO(sorteo);
         }
 
-        if (!LocalDate.now(clock).isAfter(sorteo.getFechaFin())) {
+        if (clock.instant().isBefore(sorteo.getFechaFin())) {
             throw new IllegalStateException("El sorteo todavía no ha finalizado");
         }
 

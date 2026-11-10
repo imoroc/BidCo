@@ -49,11 +49,15 @@ class PujaSorteoServiceImplTest {
         when(pujaSorteoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
     }
 
+    private static Instant finDeDia(LocalDate dia) {
+        return dia.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+    }
+
     private Sorteo sorteo(LocalDate inicio, LocalDate fin, int puntosNecesarios) {
         Sorteo s = new Sorteo();
         s.setSorteoID(1L);
         s.setFechaInicio(inicio);
-        s.setFechaFin(fin);
+        s.setFechaFin(finDeDia(fin));
         s.setPuntosNecesarios(puntosNecesarios);
         return s;
     }

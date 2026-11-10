@@ -20,8 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bidco.api_rest.util.FechasCierre;
 import java.time.Clock;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -59,6 +60,12 @@ public class SubastaServiceImpl implements SubastaService {
 
         Subasta subasta = subastaMapper.subastaCreateDTOToSubasta(subastaCreateDTO);
         subasta.setPrecioFinal(subasta.getPrecioInicial());
+
+        Instant fechaFinal = FechasCierre.parsear(subastaCreateDTO.getFechaFinal(), clock.getZone());
+        if (!fechaFinal.isAfter(clock.instant())) {
+            throw new IllegalArgumentException("La fecha final debe ser posterior a la actual");
+        }
+        subasta.setFechaFinal(fechaFinal);
 
         Usuario user = usuarioRepository.findById(subasta.getCreador().getUsuarioID())
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
@@ -108,7 +115,7 @@ public class SubastaServiceImpl implements SubastaService {
             return;
         }
 
-        if (!LocalDate.now(clock).isAfter(subasta.getFechaFinal())) {
+        if (clock.instant().isBefore(subasta.getFechaFinal())) {
             throw new IllegalStateException("La subasta todavía no ha finalizado");
         }
 
