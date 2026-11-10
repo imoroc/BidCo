@@ -46,7 +46,7 @@ class MigracionesTest {
         Number indices = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM pg_indexes WHERE schemaname = 'public' AND indexname LIKE 'idx\\_%'")
                 .getSingleResult();
-        assertEquals(10, indices.intValue());
+        assertEquals(11, indices.intValue());
     }
 
     @Test
