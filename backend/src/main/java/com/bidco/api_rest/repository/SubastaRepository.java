@@ -2,6 +2,7 @@ package com.bidco.api_rest.repository;
 
 import com.bidco.api_rest.model.Subasta;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -33,17 +34,17 @@ public interface SubastaRepository extends JpaRepository<Subasta, Long> {
     int countCreatedBidsByUsuarioId(Long usuarioID);
 
     @Query("SELECT s FROM Subasta s WHERE s.subastaNormal = TRUE AND (CASE WHEN s.precioFinal > 0 THEN s.precioFinal ELSE s.precioInicial END) BETWEEN :minPrice AND :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFinal END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFinal END DESC, s.fechaInicial DESC")
-    List<Subasta> findByFiltroNormal(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder);
+    List<Subasta> findByFiltroNormal(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder, Pageable pageable);
 
     @Query("SELECT s FROM Subasta s WHERE s.subastaNormal = FALSE AND (CASE WHEN s.precioFinal > 0 THEN s.precioFinal ELSE s.precioInicial END) BETWEEN :minPrice AND :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFinal END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFinal END DESC, s.fechaInicial DESC")
-    List<Subasta> findByFiltroCiega(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder);
+    List<Subasta> findByFiltroCiega(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder, Pageable pageable);
 
     @Query("SELECT s FROM Subasta s WHERE s.creador.id = :id AND (CASE WHEN s.precioFinal > 0 THEN s.precioFinal ELSE s.precioInicial END) BETWEEN :minPrice AND :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFinal END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFinal END DESC, s.fechaInicial DESC")
-    List<Subasta> findByFiltroMisSubastas(int id, int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder);
+    List<Subasta> findByFiltroMisSubastas(int id, int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder, Pageable pageable);
 
     @Query("SELECT s FROM Subasta s JOIN s.pujas p ON s.subastaID = p.subasta.subastaID WHERE p.pujador.id = :id AND (CASE WHEN s.precioFinal > 0 THEN s.precioFinal ELSE s.precioInicial END) BETWEEN :minPrice AND :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFinal END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFinal END DESC, s.fechaInicial DESC")
-    List<Subasta> findByFiltroMisPujas(int id, int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder);
+    List<Subasta> findByFiltroMisPujas(int id, int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder, Pageable pageable);
 
     @Query("SELECT s FROM Subasta s WHERE LOWER(s.nombreArticulo) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND (CASE WHEN s.precioFinal > 0 THEN s.precioFinal ELSE s.precioInicial END) BETWEEN :minPrice AND :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFinal END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFinal END DESC, s.fechaInicial DESC")
-    List<Subasta> findByFiltroNombre(String searchTerm, int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder);
+    List<Subasta> findByFiltroNombre(String searchTerm, int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder, Pageable pageable);
 }
