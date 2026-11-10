@@ -128,7 +128,7 @@ public class SorteoServiceImpl implements SorteoService {
     public List<SorteoResponseDTO> buscarPorFiltro(FiltroDTO filtro) {
         String[] queryCategorias = filtro.categoriasNormalizadas();
 
-        List<Sorteo> sorteo = sorteoRepository.findByFiltro(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder());
+        List<Sorteo> sorteo = sorteoRepository.findByFiltro(filtro.getMinPrice(), filtro.getMaxPrice(), queryCategorias, filtro.sinCategorias(), filtro.getDateOrder(), filtro.paginacion());
         return sorteo.stream()
                 .map(sorteoMapper::sorteoToSorteoResponseDTO)
                 .toList();
