@@ -33,6 +33,16 @@ public interface SubastaRepository extends JpaRepository<Subasta, Long> {
     @Query("SELECT COUNT(s) FROM Subasta s WHERE s.creador.usuarioID = :usuarioID")
     int countCreatedBidsByUsuarioId(Long usuarioID);
 
+    // Subastas sin cerrar de un creador: aún en plazo, o vencidas con pujas a la espera de ganador.
+    @Query("SELECT COUNT(s) FROM Subasta s WHERE s.creador.usuarioID = :usuarioID AND s.ganador IS NULL "
+            + "AND (s.fechaFinal > :ahora OR EXISTS (SELECT 1 FROM Puja p WHERE p.subasta = s))")
+    long countPendientesPorCreador(@Param("usuarioID") Long usuarioID, @Param("ahora") Instant ahora);
+
+    // Subastas sin cerrar en las que el usuario tiene alguna puja.
+    @Query("SELECT COUNT(DISTINCT s) FROM Subasta s JOIN s.pujas p WHERE p.pujador.usuarioID = :usuarioID "
+            + "AND s.ganador IS NULL")
+    long countPendientesConPujasDe(@Param("usuarioID") Long usuarioID);
+
     @Query("SELECT s FROM Subasta s WHERE s.subastaNormal = TRUE AND (CASE WHEN s.precioFinal > 0 THEN s.precioFinal ELSE s.precioInicial END) BETWEEN :minPrice AND :maxPrice AND (:todasCategorias = TRUE OR LOWER(s.categoria) IN :categorias) ORDER BY CASE WHEN :dateOrder = 'asc' THEN s.fechaFinal END ASC, CASE WHEN :dateOrder = 'desc' THEN s.fechaFinal END DESC, s.fechaInicial DESC")
     List<Subasta> findByFiltroNormal(int minPrice, int maxPrice, String[] categorias, boolean todasCategorias, String dateOrder, Pageable pageable);
 

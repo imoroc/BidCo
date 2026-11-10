@@ -50,3 +50,11 @@
 .modern-switch input:checked + .switch-slider:before {
   transform: translateX(22px);
 }
+
+/* Zona de peligro: eliminar la cuenta */
+.zona-peligro { margin-top: 24px; border-color: var(--color-error-borde); }
+.btn-peligro { --btn-bg: var(--color-error-fondo); --btn-bg-hover: var(--color-error-fondo-hover); --btn-fg: var(--color-error-fuerte); flex-shrink: 0; }
+.btn-secundario { --btn-bg: var(--color-texto-fuerte); --btn-bg-hover: var(--color-texto); --btn-fg: var(--color-superficie); }
+.eliminar-form { padding: 0 32px 24px; display: flex; flex-direction: column; gap: 16px; max-width: 420px; }
+.eliminar-acciones { display: flex; gap: 12px; flex-wrap: wrap; }
+

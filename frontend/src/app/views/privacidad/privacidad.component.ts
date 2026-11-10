@@ -45,8 +45,9 @@ import { PaginaInformativaComponent } from '../../components/pagina-informativa/
 
       <h2>5. Cuánto tiempo los conservamos</h2>
       <p>
-        Mientras tu cuenta exista. Si pides que se elimine, borraremos tus datos salvo los que deban
-        conservarse por obligación legal.
+        Mientras tu cuenta exista. Si la eliminas, borramos tus datos personales (nombre, correo,
+        dirección y saldo) y la cuenta queda anonimizada: se conservan las pujas, subastas y sorteos ya
+        realizados, sin ningún dato que te identifique, salvo lo que deba guardarse por obligación legal.
       </p>
 
       <h2>6. Con quién se comparten</h2>
@@ -68,9 +69,10 @@ import { PaginaInformativaComponent } from '../../components/pagina-informativa/
 
       <h2>8. Tus derechos</h2>
       <p>
-        Puedes solicitar el acceso, la rectificación, la supresión, la limitación, la oposición y la
-        portabilidad de tus datos, y retirar tu consentimiento en cualquier momento. Para ejercerlos
-        escribe desde la página de <a routerLink="/contacto">contacto</a>, sin publicar datos personales
+        Puedes eliminar tu cuenta tú mismo desde tu perfil, en el apartado de Privacidad (no es posible
+        mientras tengas subastas o sorteos sin cerrar). Puedes además solicitar el acceso, la rectificación,
+        la limitación, la oposición y la portabilidad de tus datos, y retirar tu consentimiento en
+        cualquier momento. Para ejercerlos escribe desde la página de <a routerLink="/contacto">contacto</a>, sin publicar datos personales
         en canales abiertos. Si consideras que no se han respetado, puedes reclamar ante la Agencia
         Española de Protección de Datos (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">aepd.es</a>).
       </p>

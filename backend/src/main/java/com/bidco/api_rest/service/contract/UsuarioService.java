@@ -24,4 +24,5 @@ public interface UsuarioService {
     StatsDTO getStats(Long usuarioId);
     BigDecimal recargarSaldo(Long usuarioId, BigDecimal cantidad);
     String login(LoginDTO loginDTO);
+    void eliminarCuenta(Long id, String contrasena);
 }

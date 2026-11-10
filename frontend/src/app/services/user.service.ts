@@ -79,6 +79,16 @@ export class UserService {
     }));
   }
 
+  // La contraseña viaja en el cuerpo (nunca en la URL). Anonimiza la cuenta; el backend rechaza el borrado
+  // si quedan subastas o sorteos sin cerrar.
+  eliminarCuenta(id: number, contrasena: string): Observable<void> {
+    const token = localStorage.getItem('authToken');
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+      body: { contrasena }
+    });
+  }
+
   registerUser(usuario: UsuarioCreate): Observable<UsuarioResponse> {
     return this.http.post<UsuarioResponse>(this.apiUrl, usuario);
   }
