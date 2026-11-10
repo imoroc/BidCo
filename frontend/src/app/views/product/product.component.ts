@@ -222,28 +222,8 @@ export class ProductComponent implements OnDestroy {
             const now = ahoraMs();
             const distance = endDate - now;
             if (distance <= 0) {
-                const estabaEnCurso = this.countdown !== '' && this.countdown !== 'Finalizada';
-                this.countdown = "Finalizada";
-                if (estabaEnCurso) this.anunciar(this.isRaffle ? 'El sorteo ha finalizado.' : 'La subasta ha finalizado.');
-                if (!this.product.ganador) {
-                    switch (this.tipo) {
-                        case 'subasta':
-                            this.productoService.finalizarSubasta(this.productId).subscribe({
-                                next: () => this.authService.loadUserProfile(this.user.usuarioID).subscribe({
-                                    next: (userActualizado) => this.authService.setUser(userActualizado)
-                                })
-                            });
-                            break;
-                        case 'sorteo':
-                            this.productoService.finalizarSorteo(this.productId).subscribe((sorteoActualizado) => {
-                                this.product = sorteoActualizado;
-                                this.setGanadorSorteo();
-                            });
-                            break;
-                    }
-                }
-                if (this.product.ganador != null && this.tipo === 'sorteo') this.setGanadorSorteo();
                 this.detenerCuentaAtras();
+                this.alLlegarACero();
                 return;
             }
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -253,6 +233,53 @@ export class ProductComponent implements OnDestroy {
             this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
         }, 1000);
         this.countdownInterval = interval;
+    }
+
+    /**
+     * Una puja de última hora prolonga el cierre de una subasta (anti-sniping) y esta ficha puede
+     * tener el plazo desactualizado: antes de darla por terminada se consulta el plazo vigente.
+     */
+    private alLlegarACero() {
+        if (this.tipo !== 'subasta') {
+            this.cerrarCuentaAtras();
+            return;
+        }
+        this.productoService.getSubastaPorId(this.productId).subscribe({
+            next: (subasta) => {
+                this.product = subasta;
+                if (cierreMs(subasta.fechaFinal) > ahoraMs()) {
+                    this.anunciar('Se ha prolongado el plazo porque entró una puja en los últimos minutos.');
+                    this.setupCountdown(subasta.fechaFinal);
+                } else {
+                    this.cerrarCuentaAtras();
+                }
+            },
+            error: () => this.cerrarCuentaAtras()
+        });
+    }
+
+    private cerrarCuentaAtras() {
+        const estabaEnCurso = this.countdown !== '' && this.countdown !== 'Finalizada';
+        this.countdown = "Finalizada";
+        if (estabaEnCurso) this.anunciar(this.isRaffle ? 'El sorteo ha finalizado.' : 'La subasta ha finalizado.');
+        if (!this.product.ganador) {
+            switch (this.tipo) {
+                case 'subasta':
+                    this.productoService.finalizarSubasta(this.productId).subscribe({
+                        next: () => this.authService.loadUserProfile(this.user.usuarioID).subscribe({
+                            next: (userActualizado) => this.authService.setUser(userActualizado)
+                        })
+                    });
+                    break;
+                case 'sorteo':
+                    this.productoService.finalizarSorteo(this.productId).subscribe((sorteoActualizado) => {
+                        this.product = sorteoActualizado;
+                        this.setGanadorSorteo();
+                    });
+                    break;
+            }
+        }
+        if (this.product.ganador != null && this.tipo === 'sorteo') this.setGanadorSorteo();
     }
 
     ngOnDestroy() {
