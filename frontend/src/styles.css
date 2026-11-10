@@ -643,6 +643,35 @@ img {
     .admin-form-card .form-body { padding: var(--espacio-5) var(--espacio-4); }
 }
 
+/* --- Chips de filtros activos --- */
+.chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--espacio-2);
+    margin: 0 0 var(--espacio-4);
+    padding: 0;
+    list-style: none;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--espacio-2);
+    min-height: var(--objetivo-tactil);
+    padding: 0 var(--espacio-4);
+    font-family: inherit;
+    font-size: var(--texto-sm);
+    font-weight: 600;
+    color: var(--color-marca);
+    background: var(--color-info-fondo);
+    border: 1px solid var(--color-acento);
+    border-radius: var(--radio-pill);
+    cursor: pointer;
+}
+
+.chip:hover { border-color: var(--color-marca); }
+
 /* --- Botones secundarios --- */
 .btn-secondary,
 .btn-ghost,
