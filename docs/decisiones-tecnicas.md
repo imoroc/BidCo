@@ -38,3 +38,16 @@
   comparte entre instancias. Por IP solamente: varios usuarios tras una misma IP comparten cupo.
 - Se usó un contador propio para no añadir una dependencia; si se escala a varias instancias, el
   siguiente paso es un almacén compartido o el limitador del proxy.
+
+## CSP del frontend (`vercel.json`)
+
+- Se publica como `Content-Security-Policy-Report-Only`: el navegador avisa en la consola de las
+  infracciones, pero no bloquea nada. Orígenes permitidos: el propio sitio, la API en Render y las
+  imágenes de Cloudinary (más `data:` y `blob:` para las vistas previas de imagen).
+- `style-src` mantiene `'unsafe-inline'` porque Angular inserta los estilos de los componentes en
+  elementos `<style>`. Quitarlo exige un nonce (`ngCspNonce`) que Vercel no genera con un sitio estático.
+- El build de producción inserta el CSS crítico con un manejador `onload` en línea, que `script-src 'self'`
+  bloquearía. Antes de pasar a modo estricto hay que desactivar `inlineCritical` o aceptar un hash.
+- Pasos pendientes: navegar por todas las vistas con la consola abierta, corregir lo que se vea
+  y, cuando no queden avisos, cambiar la cabecera a `Content-Security-Policy`.
+- `Cross-Origin-Opener-Policy: same-origin` ya se aplica. HSTS lo añade Vercel en su dominio.
