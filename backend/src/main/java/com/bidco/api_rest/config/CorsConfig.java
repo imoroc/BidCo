@@ -37,6 +37,8 @@ public class CorsConfig {
         config.setAllowedOriginPatterns(Arrays.asList(allowedOriginPatterns));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Content-Type", "Authorization", "Accept", JwtFilter.ADMIN_CSRF_HEADER));
+        // El navegador solo deja leer entre orígenes las cabeceras expuestas: Date permite ajustar la cuenta atrás.
+        config.setExposedHeaders(List.of("Date"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
