@@ -51,15 +51,17 @@ describe('FilterComponent', () => {
 });
 
 describe('FilterComponent con la URL', () => {
-  let location: Location;
+  let replaceState: jasmine.Spy;
 
+  /** Con `Location` de pruebas, `path()` no devuelve la consulta tras un `replaceState`: se comprueban las llamadas. */
   function crear(urlInicial: string, sincronizar: boolean): FilterComponent {
     TestBed.configureTestingModule({
       imports: [FilterComponent],
       providers: [provideRouter([]), provideLocationMocks(), provideHttpClient(), provideHttpClientTesting()]
     });
-    location = TestBed.inject(Location);
+    const location = TestBed.inject(Location);
     location.go(urlInicial);
+    replaceState = spyOn(location, 'replaceState');
     const fixture = TestBed.createComponent(FilterComponent);
     fixture.componentRef.setInput('permiteVencidas', true);
     fixture.componentRef.setInput('sincronizarUrl', sincronizar);
@@ -67,21 +69,25 @@ describe('FilterComponent con la URL', () => {
     return fixture.componentInstance;
   }
 
-  it('lee el filtro de la URL al abrir la página', () => {
+  it('lee el filtro de la URL al abrir la página sin reescribirla', () => {
     const componente = crear('/subastas?cat=Moda&orden=asc&min=20', true);
     expect(componente.selectedCategories).toEqual(['Moda']);
     expect(componente.dateOrder).toBe('asc');
     expect(componente.minPrice).toBe(20);
+    expect(replaceState).not.toHaveBeenCalled();
   });
 
   it('escribe los cambios en la URL y conserva los parámetros ajenos', () => {
     const componente = crear('/subastas?q=reloj', true);
     componente.selectedCategories = ['Hogar'];
     componente.applyFilter();
-    expect(location.path()).toBe('/subastas?q=reloj&cat=Hogar');
+    expect(replaceState.calls.mostRecent().args.slice(0, 2)).toEqual(['/subastas', 'q=reloj&cat=Hogar']);
+  });
 
+  it('al limpiar los filtros quita solo los parámetros del filtro', () => {
+    const componente = crear('/subastas?q=reloj&cat=Hogar', true);
     componente.limpiarFiltros();
-    expect(location.path()).toBe('/subastas?q=reloj');
+    expect(replaceState.calls.mostRecent().args.slice(0, 2)).toEqual(['/subastas', 'q=reloj']);
   });
 
   it('sin sincronización ni lee ni escribe la URL', () => {
@@ -89,6 +95,6 @@ describe('FilterComponent con la URL', () => {
     expect(componente.selectedCategories).toEqual([]);
     componente.dateOrder = 'desc';
     componente.applyFilter();
-    expect(location.path()).toBe('/subastas?cat=Moda');
+    expect(replaceState).not.toHaveBeenCalled();
   });
 });
