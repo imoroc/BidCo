@@ -29,8 +29,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* El padding actúa como un "margen de seguridad" para que la foto no toque los bordes */
-  padding: 32px; 
+  /* Margen justo para que la foto respire sin perder tamaño (con 32px se desperdiciaba casi un tercio) */
+  padding: 16px; 
   box-sizing: border-box;
 }
 

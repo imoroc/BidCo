@@ -16,7 +16,7 @@
   background-color: var(--color-superficie-suave); /* Fondo gris claro estilo Apple */
   border: 1px solid var(--color-borde-suave);
   border-radius: 20px;
-  padding: 40px;
+  padding: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,8 +24,9 @@
 }
 
 .product-image {
-  max-width: 100%;
-  max-height: 100%;
+  /* Llena la caja: una foto pequeña ya no se queda diminuta, y object-fit evita deformarla */
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   border-radius: 8px;
   /* El mix-blend-mode quita fondos blancos feos de las fotos (Magia CSS) */
@@ -188,8 +189,14 @@
   }
 
   .product-gallery {
-    padding: 20px;
+    padding: 16px;
     aspect-ratio: auto; /* Permite que la imagen tome su forma en móvil */
+  }
+
+  /* Sin caja de altura fija, la foto toma su proporción a todo el ancho, con tope para no ocupar toda la pantalla */
+  .product-image {
+    height: auto;
+    max-height: 70vh;
   }
 
   .price-value {
