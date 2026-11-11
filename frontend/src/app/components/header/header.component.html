@@ -6,14 +6,14 @@
       <a routerLink="/auction" class="logo-link" aria-label="Inicio">
         <img src="Logo BidCo Recortado.jpg" alt="Logo BidCo" class="brand-logo" />
       </a>
-      <a routerLink="/auction" class="name-link">
+      <a routerLink="/auction" class="name-link" aria-label="BidCo">
         <span class="brand-text">BidCo</span>
       </a>
     </div>
 
     <nav class="dropdown-wrapper" aria-label="Secciones">
       <div class="dropdown">
-        <button type="button" class="dropbtn" aria-haspopup="true" aria-controls="menu-secciones"
+        <button type="button" class="dropbtn" aria-label="Secciones" aria-haspopup="true" aria-controls="menu-secciones"
                 [attr.aria-expanded]="isDropdownOpen" (click)="toggleDropdown($event)">
           <svg class="icono-menu" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" aria-hidden="true"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
           <span class="dropbtn-label">Secciones</span>
