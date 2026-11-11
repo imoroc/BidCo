@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, Location } from '@angular/common';
+import { Location } from '@angular/common';
 
 import { Filtro, SubastaService } from '../../services/auction.service';
 import { consultaAFiltro, filtroAConsulta } from '../../utils/filtro-url';
@@ -8,7 +8,7 @@ import { consultaAFiltro, filtroAConsulta } from '../../utils/filtro-url';
 @Component({
   selector: 'app-filter',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule],
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.css']
 })
@@ -29,6 +29,20 @@ export class FilterComponent {
     @Input() sincronizarUrl: boolean = false;
     /** Solo afecta a pantallas estrechas: en escritorio el panel está siempre visible. */
     abierto = false;
+
+    /** Posición y ancho (en %) de la barra del rango de precio; con enlaces de estilo, sin `ngStyle`. */
+    get rangoIzquierda(): number {
+        return this.porcentaje(this.minPrice - this.minPossible);
+    }
+
+    get rangoAncho(): number {
+        return this.porcentaje(this.maxPrice - this.minPrice);
+    }
+
+    private porcentaje(valor: number): number {
+        const total = this.maxPossible - this.minPossible;
+        return total > 0 ? (valor / total) * 100 : 0;
+    }
 
     get filtrosActivos(): number {
         return this.selectedCategories.length + (this.dateOrder ? 1 : 0) + (this.mostrarVencidas ? 1 : 0);

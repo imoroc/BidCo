@@ -37,6 +37,20 @@ describe('FilterComponent', () => {
     expect(component.chips.length).toBe(1);
   });
 
+  it('calcula la posición y el ancho de la barra del rango de precio en porcentaje', () => {
+    component.minPrice = 2500;
+    component.maxPrice = 7500;
+    expect(component.rangoIzquierda).toBe(25);
+    expect(component.rangoAncho).toBe(50);
+  });
+
+  it('no devuelve NaN si el rango posible es nulo', () => {
+    component.minPossible = 100;
+    component.maxPossible = 100;
+    expect(component.rangoIzquierda).toBe(0);
+    expect(component.rangoAncho).toBe(0);
+  });
+
   it('limpia todos los filtros y avisa del cambio', () => {
     let emitido = false;
     component.filterChanged.subscribe(() => emitido = true);
