@@ -56,6 +56,10 @@ class JwtFilterTest {
     @CsvSource({
             // Rutas públicas
             "GET,/api/ping,NONE,200",
+            "GET,/actuator/health,NONE,200",
+            "GET,/actuator/info,NONE,401",
+            "GET,/actuator/env,USER,403",
+            "POST,/actuator/health,NONE,401",
             "GET,/api/subastas,NONE,200",
             "GET,/api/subastas/5,NONE,200",
             "GET,/api/subastas/5/eventos,NONE,200",

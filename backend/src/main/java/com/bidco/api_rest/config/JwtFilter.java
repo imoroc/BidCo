@@ -38,6 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "POST:/api/trabajadores/login",
             "POST:/api/admin/login",
             "GET:/api/ping",
+            "GET:/actuator/health",
             "GET:/api/subastas",
             "GET:/api/subastas/filtrar",
             "GET:/api/subastas/filtro-normal",
