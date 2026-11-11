@@ -2,6 +2,9 @@
 
 # Compiled output
 /dist
+/e2e-resultados
+/playwright-report
+/test-results
 /tmp
 /out-tsc
 /bazel-out
