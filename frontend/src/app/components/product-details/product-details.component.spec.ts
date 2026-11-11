@@ -52,7 +52,8 @@ describe('ProductDetailsComponent en directo', () => {
           provide: ProductoService,
           useValue: {
             getSubastaPorId: () => of(producto),
-            getPerfilPublicoPorId: () => of({ nombreUsuario: 'Ana', privacidadAnonimoPujas: false })
+            getPerfilPublicoPorId: () => of({ nombreUsuario: 'Ana', privacidadAnonimoPujas: false }),
+            obtenerHistorialPujas: () => of([])
           }
         },
         { provide: SubastaDirectoService, useValue: { seguir: (id: number) => { seguidas.push(id); return estados; } } }

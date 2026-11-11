@@ -2,6 +2,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HistorialPujasComponent } from '../historial-pujas/historial-pujas.component';
 import { ProductoService, SorteoResponseDto, SubastaResponseDto } from '../../services/product.service';
 import { SeoService } from '../../services/seo.service';
 import { EstadoSubasta, SubastaDirectoService } from '../../services/subasta-directo.service';
@@ -14,7 +15,7 @@ import { urlAbsoluta, urlCanonica } from '../../utils/seo';
   selector: 'app-product-details',
   changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
-  imports: [CurrencyPipe, DatePipe],
+  imports: [CurrencyPipe, DatePipe, HistorialPujasComponent],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.css'
 })
