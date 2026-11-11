@@ -39,6 +39,19 @@
 - Se usó un contador propio para no añadir una dependencia; si se escala a varias instancias, el
   siguiente paso es un almacén compartido o el limitador del proxy.
 
+## Operación: salud e identificador de petición
+
+- `IdPeticionFilter` da a cada petición un identificador que se guarda en el MDC (`idPeticion`), sale
+  en cada línea de registro y se devuelve en la cabecera `X-Request-Id`. Si el cliente o el proxy ya
+  envían uno de 8 a 64 caracteres (letras, números, `.`, `_`, `-`) se conserva; cualquier otro valor
+  se descarta y se genera un UUID, para que no se puedan inyectar saltos de línea en los registros.
+- Actuator solo expone `health`, sin detalles (`show-details=never`): sirve a un monitor externo o a
+  la comprobación de salud de la plataforma sin filtrar información interna. `GET /actuator/health`
+  es la única ruta pública de `/actuator`; el resto cae en el «denegar por defecto» del `JwtFilter`.
+- `GET /api/ping` se mantiene: lo usa `keep-alive.yml` y además hace una consulta real a la base.
+- Pendiente: logs en JSON, seguimiento de errores (Sentry) y sustituir `keep-alive.yml` por un
+  monitor externo o un plan sin suspensión.
+
 ## CSP del frontend (`vercel.json`)
 
 - Se publica como `Content-Security-Policy-Report-Only`: el navegador avisa en la consola de las
