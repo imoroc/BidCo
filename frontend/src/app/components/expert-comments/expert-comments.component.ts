@@ -1,9 +1,10 @@
 import { CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter, inject } from '@angular/core';
 
 
 import { AuthExpertService } from '../../services/auth.expert.service';
 import { ExpertService } from '../../services/expert.service';
+import { SesionStore } from '../../services/sesion.store';
 
 @Component({
   selector: 'app-expert-comments',
@@ -14,6 +15,7 @@ import { ExpertService } from '../../services/expert.service';
   styleUrls: ['./expert-comments.component.css']
 })
 export class ExpertCommentsComponent {
+    private readonly sesion = inject(SesionStore);
     @Input() comment:any;
     expert: any;
     expertLogged: any;
@@ -26,7 +28,7 @@ export class ExpertCommentsComponent {
         //Comprobamos si un experto ha iniciado sesion
         this.expertAuthService.isLoggedIn$.subscribe((estado) => {
             this.isExpert = estado;
-            const storedUser = localStorage.getItem('authExpert');
+            const storedUser = this.sesion.perfilExperto();
             if (storedUser) {
                 this.expertLogged = JSON.parse(storedUser);
             }

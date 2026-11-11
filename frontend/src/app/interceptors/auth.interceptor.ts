@@ -1,5 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { SesionStore } from '../services/sesion.store';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Never attach local credentials to third-party or unrelated URLs.
@@ -7,9 +9,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  const token =
-    localStorage.getItem('authToken') ||
-    localStorage.getItem('authTokenExpert');
+  const token = inject(SesionStore).token();
 
   if (!token) {
     return next(req);

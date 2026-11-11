@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { AuthService } from '../../services/auth.service';
+import { SesionStore } from '../../services/sesion.store';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -22,7 +23,7 @@ export class LoginComponent {
   loginError: string = '';
   enviando = false;
 
-  constructor(private auth: AuthService, private router: Router, private route: ActivatedRoute) {}
+  constructor(private auth: AuthService, private router: Router, private route: ActivatedRoute, private sesion: SesionStore) {}
 
   login() {
     // Evita envíos repetidos: cada intento fallido cuenta para el límite del servidor.
@@ -38,7 +39,7 @@ export class LoginComponent {
       next: (data) => {
         // data.token contiene el JWT generado en el backend
         if (this.remember) {
-          localStorage.setItem('authToken', data.token);
+          this.sesion.guardarTokenUsuario(data.token);
         }
         // Decodificamos el token y cargamos el perfil completo
         this.auth.setUserFromToken(data.token);

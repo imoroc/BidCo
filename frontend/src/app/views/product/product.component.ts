@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -13,6 +13,7 @@ import { ProductoService, PujaCreateDTO, PujaResponseDTO, PujaSorteoCreateDTO } 
 import { CommentService } from '../../services/comment.service';
 import { AuthExpertService } from '../../services/auth.expert.service';
 import { ahoraMs, cierreMs, hoyISO } from '../../utils/fechas';
+import { SesionStore } from '../../services/sesion.store';
 
 @Component({
   selector: 'app-product',
@@ -23,6 +24,7 @@ import { ahoraMs, cierreMs, hoyISO } from '../../utils/fechas';
   styleUrls: ['./product.component.css']
 })
 export class ProductComponent implements OnDestroy {
+    private readonly sesion = inject(SesionStore);
     product: any;
     productId = 0;
     tipo = '';
@@ -65,7 +67,7 @@ export class ProductComponent implements OnDestroy {
     ngOnInit() {
         this.authService.isLoggedIn$.subscribe((estado) => {
             this.isLoggedIn = estado;
-            const storedUser = localStorage.getItem('authUser');
+            const storedUser = this.sesion.perfilUsuario();
             if (storedUser) this.user = JSON.parse(storedUser);
         });
 
@@ -73,7 +75,7 @@ export class ProductComponent implements OnDestroy {
             this.expertAuthService.isLoggedIn$.subscribe((estado) => {
                 this.isLoggedIn = estado;
                 this.isExpert = estado;
-                const storedUser = localStorage.getItem('authExpert');
+                const storedUser = this.sesion.perfilExperto();
                 if (storedUser) this.expert = JSON.parse(storedUser);
             });
         }
@@ -186,7 +188,7 @@ export class ProductComponent implements OnDestroy {
                     this.authService.loadUserProfile(this.user.usuarioID).subscribe({
                         next: (usuarioActualizado) => {
                             this.user = usuarioActualizado;
-                            localStorage.setItem('authUser', JSON.stringify(usuarioActualizado));
+                            this.sesion.guardarPerfilUsuario(usuarioActualizado);
                         },
                         error: (err) => console.error('Error al actualizar el usuario:', err)
                     });

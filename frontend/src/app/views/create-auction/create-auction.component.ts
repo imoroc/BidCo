@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from "../../components/footer/footer.component";
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { CreateSubastaService, SubastaCreateDTO } from '../../services/create-auction.service';
 import { AuthService } from '../../services/auth.service';
 import { estaVencida, hoyISO } from '../../utils/fechas';
+import { SesionStore } from '../../services/sesion.store';
 
 const TIPOS_IMAGEN_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp'];
 const TAMANO_MAXIMO_IMAGEN = 8 * 1024 * 1024;
@@ -25,6 +26,7 @@ const TAMANO_MAXIMO_IMAGEN = 8 * 1024 * 1024;
   styleUrls: ['./create-auction.component.css']
 })
 export class CreateAuctionComponent {
+    private readonly sesion = inject(SesionStore);
     @ViewChild('resumenErrores') resumenErrores?: ElementRef<HTMLElement>;
 
     imagen: File | null = null;
@@ -58,7 +60,7 @@ export class CreateAuctionComponent {
             return;
         }
 
-        const storedUser = localStorage.getItem('authUser');
+        const storedUser = this.sesion.perfilUsuario();
         if (!storedUser) {
             this.errores = ['Debes iniciar sesión para publicar una subasta.'];
             this.mostrarErrores();
