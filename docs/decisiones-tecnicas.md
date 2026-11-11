@@ -79,3 +79,15 @@
   pierden una vez y el administrador tiene que volver a entrar.
 - Solo el panel de administración usa sesiones: el resto de la API es sin estado (JWT), así que la tabla solo
   recibe filas cuando un administrador inicia sesión.
+
+## Cobertura de pruebas del backend (JaCoCo)
+
+- El CI publica en el resumen de la ejecución la cobertura medida (líneas, ramas e instrucciones, y líneas por
+  paquete) y sube el informe HTML como artefacto (`cobertura-backend`, 14 días).
+- `mvn verify` falla si la cobertura de líneas del conjunto baja de `jacoco.minimo.lineas` (propiedad del
+  `pom.xml`, hoy 0,48). Se fijó unos 2,6 puntos por debajo de lo medido el 11-nov-2026 (50,6 %) para no romper
+  el CI por pequeñas variaciones. La regla es no bajarlo: cuando la cobertura suba de forma sostenida, se sube el mínimo.
+- El número incluye código generado (las implementaciones de MapStruct, hoy al 0 %) y las clases de DTO, así que
+  infravalora la cobertura de la lógica. Excluirlos cambiaría la medición y exige fijar de nuevo el mínimo con el
+  dato real, por eso no se ha hecho aquí.
+- Es un suelo contra regresiones, no una medida de calidad: no dice si las pruebas comprueban lo importante.
