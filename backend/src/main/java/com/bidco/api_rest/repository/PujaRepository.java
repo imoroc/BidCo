@@ -22,7 +22,7 @@ public interface PujaRepository extends JpaRepository<Puja, Long> {
     @Query("SELECT COUNT(p) > 0 FROM Puja p WHERE p.subasta.subastaID = :subastaId")
     boolean haySubastaConPujas(@Param("subastaId") Long subastaId);
 
-    @Modifying(flushAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("DELETE FROM Puja p WHERE p.subasta.subastaID = :subastaId")
     void eliminarPorSubasta(@Param("subastaId") Long subastaId);
 
