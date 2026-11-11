@@ -5,7 +5,7 @@ describe('cloudinaryLoader', () => {
 
   it('añade formato, calidad y ancho a las URL de Cloudinary', () => {
     expect(cloudinaryLoader({ src: base, width: 400 }))
-      .toBe('https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,w_400/v1/producto.jpg');
+      .toBe('https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,c_limit,w_400/v1/producto.jpg');
   });
 
   it('omite el ancho cuando no se indica', () => {
