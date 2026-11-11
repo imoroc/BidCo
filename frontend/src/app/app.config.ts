@@ -1,5 +1,6 @@
-import { ApplicationConfig, LOCALE_ID, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, inject, isDevMode, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { IMAGE_LOADER, registerLocaleData } from '@angular/common';
+import { provideServiceWorker } from '@angular/service-worker';
 import localeEs from '@angular/common/locales/es';
 import { TitleStrategy, provideRouter, withViewTransitions } from '@angular/router';
 import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
@@ -28,6 +29,12 @@ export const appConfig: ApplicationConfig = {
     // Despierta el backend (el plan gratuito de Render lo duerme) sin bloquear el arranque.
     provideAppInitializer(() => {
       inject(HttpClient).get(`${environment.apiUrl}/ping`, { responseType: 'text' }).subscribe({ error: () => {} });
+    }),
+    // Service worker solo en producción: guarda la aplicación para abrirla sin conexión. La API no se guarda
+    // en caché (las pujas y los precios deben ser siempre los del servidor).
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
     })
   ]
 };
