@@ -44,4 +44,14 @@ class ApiRestApplicationTests {
     void jwtExpirationMustBePositive() {
         assertThrows(IllegalStateException.class, () -> new JwtUtil(VALID_SECRET, 0L));
     }
+
+    @Test
+    void jwtDeUsuarioLlevaLaVersionDeSesionYElDeTrabajadorNo() {
+        JwtUtil jwtUtil = new JwtUtil(VALID_SECRET, 3600000L);
+
+        assertEquals(5, jwtUtil.getClaims(jwtUtil.generateToken("42", "USER", 5))
+                .get(JwtUtil.CLAIM_VERSION, Integer.class));
+        assertNull(jwtUtil.getClaims(jwtUtil.generateToken("42", "EXPERT"))
+                .get(JwtUtil.CLAIM_VERSION, Integer.class));
+    }
 }
