@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { RUTAS_PUBLICAS, simularApi } from './utiles';
 
 // Genera capturas de las vistas públicas en escritorio, móvil y modo oscuro. El CI las sube como
@@ -11,7 +11,8 @@ test.describe('Capturas', () => {
       await page.waitForLoadState('networkidle');
       await page.evaluate(() => document.fonts.ready);
       const nombre = ruta.slice(1).replaceAll('/', '-');
-      await page.screenshot({ path: `e2e-resultados/capturas/${info.project.name}/${nombre}.png`, fullPage: true });
+      const captura = await page.screenshot({ path: `e2e-resultados/capturas/${info.project.name}/${nombre}.png`, fullPage: true });
+      expect(captura.byteLength).toBeGreaterThan(0);
     });
   }
 });
