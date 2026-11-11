@@ -14,7 +14,7 @@ import { FooterComponent } from "../../components/footer/footer.component";
 import { SubastaService, SubastaResponseDTO, Filtro } from '../../services/auction.service';
 import { ListadoFiltrado, TAMANO_PAGINA } from '../../utils/listado-filtrado';
 import { AuthService } from '../../services/auth.service';
-import { AuthExpertService } from '../../services/auth.expert.service';
+import { SesionActivaService } from '../../services/sesion-activa.service';
 ;
 
 @Component({
@@ -36,6 +36,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 })
 
 export class SearchComponent {
+    private readonly sesionActiva = inject(SesionActivaService);
     listado = new ListadoFiltrado<SubastaResponseDTO>(params => this.subastaService.getSubastasFiltradasPorNombre(params, this.searchTerm || ''), inject(DestroyRef), p => p.fechaFinal, TAMANO_PAGINA);
     isLoggedIn = false;
     isExpert = false;
@@ -43,24 +44,18 @@ export class SearchComponent {
     private filtro?: Filtro;
     searchTerm: string|null = "";
 
-    constructor(private authService: AuthService, private expertAuthService: AuthExpertService, private subastaService: SubastaService, private activatedRoute: ActivatedRoute) {}
+    constructor(private authService: AuthService, private subastaService: SubastaService, private activatedRoute: ActivatedRoute) {}
 
     ngOnInit() {
-        this.authService.isLoggedIn$.subscribe((estado) => {
-            this.isLoggedIn = estado;
+        this.sesionActiva.estado$.subscribe(({ conectado, esExperto }) => {
+            this.isLoggedIn = conectado;
+            this.isExpert = esExperto;
         });
 
         this.authService.currentUser$.subscribe((user) => {
             if (user) this.saldoUser = user.saldo ?? 0;
         })
 
-        //Si no hay sesion de usuario se comprueba si hay sesion de experto
-        if(!this.isLoggedIn) {
-            this.expertAuthService.isLoggedIn$.subscribe((estado) => {
-                this.isLoggedIn = estado;
-                this.isExpert = estado;
-            });
-        }
 
         this.activatedRoute.queryParamMap.pipe(
             map(params => params.get('search')),
