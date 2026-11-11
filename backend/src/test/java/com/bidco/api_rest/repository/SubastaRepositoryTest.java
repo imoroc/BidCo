@@ -173,4 +173,22 @@ class SubastaRepositoryTest {
         assertTrue(subastas.findByIdForUpdate(guardada.getSubastaID()).isPresent());
         assertTrue(subastas.findByIdForUpdate(-1L).isEmpty());
     }
+
+    @Test
+    void eliminarLasPujasDeUnaSubastaNoTocaLasDeOtra() {
+        Subasta retirada = subasta("retirada", true, "moda", "10", HOY.plusDays(5));
+        Subasta otra = subasta("otra", true, "moda", "10", HOY.plusDays(5));
+        pujas.save(new Puja(null, retirada, new BigDecimal("15"), HOY, creador));
+        pujas.save(new Puja(null, otra, new BigDecimal("20"), HOY, creador));
+        assertTrue(pujas.haySubastaConPujas(retirada.getSubastaID()));
+
+        pujas.eliminarPorSubasta(retirada.getSubastaID());
+        subastas.delete(retirada);
+        subastas.flush();
+
+        assertFalse(pujas.haySubastaConPujas(retirada.getSubastaID()));
+        assertTrue(pujas.haySubastaConPujas(otra.getSubastaID()));
+        assertTrue(subastas.findById(retirada.getSubastaID()).isEmpty());
+        assertTrue(subastas.findById(otra.getSubastaID()).isPresent());
+    }
 }

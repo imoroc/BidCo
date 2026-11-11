@@ -105,4 +105,23 @@ class AvisoSubastaServiceImplTest {
         verify(emailService, timeout(2000)).enviar(anyString(), anyString(), any());
         assertEquals("&lt;a&gt;", AvisoSubastaServiceImpl.escapar("<a>"));
     }
+
+    @Test
+    void elAvisoDeRetiradaAlCreadorIncluyeElMotivoEscapado() {
+        avisos.subastaRetiradaAlCreador(usuario, subasta, "Falsificación <script>");
+
+        ArgumentCaptor<String> html = ArgumentCaptor.forClass(String.class);
+        verify(emailService, timeout(2000)).enviar(anyString(), anyString(), html.capture());
+        assertTrue(html.getValue().contains("Falsificación &lt;script&gt;"));
+        assertFalse(html.getValue().contains("<script>"));
+    }
+
+    @Test
+    void elAvisoDeRetiradaAlPujadorIndicaLoDevuelto() {
+        avisos.subastaRetiradaAlPujador(usuario, subasta, new BigDecimal("40"));
+
+        ArgumentCaptor<String> html = ArgumentCaptor.forClass(String.class);
+        verify(emailService, timeout(2000)).enviar(anyString(), anyString(), html.capture());
+        assertTrue(html.getValue().contains("40,00 €"));
+    }
 }

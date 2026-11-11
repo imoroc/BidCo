@@ -135,13 +135,57 @@ public class SubastaServiceImpl implements SubastaService {
     @Transactional
     public void cancelarSubasta(Long id, Long usuarioId) {
         Subasta subasta = obtenerModificable(id, usuarioId);
-        // Crear la subasta dio 50 puntos: al retirarla se devuelven, para que no se pueda abusar de ello.
+        quitarPuntosDeCreacion(usuarioId);
+        comentarioRepository.eliminarPorSubasta(id);
+        subastaRepository.delete(subasta);
+    }
+
+    @Override
+    @Transactional
+    public void retirarPorModeracion(Long id, String motivo) {
+        if (motivo == null || motivo.isBlank()) {
+            throw new IllegalArgumentException("Indica el motivo de la retirada");
+        }
+        Subasta subasta = subastaRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subasta no encontrada"));
+        if (subasta.getGanador() != null) {
+            throw new IllegalStateException("La subasta ya se cerró con ganador y no se puede retirar");
+        }
+
+        // Solo quien lidera tiene saldo retenido (a los demás se les devolvió al ser superados).
+        Puja lider = pujaRepository.findTopBySubastaIdOrderByImporteDesc(id);
+        Usuario pujador = null;
+        if (lider != null) {
+            pujador = usuarioRepository.findByIdForUpdate(lider.getPujador().getUsuarioID())
+                    .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+            pujador.setSaldo(pujador.getSaldo().add(lider.getImporte()));
+            usuarioRepository.save(pujador);
+        }
+
+        Usuario creador = subasta.getCreador();
+        if (creador != null) {
+            quitarPuntosDeCreacion(creador.getUsuarioID());
+        }
+
+        // Los avisos leen la subasta ahora y salen solo si la transacción se confirma.
+        if (creador != null) {
+            avisos.subastaRetiradaAlCreador(creador, subasta, motivo.trim());
+        }
+        if (pujador != null) {
+            avisos.subastaRetiradaAlPujador(pujador, subasta, lider.getImporte());
+        }
+
+        pujaRepository.eliminarPorSubasta(id);
+        comentarioRepository.eliminarPorSubasta(id);
+        subastaRepository.delete(subasta);
+    }
+
+    /** Crear la subasta dio 50 puntos: al retirarla se devuelven, para que no se pueda abusar de ello. */
+    private void quitarPuntosDeCreacion(Long usuarioId) {
         Usuario creador = usuarioRepository.findByIdForUpdate(usuarioId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         creador.setPuntos(Math.max(0, creador.getPuntos() - PUNTOS_POR_CREAR));
         usuarioRepository.save(creador);
-        comentarioRepository.eliminarPorSubasta(id);
-        subastaRepository.delete(subasta);
     }
 
     /**

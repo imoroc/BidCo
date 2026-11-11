@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -215,5 +216,38 @@ class AdminControllerTest {
                         .file(parteSorteo("{\"nombreArticulo\":\"Reloj\",\"puntosNecesarios\":10}")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("No autenticado como admin"));
+    }
+
+    // ---- Moderación ----
+
+    @Test
+    void retirarUnaSubastaDevuelve204YPasaElMotivo() throws Exception {
+        mvc.perform(post("/api/admin/subastas/9/retirar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"Contenido no permitido\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(adminService).retirarSubasta(eq(9L), eq("Contenido no permitido"), any(HttpSession.class));
+    }
+
+    @Test
+    void retirarSinMotivoDevuelve400SinLlamarAlServicio() throws Exception {
+        mvc.perform(post("/api/admin/subastas/9/retirar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"  \"}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(adminService);
+    }
+
+    @Test
+    void retirarUnaSubastaYaCerradaDevuelve409() throws Exception {
+        doThrow(new IllegalStateException("La subasta ya se cerró con ganador y no se puede retirar"))
+                .when(adminService).retirarSubasta(eq(9L), any(), any());
+
+        mvc.perform(post("/api/admin/subastas/9/retirar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"x\"}"))
+                .andExpect(status().isConflict());
     }
 }

@@ -428,7 +428,7 @@ Pendiente:
 - [x] Avisos por correo («te han superado», «has ganado»).
 - [ ] Pujas en tiempo real.
 - [x] Editar y cancelar la subasta propia (mientras no tenga pujas).
-- [ ] Moderación de subastas desde la administración.
+- [x] Moderación de subastas desde la administración.
 - [ ] Favoritos y valoraciones.
 - [ ] Cabeceras de seguridad y CSP también en el frontend (hoy la CSP está en modo informe).
 - [ ] Limitador de peticiones compartido entre instancias (hoy es en memoria).

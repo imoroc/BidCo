@@ -6,6 +6,7 @@ import com.bidco.api_rest.model.Subasta;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,10 @@ public interface PujaRepository extends JpaRepository<Puja, Long> {
 
     @Query("SELECT COUNT(p) > 0 FROM Puja p WHERE p.subasta.subastaID = :subastaId")
     boolean haySubastaConPujas(@Param("subastaId") Long subastaId);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("DELETE FROM Puja p WHERE p.subasta.subastaID = :subastaId")
+    void eliminarPorSubasta(@Param("subastaId") Long subastaId);
 
     @Query("SELECT p FROM Puja p WHERE p.subasta.subastaID = :subastaId ORDER BY p.importe DESC LIMIT 1")
     Puja findTopBySubastaIdOrderByImporteDesc(Long subastaId);

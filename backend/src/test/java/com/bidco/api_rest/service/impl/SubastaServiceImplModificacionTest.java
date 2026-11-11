@@ -5,6 +5,7 @@ import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.mapper.PujaMapper;
 import com.bidco.api_rest.mapper.SubastaMapper;
 import com.bidco.api_rest.mapper.UsuarioMapper;
+import com.bidco.api_rest.model.Puja;
 import com.bidco.api_rest.model.Subasta;
 import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.ComentarioRepository;
@@ -17,6 +18,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -39,6 +41,7 @@ class SubastaServiceImplModificacionTest {
     private PujaRepository pujaRepository;
     private UsuarioRepository usuarioRepository;
     private ComentarioRepository comentarioRepository;
+    private AvisoSubastaService avisos;
     private SubastaServiceImpl servicio;
     private Subasta subasta;
     private Usuario creador;
@@ -49,10 +52,11 @@ class SubastaServiceImplModificacionTest {
         pujaRepository = mock(PujaRepository.class);
         usuarioRepository = mock(UsuarioRepository.class);
         comentarioRepository = mock(ComentarioRepository.class);
+        avisos = mock(AvisoSubastaService.class);
         Clock reloj = Clock.fixed(Instant.parse("2026-11-10T10:00:00Z"), ZoneId.of("Europe/Madrid"));
         servicio = new SubastaServiceImpl(subastaRepository, mock(SubastaMapper.class), mock(UsuarioMapper.class),
                 usuarioRepository, pujaRepository, mock(PujaMapper.class), mock(CloudinaryService.class),
-                mock(AvisoSubastaService.class), comentarioRepository, reloj);
+                avisos, comentarioRepository, reloj);
 
         creador = new Usuario();
         creador.setUsuarioID(CREADOR);
@@ -131,5 +135,66 @@ class SubastaServiceImplModificacionTest {
         servicio.cancelarSubasta(ID, CREADOR);
 
         assertEquals(0, creador.getPuntos());
+    }
+
+    // ---- Moderación ----
+
+    private Usuario lider(long id, String saldo, String importe) {
+        Usuario pujador = new Usuario();
+        pujador.setUsuarioID(id);
+        pujador.setSaldo(new BigDecimal(saldo));
+        Puja puja = new Puja();
+        puja.setPujador(pujador);
+        puja.setImporte(new BigDecimal(importe));
+        when(pujaRepository.findTopBySubastaIdOrderByImporteDesc(ID)).thenReturn(puja);
+        when(usuarioRepository.findByIdForUpdate(id)).thenReturn(Optional.of(pujador));
+        return pujador;
+    }
+
+    @Test
+    void retirarPorModeracionDevuelveElSaldoAlLiderBorraTodoYAvisa() {
+        Usuario pujador = lider(8L, "5", "40");
+
+        servicio.retirarPorModeracion(ID, " Contenido no permitido ");
+
+        assertEquals(new BigDecimal("45"), pujador.getSaldo());
+        assertEquals(70, creador.getPuntos());
+        verify(avisos).subastaRetiradaAlCreador(creador, subasta, "Contenido no permitido");
+        verify(avisos).subastaRetiradaAlPujador(pujador, subasta, new BigDecimal("40"));
+        verify(pujaRepository).eliminarPorSubasta(ID);
+        verify(comentarioRepository).eliminarPorSubasta(ID);
+        verify(subastaRepository).delete(subasta);
+    }
+
+    @Test
+    void retirarPorModeracionSinPujasNoTocaSaldosNiAvisaAPujadores() {
+        servicio.retirarPorModeracion(ID, "Motivo");
+
+        verify(avisos, never()).subastaRetiradaAlPujador(any(), any(), any());
+        verify(subastaRepository).delete(subasta);
+    }
+
+    @Test
+    void sePuedeRetirarUnaSubastaConPujasAunqueNoSeaDelUsuario() {
+        when(pujaRepository.haySubastaConPujas(ID)).thenReturn(true);
+
+        servicio.retirarPorModeracion(ID, "Motivo");
+
+        verify(subastaRepository).delete(subasta);
+    }
+
+    @Test
+    void unaSubastaConGanadorNoSePuedeRetirar() {
+        subasta.setGanador(8L);
+
+        assertThrows(IllegalStateException.class, () -> servicio.retirarPorModeracion(ID, "Motivo"));
+        verify(subastaRepository, never()).delete(any());
+    }
+
+    @Test
+    void retirarPorModeracionExigeMotivo() {
+        assertThrows(IllegalArgumentException.class, () -> servicio.retirarPorModeracion(ID, "  "));
+        assertThrows(IllegalArgumentException.class, () -> servicio.retirarPorModeracion(ID, null));
+        verify(subastaRepository, never()).delete(any());
     }
 }
