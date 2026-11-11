@@ -131,3 +131,10 @@
 - Se avisa por correo al creador (con el motivo, escapado) y a quien lideraba (con el importe devuelto), con las
   mismas reglas que los demás avisos: solo cuentas verificadas y tras confirmar la transacción.
 - En la administración, «Moderar subastas» busca por nombre (primeros 12 resultados) y pide el motivo antes de confirmar.
+
+## Historial de pujas
+- `GET /api/pujas/historial/{subastaId}` es público y devuelve las 20 pujas más altas (importe y fecha), no el identificador del pujador: así el historial no permite enlazar a una persona con sus pujas en otras subastas.
+- El pujador se muestra con la inicial y asteriscos («M***»). Quien activó «pujar de forma anónima» aparece como «Anónimo».
+- En una subasta a ciegas el historial no se publica hasta que termina el plazo, igual que `/pujas/mayor`; después se muestra con el mismo enmascarado.
+- La ficha de las subastas normales lo recarga cada vez que el flujo en directo informa de un precio nuevo.
+- La fecha de la puja se guarda como día (sin hora), de modo que el orden entre pujas del mismo día lo da el importe.

@@ -230,7 +230,7 @@ Todas las rutas cuelgan de `/api`. Con `SWAGGER_ENABLED=true` la documentación 
 | | `POST /subastas` (multipart), `PUT /subastas/final/{id}` | Usuario |
 | | `GET /subastas/filtrar-creador`, `/filtro-mis-subastas`, `/filtro-mis-pujas` | Con sesión iniciada |
 | Pujas | `POST /pujas`, `GET /pujas/subastas-usuario/{usuarioId}`, `GET /pujas/{id}` | Usuario |
-| | `GET /pujas/mayor/{subastaId}` | Público |
+| | `GET /pujas/mayor/{subastaId}`, `GET /pujas/historial/{subastaId}` | Público |
 | Sorteos | `GET /sorteos`, `GET /sorteos/{id}`, `GET /sorteos/filtro` | Público |
 | | `PUT /sorteos/final/{id}` | Usuario |
 | Participación en sorteos | `POST /pujas-sorteo`, `GET /pujas-sorteo/{id}` | Usuario |
