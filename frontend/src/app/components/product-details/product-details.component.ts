@@ -69,6 +69,11 @@ export class ProductDetailsComponent implements OnInit {
         }
     }
 
+    /** Foto de la ficha a 1200 px como máximo (sin ampliar), en el formato y calidad que mejor admita el navegador. */
+    imagenFicha(src: string): string {
+        return cloudinaryLoader({ src, width: 1200 });
+    }
+
     /** Título, imagen y JSON-LD propios de la subasta (en una ciega solo se publica el precio base). */
     private publicarDatosSeo(product: SubastaResponseDto): void {
         const cierre = cierreMs(product.fechaFinal);

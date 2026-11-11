@@ -27,6 +27,15 @@ describe('ProductDetailsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('pide la foto de la ficha a Cloudinary a 1200 px sin ampliarla', () => {
+    expect(component.imagenFicha('https://res.cloudinary.com/demo/image/upload/v1/reloj.jpg'))
+      .toBe('https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,c_limit,w_1200/v1/reloj.jpg');
+  });
+
+  it('deja intacta una imagen que no es de Cloudinary', () => {
+    expect(component.imagenFicha('reloj.jpg')).toBe('reloj.jpg');
+  });
 });
 
 describe('ProductDetailsComponent en directo', () => {
