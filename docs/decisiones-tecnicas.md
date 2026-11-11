@@ -49,8 +49,12 @@
   la comprobación de salud de la plataforma sin filtrar información interna. `GET /actuator/health`
   es la única ruta pública de `/actuator`; el resto cae en el «denegar por defecto» del `JwtFilter`.
 - `GET /api/ping` se mantiene: lo usa `keep-alive.yml` y además hace una consulta real a la base.
-- Pendiente: logs en JSON, seguimiento de errores (Sentry) y sustituir `keep-alive.yml` por un
-  monitor externo o un plan sin suspensión.
+- Logs en JSON: el perfil `json` (`SPRING_PROFILES_ACTIVE=json`) activa el formato ECS nativo de Spring
+  Boot, sin dependencias nuevas. Cada línea es un JSON con el mensaje, el nivel y el `idPeticion` del MDC,
+  que los agregadores (Grafana Loki, Datadog, etc.) indexan sin configurar patrones. Por defecto se
+  mantiene el formato de texto, que es más legible en local.
+- Pendiente: seguimiento de errores (Sentry) y sustituir `keep-alive.yml` por un monitor externo o un
+  plan sin suspensión.
 
 ## CSP del frontend (`vercel.json`)
 
