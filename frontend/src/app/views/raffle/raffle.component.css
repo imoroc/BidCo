@@ -83,7 +83,7 @@
 .products-grid {
   display: grid;
   /* Ancho mínimo de 280px para que las tarjetas sean consistentes con el resto de la web */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 32px; 
 }
 

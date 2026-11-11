@@ -74,7 +74,7 @@
 .products-grid {
   display: grid;
   /* Esto crea las columnas automáticamente. Nunca serán más pequeñas de 280px */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 32px; /* Espacio generoso entre productos */
 }
 

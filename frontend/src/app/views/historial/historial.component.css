@@ -45,7 +45,7 @@
 .products-grid {
   display: grid;
   /* Ancho mínimo 280px. Evita que las tarjetas se deformen o alarguen */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 32px; 
 }
 
