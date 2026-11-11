@@ -410,13 +410,26 @@ BidCo/
 
 ## Hoja de ruta
 
-- [ ] `docker compose` con PostgreSQL, backend y frontend.
-- [ ] Pruebas de integración de los repositorios y pruebas end-to-end en el CI.
-- [ ] Paginación de listados y orden y filtros reflejados en la URL.
-- [ ] Favoritos y aviso al terminar una subasta.
-- [ ] Cabeceras de seguridad y CSP también en el frontend.
-- [ ] Limitador de peticiones compartido entre instancias (hoy hay uno general por IP, en memoria).
+Hecho:
+
+- [x] `docker compose` con PostgreSQL, backend y frontend.
+- [x] Pruebas de integración de los repositorios y de los controladores, y mínimo de cobertura en el CI.
+- [x] Pruebas e2e de las rutas públicas, accesibilidad con axe y Lighthouse en el CI.
+- [x] Paginación de listados, y orden y filtros reflejados en la URL.
+- [x] Cierre programado de subastas y sorteos, y anti-sniping.
+- [x] Verificación de correo, descarga de datos y eliminación de cuenta.
+- [x] Sesión de administración persistente y revocación de las sesiones de usuario.
+
+Pendiente:
+
+- [ ] Pruebas e2e del flujo completo (registro, verificación, puja y cierre) con backend y PostgreSQL en el CI.
+- [ ] Pujas en tiempo real y avisos por correo («te han superado», «has ganado»).
+- [ ] Editar y cancelar la subasta propia, y moderación desde la administración.
+- [ ] Favoritos y valoraciones.
+- [ ] Cabeceras de seguridad y CSP también en el frontend (hoy la CSP está en modo informe).
+- [ ] Limitador de peticiones compartido entre instancias (hoy es en memoria).
 - [ ] Endpoint de salud con Actuator y logs estructurados.
+- [ ] PWA: service worker y página sin conexión.
 - [ ] Interfaz en varios idiomas.
 
 ## Contribuir
