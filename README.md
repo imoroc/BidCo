@@ -32,6 +32,8 @@ BidCo es una aplicación desarrollada para la asignatura Servicios y Sistemas We
 - **Valoraciones de expertos:** comentarios con precio estimado sobre las subastas.
 - **Búsqueda y filtros** por nombre, categoría, precio y fecha, con subastas y sorteos vencidos ocultos por defecto.
 - **Recuperación de contraseña** por correo electrónico.
+- **Verificación de correo:** las cuentas nuevas confirman su correo con un enlace antes de pujar, participar en sorteos o crear subastas (ver [Recuperación de contraseña por correo](#recuperación-de-contraseña-por-correo)).
+- **Derechos sobre los datos:** cada usuario puede descargar sus datos en JSON y eliminar su cuenta. Al eliminarla se anonimiza en lugar de borrarla en cascada, y se rechaza mientras haya subastas propias, pujas en subastas o participaciones en sorteos sin cerrar.
 
 ### Roles y permisos
 
@@ -221,6 +223,9 @@ Todas las rutas cuelgan de `/api`. Con `SWAGGER_ENABLED=true` la documentación 
 | Usuarios | `POST /usuarios` (registro), `POST /usuarios/login`, `GET/PUT /usuarios/{id}`, `PATCH /usuarios/{id}/password`, `PATCH /usuarios/{id}/recargar-saldo`, `GET/PUT /usuarios/{id}/privacidad`, `GET /usuarios/{id}/stats` | Registro y login públicos; el resto, usuario |
 | Perfil público | `GET /usuarios/{id}/publico` | Público |
 | Recuperación | `POST /usuarios/recuperar-contrasena`, `POST /usuarios/restablecer-contrasena` | Público |
+| Verificación de correo | `POST /usuarios/verificar-correo` | Público |
+| | `POST /usuarios/{id}/reenviar-verificacion` | Usuario |
+| Derechos sobre los datos | `GET /usuarios/{id}/exportar`, `DELETE /usuarios/{id}` (con la contraseña en el cuerpo) | Usuario |
 | Subastas | `GET /subastas`, `GET /subastas/{id}`, `GET /subastas/filtrar`, `/filtro-normal`, `/filtro-ciega`, `/filtro-nombre` | Público |
 | | `POST /subastas` (multipart), `PUT /subastas/final/{id}` | Usuario |
 | | `GET /subastas/filtrar-creador`, `/filtro-mis-subastas`, `/filtro-mis-pujas` | Con sesión iniciada |
@@ -239,7 +244,8 @@ Todas las rutas cuelgan de `/api`. Con `SWAGGER_ENABLED=true` la documentación 
 
 ## Seguridad
 
-- **Autenticación:** tokens JWT firmados con HS256 (el secreto debe tener al menos 32 bytes) y contraseñas con BCrypt. La administración usa una sesión de servidor con cookie `Secure` y cabecera anti-CSRF obligatoria.
+- **Autenticación:** tokens JWT firmados con HS256 (el secreto debe tener al menos 32 bytes) y contraseñas con BCrypt. La administración usa una sesión de servidor con cookie `Secure` y cabecera anti-CSRF obligatoria; la sesión se guarda en PostgreSQL (Spring Session JDBC), así que sobrevive a un reinicio del servicio.
+- **Revocación de sesiones de usuario:** el token lleva una versión de sesión que se comprueba en cada petición. Sube al cambiar o restablecer la contraseña y al eliminar la cuenta, y los tokens anteriores dejan de valer. La vida del token sigue siendo de 24 horas.
 - **Autorización por rol:** un filtro comprueba el rol del token en cada ruta, y los servicios verifican que el usuario autenticado sea el propietario del recurso.
 - **Fuerza bruta:** los logins se limitan a 5 fallos cada 15 minutos y el tiempo de respuesta se iguala entre cuenta existente e inexistente. El límite vive en memoria de cada instancia (ver [decisiones técnicas](docs/decisiones-tecnicas.md)).
 - **Recuperación de contraseña:** token aleatorio de un solo uso, guardado como hash y válido 30 minutos.
