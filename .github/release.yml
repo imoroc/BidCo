@@ -1,0 +1,25 @@
+changelog:
+  exclude:
+    labels:
+      - invalid
+      - duplicate
+      - wontfix
+  categories:
+    - title: Novedades
+      labels:
+        - enhancement
+    - title: Correcciones
+      labels:
+        - bug
+    - title: Documentación
+      labels:
+        - documentation
+    - title: Dependencias
+      labels:
+        - dependencies
+        - java
+        - javascript
+        - github-actions
+    - title: Otros cambios
+      labels:
+        - "*"

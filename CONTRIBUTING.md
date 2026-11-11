@@ -14,6 +14,7 @@ Gracias por querer colaborar. Esta guía resume cómo trabajar en el repositorio
 - Haz commits pequeños, uno por cambio lógico, y súbelos con frecuencia.
 - Abre la PR hacia `deploy` en cuanto tengas el primer commit: el CI solo se ejecuta con una PR abierta.
 - Rellena la plantilla de la PR y espera a que pasen todos los checks antes de fusionar.
+- Pon a la PR una etiqueta (`enhancement`, `bug`, `documentation` o `dependencies`): las notas de cada release se generan agrupando las PR por etiqueta (`.github/release.yml`).
 
 ## Mensajes de commit
 
