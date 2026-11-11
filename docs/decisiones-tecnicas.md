@@ -51,3 +51,18 @@
 - Pasos pendientes: navegar por todas las vistas con la consola abierta, corregir lo que se vea
   y, cuando no queden avisos, cambiar la cabecera a `Content-Security-Policy`.
 - `Cross-Origin-Opener-Policy: same-origin` ya se aplica. HSTS lo añade Vercel en su dominio.
+
+## Revocación de sesiones de usuario
+
+- Cada cuenta tiene una `token_version` (columna `usuario.token_version`, migración V5). El JWT de usuario
+  lleva esa versión en el claim `tv`, y `JwtFilter` la compara en cada petición autenticada con la de la base
+  de datos (una consulta por clave primaria). Si no coinciden, o la cuenta ya no existe, responde 401 y el
+  frontend cierra la sesión.
+- La versión sube al cambiar la contraseña, al restablecerla por correo y al eliminar la cuenta. Al cambiarla
+  desde el perfil, la API devuelve un token nuevo para que el dispositivo actual no pierda la sesión; el resto
+  quedan cerradas.
+- Los tokens emitidos antes de la V5 no llevan `tv` y cuentan como versión 0, igual que todas las cuentas
+  existentes: nadie pierde la sesión al desplegar.
+- No se acortó la vida del JWT (24 h) porque, sin *refresh token*, obligaría a volver a entrar a mitad de
+  una subasta. Con la revocación cubierta, acortarla solo tiene sentido junto a una renovación silenciosa.
+- Los tokens de trabajadores y expertos no se revocan por este mecanismo.
