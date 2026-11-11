@@ -9,7 +9,7 @@ import { PaginaInformativaComponent } from '../../components/pagina-informativa/
   standalone: true,
   imports: [PaginaInformativaComponent, RouterLink],
   template: `
-    <app-pagina-informativa titulo="Política de privacidad" actualizacion="8 de noviembre de 2026">
+    <app-pagina-informativa titulo="Política de privacidad" actualizacion="11 de noviembre de 2026">
       <p>
         Esta página explica qué datos trata BidCo, para qué y con quién se comparten. BidCo es un
         proyecto académico sin fines comerciales.
@@ -36,6 +36,11 @@ import { PaginaInformativaComponent } from '../../components/pagina-informativa/
         Únicamente para crear tu cuenta, permitirte iniciar sesión y hacer funcionar las subastas y
         los sorteos. No hacemos perfiles publicitarios ni vendemos tus datos.
       </p>
+      <p>
+        Usamos tu correo para verificar la cuenta, recuperar la contraseña y avisarte de lo que ocurre en
+        las subastas en las que participas: cuando alguien supera tu puja en una subasta normal y cuando
+        ganas una subasta. Son avisos de servicio, no publicidad, y solo se envían a correos verificados.
+      </p>
 
       <h2>4. Base legal</h2>
       <p>
@@ -56,6 +61,7 @@ import { PaginaInformativaComponent } from '../../components/pagina-informativa/
         <li>Vercel: aloja la aplicación web.</li>
         <li>Render: aloja la API.</li>
         <li>Aiven: aloja la base de datos.</li>
+        <li>Brevo: envía los correos de servicio (verificación, recuperación de contraseña y avisos de subastas).</li>
         <li>Cloudinary: almacena las imágenes de las subastas.</li>
       </ul>
       <p>Algunos de estos proveedores pueden tratar datos fuera del Espacio Económico Europeo.</p>
