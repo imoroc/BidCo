@@ -82,6 +82,8 @@ public class RecuperacionContrasenaServiceImpl implements RecuperacionContrasena
         Usuario usuario = usuarioRepository.findByIdForUpdate(registro.getUsuarioId())
                 .orElseThrow(() -> new IllegalArgumentException(ENLACE_INVALIDO));
         usuario.setContrasena(passwordEncoder.encode(nuevaContrasena));
+        // Quien tuviera acceso a la cuenta (la razón habitual de restablecer) pierde sus sesiones.
+        usuario.invalidarSesiones();
         usuarioRepository.save(usuario);
         // Un solo uso: se invalidan este y cualquier otro enlace pendiente de la cuenta.
         tokenRepository.eliminarPorUsuario(usuario.getUsuarioID());

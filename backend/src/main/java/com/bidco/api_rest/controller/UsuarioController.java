@@ -95,7 +95,7 @@ public class UsuarioController {
     }
 
     @PatchMapping("/{id}/password")
-    public ResponseEntity<Void> updatePassword(
+    public ResponseEntity<Map<String, String>> updatePassword(
             @PathVariable Long id,
             @Valid @RequestBody CambiarContrasenaDTO passwords,
             @RequestAttribute("authenticatedUserId") Long authenticatedUserId,
@@ -104,14 +104,15 @@ public class UsuarioController {
         // Limita los intentos con la contraseña actual por si alguien usa un token robado.
         String key = loginRateLimiter.key("password", String.valueOf(id), request.getRemoteAddr());
         loginRateLimiter.assertAllowed(key);
+        final String nuevoToken;
         try {
-            usuarioService.updatePassword(id, passwords.getCurrentPassword(), passwords.getNewPassword());
+            nuevoToken = usuarioService.updatePassword(id, passwords.getCurrentPassword(), passwords.getNewPassword());
         } catch (ContrasenaActualIncorrectaException exception) {
             loginRateLimiter.recordFailure(key);
             throw exception;
         }
         loginRateLimiter.reset(key);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Map.of("token", nuevoToken));
     }
 
     @GetMapping("/{id}/privacidad")
