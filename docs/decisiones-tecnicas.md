@@ -66,3 +66,16 @@
 - No se acortó la vida del JWT (24 h) porque, sin *refresh token*, obligaría a volver a entrar a mitad de
   una subasta. Con la revocación cubierta, acortarla solo tiene sentido junto a una renovación silenciosa.
 - Los tokens de trabajadores y expertos no se revocan por este mecanismo.
+
+## Sesión de administración persistente (Spring Session JDBC)
+
+- La sesión del panel de administración (`HttpSession`, atributo `adminId`) se guarda en PostgreSQL con
+  Spring Session JDBC en lugar de en la memoria de Tomcat: sobrevive a reinicios y redespliegues y es válida si
+  hay varias instancias de la API. Se mantiene el modelo actual (cookie de sesión, cabecera CSRF en el filtro y
+  expiración por inactividad de 30 minutos); solo cambia dónde se almacena.
+- Las tablas `spring_session` y `spring_session_attributes` las crea Flyway (V6, esquema oficial de
+  `spring-session-jdbc`), con `spring.session.jdbc.initialize-schema=never`. Spring borra las caducadas cada minuto.
+- El nombre de la cookie pasa de `JSESSIONID` a `SESSION`: las sesiones abiertas en el momento del despliegue se
+  pierden una vez y el administrador tiene que volver a entrar.
+- Solo el panel de administración usa sesiones: el resto de la API es sin estado (JWT), así que la tabla solo
+  recibe filas cuando un administrador inicia sesión.
