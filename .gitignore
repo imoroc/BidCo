@@ -66,3 +66,7 @@ test-output/
 
 # Plantilla de variables de entorno (sin valores reales): sí se versiona.
 !.env.example
+
+# Catálogo de demostración: lo generado por seed/sembrar.mjs no se versiona
+seed/salida/
+seed/fotos/
