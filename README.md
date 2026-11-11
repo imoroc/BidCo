@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/public/Logo%20BidCo%20Recortado.jpg" alt="Logo de BidCo" height="96" />
+  <img src="frontend/public/logo.svg" alt="Logo de BidCo" height="96" />
   <h1 align="center">BidCo</h1>
 
   <p align="center">
