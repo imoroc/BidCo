@@ -14,6 +14,8 @@ import { ahoraMs, cierreMs } from '../../utils/fechas';
 })
 export class ProductItemComponent implements OnInit {
     @Input() product: any;
+    /** Solo la primera tarjeta de un listado: su imagen es la candidata a LCP y se carga con prioridad. */
+    @Input() prioridad = false;
     isBlindAuction: boolean = false;
     isRaffle: boolean = false;
 

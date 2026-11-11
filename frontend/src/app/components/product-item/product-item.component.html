@@ -7,7 +7,7 @@
       <span class="badge badge-raffle">Sorteo</span>
     }
     
-    <img class="product-img" [ngSrc]="product.imagen" fill sizes="(max-width: 600px) 50vw, (max-width: 1100px) 33vw, 25vw" [alt]="product.nombreArticulo" />
+    <img class="product-img" [ngSrc]="product.imagen" fill [priority]="prioridad" sizes="(max-width: 600px) 50vw, (max-width: 1100px) 33vw, 25vw" [alt]="product.nombreArticulo" />
   </div>
 
   <div class="card-content">
