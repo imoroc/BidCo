@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { SesionStore } from './sesion.store';
 
 export interface UsuarioResponse {
   usuarioID: number;
@@ -60,10 +61,10 @@ export interface Stats {
 export class UserService {
   private apiUrl = `${environment.apiUrl}/usuarios`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sesion: SesionStore) {}
 
   updateUser(id: number, usuario: UsuarioUpdate): Observable<UsuarioResponse> {
-    const token = localStorage.getItem('authToken');
+    const token = this.sesion.tokenUsuario();
     return this.http.put<UsuarioResponse>(`${this.apiUrl}/${id}`, usuario, {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
     });
@@ -71,7 +72,7 @@ export class UserService {
 
   // Devuelve un token nuevo: el cambio cierra las demás sesiones y esta debe seguir con el token actualizado.
   updatePassword(id: number, passwords: { currentPassword: string, newPassword: string }): Observable<{ token: string }> {
-    const token = localStorage.getItem('authToken');
+    const token = this.sesion.tokenUsuario();
     return this.http.patch<{ token: string }>(`${this.apiUrl}/${id}/password`, passwords, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${token}`,
@@ -88,7 +89,7 @@ export class UserService {
   }
 
   reenviarVerificacion(id: number): Observable<void> {
-    const token = localStorage.getItem('authToken');
+    const token = this.sesion.tokenUsuario();
     return this.http.post<void>(`${this.apiUrl}/${id}/reenviar-verificacion`, null, {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
     });
@@ -96,7 +97,7 @@ export class UserService {
 
   // Copia en JSON de los datos del usuario (derecho de acceso y portabilidad).
   exportarDatos(id: number): Observable<Blob> {
-    const token = localStorage.getItem('authToken');
+    const token = this.sesion.tokenUsuario();
     return this.http.get(`${this.apiUrl}/${id}/exportar`, {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
       responseType: 'blob'
@@ -106,7 +107,7 @@ export class UserService {
   // La contraseña viaja en el cuerpo (nunca en la URL). Anonimiza la cuenta; el backend rechaza el borrado
   // si quedan subastas o sorteos sin cerrar.
   eliminarCuenta(id: number, contrasena: string): Observable<void> {
-    const token = localStorage.getItem('authToken');
+    const token = this.sesion.tokenUsuario();
     return this.http.delete<void>(`${this.apiUrl}/${id}`, {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
       body: { contrasena }

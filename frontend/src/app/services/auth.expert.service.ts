@@ -6,6 +6,7 @@ import { UserService } from './user.service';
 import { ExpertoResponse, ExpertService } from './expert.service';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../environments/environment';
+import { SesionStore } from './sesion.store';
 
 
 @Injectable({
@@ -23,9 +24,9 @@ export class AuthExpertService {
 
   private expertApiUrl: string = `${environment.apiUrl}/trabajadores`;
 
-  constructor(private http: HttpClient, private userService: UserService, private expertService: ExpertService) {
-    const token = localStorage.getItem('authTokenExpert');
-    const userData = localStorage.getItem('authExpert');
+  constructor(private http: HttpClient, private userService: UserService, private expertService: ExpertService, private sesion: SesionStore) {
+    const token = this.sesion.tokenExperto();
+    const userData = this.sesion.perfilExperto();
 
     if (token && userData) {
         this.loggedIn.next(true);
@@ -35,7 +36,7 @@ export class AuthExpertService {
         this.loadExpertProfile(this.currentUser.value!.usuarioID).subscribe({
             next: (updatedUser) => {
                 // Actualizamos la información del usuario en localStorage
-                localStorage.setItem('authExpert', JSON.stringify(updatedUser));
+                this.sesion.guardarPerfilExperto(updatedUser);
                 this.currentUser.next(updatedUser);
             },
             error: (err) => {
@@ -54,7 +55,7 @@ export class AuthExpertService {
   }
 
   setExpertFromToken(token: string): void {
-    localStorage.setItem('authTokenExpert', token);
+    this.sesion.guardarTokenExperto(token);
     this.loggedIn.next(true);
     // Ahora sí pedimos el perfil
     this.expertService
@@ -63,7 +64,7 @@ export class AuthExpertService {
   }
 
   loadExpertProfile(userID: number): Observable<ExpertoResponse> {
-    const token = localStorage.getItem('authTokenExpert');
+    const token = this.sesion.tokenExperto();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
@@ -75,7 +76,7 @@ export class AuthExpertService {
   setExperto(user: ExpertoResponse): void {
     console.log("Actualizando currentUser en AuthService:", user);
     this.currentUser.next(user);
-    localStorage.setItem('authExpert', JSON.stringify(user));
+    this.sesion.guardarPerfilExperto(user);
     this.setUserRole("expert");
   }
 
@@ -88,7 +89,6 @@ export class AuthExpertService {
     this.loggedIn.next(false);
     this.currentUser.next(null);
     this.setUserRole(null);
-    localStorage.removeItem('authTokenExpert');
-    localStorage.removeItem('authExpert');
+    this.sesion.limpiarExperto();
   }
 }

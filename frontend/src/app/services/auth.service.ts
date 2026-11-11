@@ -6,6 +6,7 @@ import { UserService } from './user.service';
 import { ExpertoResponse, ExpertService } from './expert.service';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../environments/environment';
+import { SesionStore } from './sesion.store';
 
 export interface UsuarioResponse {
   usuarioID: number;
@@ -40,10 +41,11 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private userService: UserService,
-    private expertService: ExpertService
+    private expertService: ExpertService,
+    private sesion: SesionStore
   ) {
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('authUser');
+    const token = this.sesion.tokenUsuario();
+    const userData = this.sesion.perfilUsuario();
 
     if (token && userData) {
       this.loggedIn.next(true);
@@ -51,7 +53,7 @@ export class AuthService {
 
       this.loadUserProfile(this.currentUser.value!.usuarioID).subscribe({
         next: (updatedUser) => {
-          localStorage.setItem('authUser', JSON.stringify(updatedUser));
+          this.sesion.guardarPerfilUsuario(updatedUser);
           this.currentUser.next(updatedUser);
         },
         error: () => {
@@ -70,7 +72,7 @@ export class AuthService {
   }
 
   setUserFromToken(token: string): void {
-    localStorage.setItem('authToken', token);
+    this.sesion.guardarTokenUsuario(token);
     this.loggedIn.next(true);
     this.userService
       .getUserById(+(jwtDecode(token).sub ?? 0))
@@ -81,7 +83,7 @@ export class AuthService {
   }
 
   loadUserProfile(userID: number): Observable<UsuarioResponse> {
-    const token = localStorage.getItem('authToken');
+    const token = this.sesion.tokenUsuario();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
@@ -104,7 +106,7 @@ export class AuthService {
 
   setUser(user: UsuarioResponse): void {
     this.currentUser.next(user);
-    localStorage.setItem('authUser', JSON.stringify(user));
+    this.sesion.guardarPerfilUsuario(user);
     this.setUserRole('user');
   }
 
@@ -126,7 +128,6 @@ export class AuthService {
     this.loggedIn.next(false);
     this.currentUser.next(null);
     this.setUserRole(null);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('authUser');
+    this.sesion.limpiarUsuario();
   }
 }
