@@ -43,6 +43,18 @@ jobs:
         run: npm run e2e:instalar
       - name: Pruebas e2e (humo, accesibilidad y capturas)
         run: npm run test:e2e
+      - name: Lighthouse (rendimiento, accesibilidad y SEO)
+        # Informativo: no bloquea la PR; los resultados salen como anotaciones.
+        continue-on-error: true
+        run: npm run lighthouse
+      - name: Subir informes de Lighthouse
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse
+          path: frontend/e2e-resultados/lighthouse
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Subir capturas
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
