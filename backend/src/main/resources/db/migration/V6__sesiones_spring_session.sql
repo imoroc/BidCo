@@ -1,9 +1,11 @@
 -- Sesiones HTTP persistentes (Spring Session JDBC), usadas por la sesión de administración.
--- Es el esquema oficial de spring-session-jdbc para PostgreSQL; se versiona aquí y no con
+-- Esquema de spring-session-jdbc para PostgreSQL, versionado aquí y no con
 -- spring.session.jdbc.initialize-schema para que Flyway sea el único que toca el esquema.
+-- Único cambio respecto al oficial: los identificadores (UUID de 36 caracteres) son VARVARCHAR(36) en lugar
+-- de VARCHAR(36); para Spring Session es indistinguible.
 CREATE TABLE SPRING_SESSION (
-	PRIMARY_ID CHAR(36) NOT NULL,
-	SESSION_ID CHAR(36) NOT NULL,
+	PRIMARY_ID VARCHAR(36) NOT NULL,
+	SESSION_ID VARCHAR(36) NOT NULL,
 	CREATION_TIME BIGINT NOT NULL,
 	LAST_ACCESS_TIME BIGINT NOT NULL,
 	MAX_INACTIVE_INTERVAL INT NOT NULL,
@@ -17,7 +19,7 @@ CREATE INDEX SPRING_SESSION_IX2 ON SPRING_SESSION (EXPIRY_TIME);
 CREATE INDEX SPRING_SESSION_IX3 ON SPRING_SESSION (PRINCIPAL_NAME);
 
 CREATE TABLE SPRING_SESSION_ATTRIBUTES (
-	SESSION_PRIMARY_ID CHAR(36) NOT NULL,
+	SESSION_PRIMARY_ID VARCHAR(36) NOT NULL,
 	ATTRIBUTE_NAME VARCHAR(200) NOT NULL,
 	ATTRIBUTE_BYTES BYTEA NOT NULL,
 	CONSTRAINT SPRING_SESSION_ATTRIBUTES_PK PRIMARY KEY (SESSION_PRIMARY_ID, ATTRIBUTE_NAME),
