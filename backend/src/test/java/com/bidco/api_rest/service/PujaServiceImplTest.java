@@ -11,6 +11,7 @@ import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
 import com.bidco.api_rest.service.contract.AvisoSubastaService;
+import com.bidco.api_rest.service.contract.SubastaEventosService;
 import com.bidco.api_rest.service.impl.PujaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ class PujaServiceImplTest {
     private SubastaRepository subastaRepository;
     private UsuarioRepository usuarioRepository;
     private AvisoSubastaService avisos;
+    private SubastaEventosService eventos;
     private PujaServiceImpl service;
 
     @BeforeEach
@@ -44,8 +46,9 @@ class PujaServiceImplTest {
         subastaRepository = mock(SubastaRepository.class);
         usuarioRepository = mock(UsuarioRepository.class);
         avisos = mock(AvisoSubastaService.class);
+        eventos = mock(SubastaEventosService.class);
         Clock clock = Clock.fixed(Instant.parse("2026-06-15T10:00:00Z"), ZoneOffset.UTC);
-        service = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, avisos, clock, 5L);
+        service = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, avisos, eventos, clock, 5L);
     }
 
     private static Instant finDeDia(LocalDate dia) {
@@ -214,7 +217,7 @@ class PujaServiceImplTest {
     @Test
     void conLaVentanaACeroElAntisnipingEstaDesactivado() {
         Clock clock = Clock.fixed(Instant.parse("2026-06-15T10:00:00Z"), ZoneOffset.UTC);
-        PujaServiceImpl sinAntisniping = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, avisos, clock, 0L);
+        PujaServiceImpl sinAntisniping = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, avisos, eventos, clock, 0L);
         Subasta s = subasta(true, HOY.minusDays(1), HOY);
         s.setFechaFinal(Instant.parse("2026-06-15T10:02:00Z"));
         when(subastaRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(s));
@@ -305,5 +308,38 @@ class PujaServiceImplTest {
         pujaValidaSobre(subasta(true, HOY.minusDays(1), HOY.plusDays(5)));
 
         verify(avisos, never()).pujaSuperada(any(), any(), any());
+    }
+
+    @Test
+    void laPujaLideraEnSubastaNormalPublicaElPrecioNuevo() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY.plusDays(5));
+        pujaValidaSobre(s);
+
+        verify(eventos).publicarPuja(1L, new BigDecimal("20"), s.getFechaFinal());
+    }
+
+    @Test
+    void laPublicacionIncluyeElCierreProlongadoPorElAntisniping() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY);
+        s.setFechaFinal(Instant.parse("2026-06-15T10:02:00Z"));
+        pujaValidaSobre(s);
+
+        verify(eventos).publicarPuja(1L, new BigDecimal("20"), Instant.parse("2026-06-15T10:05:00Z"));
+    }
+
+    @Test
+    void enSubastaACiegasNoSePublicaNada() {
+        pujaValidaSobre(subasta(false, HOY.minusDays(1), HOY.plusDays(5)));
+
+        verifyNoInteractions(eventos);
+    }
+
+    @Test
+    void unaPujaRechazadaNoPublicaNada() {
+        when(subastaRepository.findByIdForUpdate(1L))
+                .thenReturn(Optional.of(subasta(true, HOY.minusDays(1), HOY.plusDays(5))));
+
+        assertThrows(IllegalArgumentException.class, () -> service.crearPuja(dto("10")));
+        verifyNoInteractions(eventos);
     }
 }
