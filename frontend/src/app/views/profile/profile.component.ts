@@ -4,7 +4,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 
 import { FooterComponent } from "../../components/footer/footer.component";
 import { HeaderComponent } from "../../components/header/header.component";
-import { AuthExpertService } from '../../services/auth.expert.service';
+import { SesionActivaService } from '../../services/sesion-activa.service';
 
 @Component({
   selector: 'app-profile',
@@ -23,12 +23,12 @@ import { AuthExpertService } from '../../services/auth.expert.service';
 export class ProfileComponent {
     isExpert = false;
     
-    constructor(private expertAuthService: AuthExpertService) {}
+    constructor(private sesionActiva: SesionActivaService) {}
 
     ngOnInit() {
         //Comprobamos si un experto ha iniciado sesion
-        this.expertAuthService.isLoggedIn$.subscribe((estado) => {
-            this.isExpert = estado;
+        this.sesionActiva.estado$.subscribe(({ esExperto }) => {
+            this.isExpert = esExperto;
         });
     }
 }
