@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, HostListener, ElementRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, ElementRef, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../services/auth.service';
 import { AuthExpertService } from '../../services/auth.expert.service';
+import { SesionActivaService } from '../../services/sesion-activa.service';
 
 @Component({
   selector: 'app-header',
@@ -19,6 +20,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
+    private readonly sesionActiva = inject(SesionActivaService);
   isDropdownOpen = false;
   isUserMenuOpen = false;
   isExamplesDropdownOpen = false;
@@ -45,17 +47,11 @@ export class HeaderComponent {
   }
 
   ngOnInit() {
-    this.authService.isLoggedIn$.subscribe((estado: boolean) => {
-      this.isLoggedIn = estado;
+    this.sesionActiva.estado$.subscribe(({ conectado, esExperto }) => {
+        this.isLoggedIn = conectado;
+        this.isExpert = esExperto;
     });
 
-    //Si no hay sesion de usuario se comprueba si hay sesion de experto
-    if(!this.isLoggedIn) {
-        this.expertAuthService.isLoggedIn$.subscribe((estado) => {
-            this.isLoggedIn = estado;
-            this.isExpert = estado;
-        });
-    }
   }
 
   toggleDropdown(event: MouseEvent) {
