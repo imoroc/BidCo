@@ -1,5 +1,7 @@
 package com.bidco.api_rest.config;
 
+import com.bidco.api_rest.repository.UsuarioRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -8,7 +10,13 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /** Matriz de permisos del filtro: ruta × método × rol → estado esperado. */
 class JwtFilterTest {
@@ -17,7 +25,13 @@ class JwtFilterTest {
     private static final int PASA = 200;
 
     private final JwtUtil jwtUtil = new JwtUtil("k".repeat(40), 3_600_000L);
-    private final JwtFilter filter = new JwtFilter(jwtUtil);
+    private final UsuarioRepository usuarios = mock(UsuarioRepository.class);
+    private final JwtFilter filter = new JwtFilter(jwtUtil, usuarios);
+
+    @BeforeEach
+    void cuentaSieteConVersionCero() {
+        when(usuarios.findTokenVersionById(7L)).thenReturn(Optional.of(0));
+    }
 
     private int ejecutar(String metodo, String ruta, String rol, MockHttpSession sesion, String csrf) throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest(metodo, ruta);
@@ -129,5 +143,52 @@ class JwtFilterTest {
         assertEquals(403, ejecutar("POST", "/api/trabajadores", NONE, null, null));
         assertEquals(403, ejecutar("POST", "/api/trabajadores", NONE, conSesion, null));
         assertEquals(PASA, ejecutar("POST", "/api/trabajadores", NONE, conSesion, "BidCo"));
+    }
+
+    private int conToken(String token) throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/usuarios/7");
+        request.addHeader("Authorization", "Bearer " + token);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain chain = new MockFilterChain();
+        filter.doFilter(request, response, chain);
+        return chain.getRequest() != null ? PASA : response.getStatus();
+    }
+
+    @Test
+    void unTokenConLaVersionVigenteSePermite() throws Exception {
+        when(usuarios.findTokenVersionById(7L)).thenReturn(Optional.of(3));
+
+        assertEquals(PASA, conToken(jwtUtil.generateToken("7", "USER", 3)));
+    }
+
+    @Test
+    void unTokenAnteriorAlUltimoCambioDeSesionSeRechaza() throws Exception {
+        when(usuarios.findTokenVersionById(7L)).thenReturn(Optional.of(4));
+
+        assertEquals(401, conToken(jwtUtil.generateToken("7", "USER", 3)));
+    }
+
+    @Test
+    void unTokenSinVersionCuentaComoVersionCero() throws Exception {
+        assertEquals(PASA, conToken(jwtUtil.generateToken("7", "USER")));
+
+        when(usuarios.findTokenVersionById(7L)).thenReturn(Optional.of(1));
+        assertEquals(401, conToken(jwtUtil.generateToken("7", "USER")));
+    }
+
+    @Test
+    void unTokenDeUnaCuentaInexistenteSeRechaza() throws Exception {
+        when(usuarios.findTokenVersionById(7L)).thenReturn(Optional.empty());
+
+        assertEquals(401, conToken(jwtUtil.generateToken("7", "USER", 0)));
+    }
+
+    @Test
+    void lasSesionesDeExpertosNoConsultanLaVersionDeUsuario() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sorteos/filtro-experto");
+        request.addHeader("Authorization", "Bearer " + jwtUtil.generateToken("7", "EXPERT"));
+        filter.doFilter(request, new MockHttpServletResponse(), new MockFilterChain());
+
+        verify(usuarios, never()).findTokenVersionById(7L);
     }
 }

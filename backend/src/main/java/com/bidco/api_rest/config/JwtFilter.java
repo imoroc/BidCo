@@ -1,5 +1,6 @@
 package com.bidco.api_rest.config;
 
+import com.bidco.api_rest.repository.UsuarioRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -25,6 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private static final String ADMIN_CSRF_VALUE = "BidCo";
 
     private final JwtUtil jwtUtil;
+    private final UsuarioRepository usuarioRepository;
 
     private static final List<String> PUBLIC_ROUTES = List.of(
             "POST:/api/usuarios",
@@ -44,8 +47,9 @@ public class JwtFilter extends OncePerRequestFilter {
             "GET:/api/sorteos/filtro"
     );
 
-    public JwtFilter(JwtUtil jwtUtil) {
+    public JwtFilter(JwtUtil jwtUtil, UsuarioRepository usuarioRepository) {
         this.jwtUtil = jwtUtil;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -124,12 +128,22 @@ public class JwtFilter extends OncePerRequestFilter {
 
         request.setAttribute("authenticatedSubject", subject);
         if ("USER".equals(role)) {
+            final Long userId;
             try {
-                request.setAttribute("authenticatedUserId", Long.valueOf(subject));
+                userId = Long.valueOf(subject);
             } catch (NumberFormatException exception) {
                 sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Identidad de usuario inválida");
                 return;
             }
+            // Un token sin versión (anterior a esta comprobación) cuenta como versión 0. Si la cuenta ya no
+            // existe, o su versión ha subido desde que se emitió el token, la sesión está revocada.
+            Integer versionDelToken = claims.get(JwtUtil.CLAIM_VERSION, Integer.class);
+            Optional<Integer> versionActual = usuarioRepository.findTokenVersionById(userId);
+            if (versionActual.isEmpty() || versionActual.get() != (versionDelToken == null ? 0 : versionDelToken)) {
+                sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "La sesión ya no es válida. Inicia sesión de nuevo");
+                return;
+            }
+            request.setAttribute("authenticatedUserId", userId);
         }
 
         // No incluir la ejecución del controlador dentro del try de validación JWT:

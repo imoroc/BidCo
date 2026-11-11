@@ -107,6 +107,7 @@ class RecuperacionContrasenaServiceImplTest {
         service.restablecer("tok", NUEVA_CONTRASENA);
 
         assertTrue(new BCryptPasswordEncoder().matches(NUEVA_CONTRASENA, usuario.getContrasena()));
+        assertEquals(1, usuario.getTokenVersion());
         verify(usuarioRepository).save(usuario);
         verify(tokenRepository).eliminarPorUsuario(7L);
     }

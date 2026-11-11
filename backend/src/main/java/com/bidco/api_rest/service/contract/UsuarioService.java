@@ -19,7 +19,8 @@ public interface UsuarioService {
     UsuarioResponseDTO buscarUsuarioPorNombreUsuario(String nombreUsuario);
     PerfilPublicoDTO obtenerPerfilPublico(Long id);
     PerfilPublicoDTO buscarPerfilPublicoPorNombreUsuario(String nombreUsuario);
-    void updatePassword(Long id, String password, String newPassword);
+    /** Cambia la contraseña, cierra el resto de sesiones y devuelve un token nuevo para la actual. */
+    String updatePassword(Long id, String password, String newPassword);
     PrivacidadDTO getPrivacidad(Long id);
     UsuarioResponseDTO actualizarPrivacidad(Long id, PrivacidadDTO privacidadDTO);
     StatsDTO getStats(Long usuarioId);

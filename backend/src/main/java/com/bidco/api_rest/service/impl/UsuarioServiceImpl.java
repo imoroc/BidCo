@@ -178,11 +178,12 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!passwordEncoder.matches(loginDTO.getContrasena(), usuario.getContrasena())) {
             throw new AuthenticationFailedException("Credenciales incorrectas");
         }
-        return jwtUtil.generateToken(usuario.getUsuarioID().toString(), "USER");
+        return jwtUtil.generateToken(usuario.getUsuarioID().toString(), "USER", usuario.getTokenVersion());
     }
 
     @Override
-    public void updatePassword(Long id, String currentPassword, String newPassword) {
+    @Transactional
+    public String updatePassword(Long id, String currentPassword, String newPassword) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
@@ -194,7 +195,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         usuario.setContrasena(passwordEncoder.encode(newPassword));
+        // Cierra las sesiones abiertas en otros dispositivos; la actual recibe un token nuevo y sigue activa.
+        usuario.invalidarSesiones();
         usuarioRepository.save(usuario);
+        return jwtUtil.generateToken(usuario.getUsuarioID().toString(), "USER", usuario.getTokenVersion());
     }
 
     @Override
@@ -287,6 +291,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setPrivacidadAnonimoPujas(true);
         usuario.setPrivacidadEstadisticas(false);
         usuario.setPrivacidadPerfilVisible(false);
+        // El token vigente deja de servir: la cuenta anonimizada no puede seguir actuando.
+        usuario.invalidarSesiones();
         usuarioRepository.save(usuario);
 
         tokenRecuperacionRepository.eliminarPorUsuario(id);

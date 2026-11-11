@@ -52,6 +52,10 @@ public class Usuario {
     @Column(name = "correo_verificado", nullable = false)
     private boolean correoVerificado = true;
 
+    // Versión de sesión: ver V5__version_de_token.sql.
+    @Column(name = "token_version", nullable = false)
+    private int tokenVersion = 0;
+
     @OneToMany(mappedBy = "pujador",fetch = FetchType.LAZY)
     private List<PujaSorteo> pujasSorteo;
 
@@ -204,6 +208,11 @@ public class Usuario {
     public void setSubastas(List<Subasta> subastas) {
         this.subastas = subastas;
     }
+
+    public int getTokenVersion() { return tokenVersion; }
+
+    /** Invalida todos los tokens emitidos hasta ahora para esta cuenta. */
+    public void invalidarSesiones() { this.tokenVersion++; }
 
     public boolean isCorreoVerificado() { return correoVerificado; }
     public void setCorreoVerificado(boolean correoVerificado) { this.correoVerificado = correoVerificado; }

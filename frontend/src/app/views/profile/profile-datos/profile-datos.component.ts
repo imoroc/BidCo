@@ -115,7 +115,9 @@ export class ProfileDatosComponent implements OnInit {
       currentPassword: this.currentPassword,
       newPassword: this.newPassword
     }).subscribe({
-      next: () => {
+      next: ({ token }) => {
+        // El token anterior ya no vale: se guarda el nuevo para no perder la sesión en este dispositivo.
+        localStorage.setItem('authToken', token);
         this.updatePasswdMessage = '¡Contraseña actualizada correctamente!';
         setTimeout(() => this.updatePasswdMessage = '', 3000);
         this.currentPassword = '';

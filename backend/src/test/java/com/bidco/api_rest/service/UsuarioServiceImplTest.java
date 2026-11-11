@@ -45,6 +45,7 @@ class UsuarioServiceImplTest {
     private TokenRecuperacionRepository tokenRecuperacionRepository;
     private UsuarioMapper usuarioMapper;
     private VerificacionCorreoService verificacionCorreoService;
+    private JwtUtil jwtUtil;
     private UsuarioServiceImpl service;
 
     @BeforeEach
@@ -57,6 +58,7 @@ class UsuarioServiceImplTest {
         tokenRecuperacionRepository = mock(TokenRecuperacionRepository.class);
         usuarioMapper = mock(UsuarioMapper.class);
         verificacionCorreoService = mock(VerificacionCorreoService.class);
+        jwtUtil = mock(JwtUtil.class);
         service = new UsuarioServiceImpl(
                 usuarioRepository,
                 usuarioMapper,
@@ -64,7 +66,7 @@ class UsuarioServiceImplTest {
                 subastaRepository,
                 pujaSorteoRepository,
                 sorteoRepository,
-                mock(JwtUtil.class),
+                jwtUtil,
                 tokenRecuperacionRepository,
                 Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC),
                 verificacionCorreoService);
@@ -196,6 +198,7 @@ class UsuarioServiceImplTest {
         assertNull(usuario.getLetraPiso());
         assertTrue(usuario.getPrivacidadAnonimoPujas());
         assertFalse(usuario.getPrivacidadPerfilVisible());
+        assertEquals(1, usuario.getTokenVersion());
         verify(usuarioRepository).save(usuario);
         verify(tokenRecuperacionRepository).eliminarPorUsuario(7L);
     }
@@ -308,5 +311,47 @@ class UsuarioServiceImplTest {
 
         assertTrue(usuario.isCorreoVerificado());
         verify(verificacionCorreoService, never()).enviar(any());
+    }
+
+    @Test
+    void cambiarLaContrasenaCierraLasOtrasSesionesYDevuelveUnTokenValido() {
+        String clave = "k".repeat(12);
+        Usuario usuario = usuarioConClave(clave);
+        when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
+        when(jwtUtil.generateToken("7", "USER", 1)).thenReturn("token-nuevo");
+
+        String token = service.updatePassword(7L, clave, "n".repeat(12));
+
+        assertEquals("token-nuevo", token);
+        assertEquals(1, usuario.getTokenVersion());
+        assertTrue(new BCryptPasswordEncoder().matches("n".repeat(12), usuario.getContrasena()));
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void cambiarLaContrasenaConLaActualIncorrectaNoTocaLasSesiones() {
+        Usuario usuario = usuarioConClave("k".repeat(12));
+        when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
+
+        assertThrows(ContrasenaActualIncorrectaException.class,
+                () -> service.updatePassword(7L, "z".repeat(12), "n".repeat(12)));
+
+        assertEquals(0, usuario.getTokenVersion());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void elLoginEmiteElTokenConLaVersionActualDeLaCuenta() {
+        String clave = "k".repeat(12);
+        Usuario usuario = usuarioConClave(clave);
+        usuario.invalidarSesiones();
+        usuario.invalidarSesiones();
+        when(usuarioRepository.findByNombreUsuario("ana")).thenReturn(Optional.of(usuario));
+        when(jwtUtil.generateToken("7", "USER", 2)).thenReturn("token-v2");
+        com.bidco.api_rest.dto.usuario.LoginDTO login = new com.bidco.api_rest.dto.usuario.LoginDTO();
+        login.setIdentificador("ana");
+        login.setContrasena(clave);
+
+        assertEquals("token-v2", service.login(login));
     }
 }
