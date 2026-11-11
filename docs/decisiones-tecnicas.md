@@ -63,8 +63,12 @@
   imágenes de Cloudinary (más `data:` y `blob:` para las vistas previas de imagen).
 - `style-src` mantiene `'unsafe-inline'` porque Angular inserta los estilos de los componentes en
   elementos `<style>`. Quitarlo exige un nonce (`ngCspNonce`) que Vercel no genera con un sitio estático.
-- El build de producción inserta el CSS crítico con un manejador `onload` en línea, que `script-src 'self'`
-  bloquearía. Antes de pasar a modo estricto hay que desactivar `inlineCritical` o aceptar un hash.
+- El build de producción inserta un `<script>` en línea (Beasties) que activa el CSS no crítico; con
+  `script-src 'self'` solo, en modo estricto quedaría bloqueado y los estilos principales no se aplicarían.
+  Se permite por su hash SHA-256 en `script-src` (se mantiene el CSS crítico en línea, que mejora el primer
+  pintado). `npm run csp:comprobar` lo verifica tras el build en el CI: falla si el hash deja de coincidir
+  con el script real (por ejemplo, al subir Angular) o si aparece un manejador `on…=` en `index.html`.
+  Si falla, se copia el hash nuevo que muestra el error a `frontend/vercel.json`.
 - Pasos pendientes: navegar por todas las vistas con la consola abierta, corregir lo que se vea
   y, cuando no queden avisos, cambiar la cabecera a `Content-Security-Policy`.
 - `Cross-Origin-Opener-Policy: same-origin` ya se aplica. HSTS lo añade Vercel en su dominio.

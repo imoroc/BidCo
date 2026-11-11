@@ -37,8 +37,12 @@ jobs:
         run: npm test -- --watch=false --browsers=ChromeHeadlessCI
       - name: Contraste de los tokens de color
         run: npm run test:contraste
+      - name: Pruebas de la comprobación de la CSP
+        run: npm run test:csp
       - name: Production build
         run: npm run build -- --configuration production
+      - name: Comprobar que la CSP permite los scripts en línea del build
+        run: npm run csp:comprobar
       - name: Descargar Chromium para Playwright
         # Sin --with-deps: el apt de las dependencias se cuelga en el CI y el runner ya trae las librerías.
         timeout-minutes: 4
