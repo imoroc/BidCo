@@ -126,56 +126,53 @@
   </main>
 </div>
 
-@if (showExpertForm) {
-  <div class="modal-overlay" (keydown)="onModalKeydown($event)">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
-      <form (ngSubmit)="handleFormSubmit()" class="modal-form">
-        
-        <header class="modal-header">
-          <h3 id="modal-titulo">{{ editandoComentario ? 'Editar Valoración' : 'Nueva Valoración de Experto' }}</h3>
-          <button type="button" class="btn-close" (click)="closeExpertForm()" aria-label="Cerrar">×</button>
-        </header>
+<dialog #modalExperto class="modal-card" aria-labelledby="modal-titulo" (close)="alCerrarModal()">
+  <form (ngSubmit)="handleFormSubmit()" class="modal-form">
+    
+    <header class="modal-header">
+      <h3 id="modal-titulo">{{ editandoComentario ? 'Editar Valoración' : 'Nueva Valoración de Experto' }}</h3>
+      <button type="button" class="btn-close" (click)="closeExpertForm()" aria-label="Cerrar">×</button>
+    </header>
 
-        @if (errorFormulario) {
-          <p class="form-message form-message-error" role="alert">{{ errorFormulario }}</p>
-        }
+    @if (errorFormulario) {
+      <p class="form-message form-message-error" role="alert">{{ errorFormulario }}</p>
+    }
 
-        <div class="input-group">
-          <label for="review">Tu análisis detallado:</label>
-          <textarea 
-            id="review" 
-            [(ngModel)]="comentarioEditado.comment" 
-            name="reviewText" 
-            placeholder="Describe el estado, rareza, y justificación del precio..."
-            [attr.aria-invalid]="errorFormulario && !comentarioEditado.comment ? 'true' : null"
-            required>
-          </textarea>
-        </div>
-
-        <div class="input-group">
-          <label for="estimatedPrice">Valor Estimado (€):</label>
-          <input
-            type="number"
-            id="estimatedPrice"
-            [(ngModel)]="comentarioEditado.estimated_price"
-            name="estimatedPrice"
-            min="1"
-            placeholder="0.00"
-            [attr.aria-invalid]="errorFormulario && comentarioEditado.estimated_price <= 0 ? 'true' : null"
-            required
-          >
-        </div>
-
-        <footer class="modal-actions">
-          <button type="button" class="btn-ghost" (click)="closeExpertForm()">Cancelar</button>
-          <button type="submit" class="btn-primary">
-            {{ editandoComentario ? 'Guardar Cambios' : 'Publicar Valoración' }}
-          </button>
-        </footer>
-
-      </form>
+    <div class="input-group">
+      <label for="review">Tu análisis detallado:</label>
+      <textarea 
+        id="review" 
+        [(ngModel)]="comentarioEditado.comment" 
+        name="reviewText" 
+        autofocus
+        placeholder="Describe el estado, rareza, y justificación del precio..."
+        [attr.aria-invalid]="errorFormulario && !comentarioEditado.comment ? 'true' : null"
+        required>
+      </textarea>
     </div>
-  </div>
-}
+
+    <div class="input-group">
+      <label for="estimatedPrice">Valor Estimado (€):</label>
+      <input
+        type="number"
+        id="estimatedPrice"
+        [(ngModel)]="comentarioEditado.estimated_price"
+        name="estimatedPrice"
+        min="1"
+        placeholder="0.00"
+        [attr.aria-invalid]="errorFormulario && comentarioEditado.estimated_price <= 0 ? 'true' : null"
+        required
+      >
+    </div>
+
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="closeExpertForm()">Cancelar</button>
+      <button type="submit" class="btn-primary">
+        {{ editandoComentario ? 'Guardar Cambios' : 'Publicar Valoración' }}
+      </button>
+    </footer>
+
+  </form>
+</dialog>
 
 <app-footer></app-footer>
