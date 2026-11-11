@@ -30,7 +30,9 @@ const LONGITUD_MINIMA = 10;
             <div class="alert-success">
               <span>Contraseña actualizada. Ya puedes iniciar sesión con la nueva.</span>
             </div>
-            <a routerLink="/login" class="btn-primary" style="display:block;text-align:center;text-decoration:none">Iniciar sesión</a>
+            <div class="auth-form">
+              <a routerLink="/login" class="btn-primary">Iniciar sesión</a>
+            </div>
           } @else if (!token) {
             <p class="alert-error" role="alert">
               El enlace no es válido. Pide uno nuevo desde «Recuperar contraseña».
