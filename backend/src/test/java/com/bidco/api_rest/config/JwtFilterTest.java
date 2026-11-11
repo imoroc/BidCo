@@ -58,6 +58,7 @@ class JwtFilterTest {
             "GET,/api/ping,NONE,200",
             "GET,/api/subastas,NONE,200",
             "GET,/api/subastas/5,NONE,200",
+            "GET,/api/subastas/5/eventos,NONE,200",
             "GET,/api/sorteos/3,NONE,200",
             "GET,/api/comentarios/subasta/2,NONE,200",
             "POST,/api/usuarios/login,NONE,200",

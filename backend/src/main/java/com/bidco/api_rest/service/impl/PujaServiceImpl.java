@@ -11,6 +11,7 @@ import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
 import com.bidco.api_rest.service.contract.AvisoSubastaService;
 import com.bidco.api_rest.service.contract.PujaService;
+import com.bidco.api_rest.service.contract.SubastaEventosService;
 import com.bidco.api_rest.exception.CorreoNoVerificadoException;
 import com.bidco.api_rest.exception.ForbiddenException;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,17 +35,19 @@ public class PujaServiceImpl implements PujaService {
     private final SubastaRepository subastaRepository;
     private final UsuarioRepository usuarioRepository;
     private final AvisoSubastaService avisos;
+    private final SubastaEventosService eventos;
     private final Clock clock;
     private final Duration ventanaAntisniping;
 
     public PujaServiceImpl(PujaRepository pujaRepository, PujaMapper pujaMapper, SubastaRepository subastaRepository, UsuarioRepository usuarioRepository,
-                           AvisoSubastaService avisos, Clock clock,
+                           AvisoSubastaService avisos, SubastaEventosService eventos, Clock clock,
                            @Value("${app.antisniping.minutos:5}") long minutosAntisniping) {
         this.pujaRepository = pujaRepository;
         this.pujaMapper = pujaMapper;
         this.subastaRepository = subastaRepository;
         this.usuarioRepository = usuarioRepository;
         this.avisos = avisos;
+        this.eventos = eventos;
         this.clock = clock;
         this.ventanaAntisniping = Duration.ofMinutes(Math.max(minutosAntisniping, 0));
     }
@@ -106,6 +109,7 @@ public class PujaServiceImpl implements PujaService {
                 subasta.setPrecioFinal(importe);
                 prolongarPlazoSiHaceFalta(subasta);
                 subastaRepository.save(subasta);
+                eventos.publicarPuja(subasta.getSubastaID(), importe, subasta.getFechaFinal());
             }
         }
         // Una puja a ciegas que no supera a la máxima no puede ganar: se registra sin retener saldo.

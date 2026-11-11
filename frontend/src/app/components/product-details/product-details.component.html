@@ -11,10 +11,18 @@
     <div class="product-info">
       <h1 class="product-title">{{ productoSubasta.nombreArticulo }}</h1>
       
-      <div class="price-box">
-        <span class="price-label">Precio Base</span>
-        <span class="price-value">{{ productoSubasta.precioInicial | currency:'EUR':'symbol':'1.0-2' }}</span>
-      </div>
+      @if (productoSubasta.subastaNormal === false || tipo === 'ciega') {
+        <div class="price-box">
+          <span class="price-label">Precio Base</span>
+          <span class="price-value">{{ productoSubasta.precioInicial | currency:'EUR':'symbol':'1.0-2' }}</span>
+        </div>
+      } @else {
+        <div class="price-box" aria-live="polite">
+          <span class="price-label">{{ precioActual > 0 ? 'Puja actual' : 'Precio Base' }}</span>
+          <span class="price-value">{{ (precioActual > 0 ? precioActual : productoSubasta.precioInicial) | currency:'EUR':'symbol':'1.0-2' }}</span>
+          <span class="price-cierre">Cierra el {{ cierre | date:'d MMM y, HH:mm':zona }}@if (cierreAmpliado) { · ampliado por una puja de última hora }</span>
+        </div>
+      }
 
       <div class="product-description">
         <h3>Acerca de este artículo</h3>
