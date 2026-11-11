@@ -38,7 +38,7 @@ La URL de la API está en `src/environments/`:
 | `npm start` | Servidor de desarrollo. |
 | `npm test` | Pruebas unitarias con Karma (en el CI: `npm test -- --watch=false --browsers=ChromeHeadlessCI`). |
 | `npm run build -- --configuration production` | Build de producción en `dist/frontend`. |
-| `npm run lighthouse` | Lighthouse (escritorio) sobre el build de producción: exige rendimiento ≥ 90, accesibilidad ≥ 95 y SEO ≥ 90 en `/auction`, `/login` y `/ayuda`. Bloquea la API, así que mide la aplicación sin datos. Necesita Chromium de Playwright (`npm run e2e:instalar`). |
+| `npm run lighthouse` | Lighthouse (escritorio) sobre el build de producción: exige rendimiento ≥ 90, accesibilidad ≥ 95 y SEO ≥ 90 en `/auction`, `/raffle` y `/ayuda`. Bloquea la API, así que mide la aplicación sin datos. Necesita Chromium de Playwright (`npm run e2e:instalar`). |
 | `npm run test:e2e` | Pruebas de extremo a extremo con Playwright sobre el build de producción (primero hay que compilar; la primera vez, `npx playwright install chromium`). |
 
 ## Estructura

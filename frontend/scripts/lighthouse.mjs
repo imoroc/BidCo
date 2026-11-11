@@ -9,7 +9,8 @@ import { chromium } from '@playwright/test';
 const PUERTO_WEB = 4301;
 const PUERTO_DEPURACION = 9222;
 const SALIDA = 'e2e-resultados/lighthouse';
-const RUTAS = ['/auction', '/login', '/ayuda'];
+// Solo vistas indexables: las que llevan noindex (login, registro…) suspenderían el SEO a propósito.
+const RUTAS = ['/auction', '/raffle', '/ayuda'];
 const UMBRALES = { performance: 90, accessibility: 95, seo: 90 };
 const NOMBRES = { performance: 'rendimiento', accessibility: 'accesibilidad', seo: 'SEO', 'best-practices': 'buenas prácticas' };
 
