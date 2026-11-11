@@ -47,10 +47,8 @@
               <!-- Barra que representa el rango seleccionado -->
               <div
                 class="range"
-            [ngStyle]="{
-              left: ((minPrice - minPossible) / (maxPossible - minPossible)) * 100 + '%',
-              width: ((maxPrice - minPrice) / (maxPossible - minPossible)) * 100 + '%'
-            }"
+                [style.left.%]="rangoIzquierda"
+                [style.width.%]="rangoAncho"
               ></div>
               <!-- Thumb para el precio mínimo -->
               <input
