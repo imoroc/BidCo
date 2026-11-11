@@ -1,6 +1,7 @@
 package com.bidco.api_rest.controller;
 
 import com.bidco.api_rest.dto.puja.PujaCreateDTO;
+import com.bidco.api_rest.dto.puja.PujaHistorialDTO;
 import com.bidco.api_rest.dto.puja.PujaResponseDTO;
 import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.exception.GlobalExceptionHandler;
@@ -139,6 +140,25 @@ class PujaControllerTest {
         mvc.perform(get("/api/pujas/mayor/5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.importe").value(42));
+    }
+
+    @Test
+    void elHistorialSeConsultaSinIdentificarseYNoExponeIdentificadores() throws Exception {
+        when(pujaService.obtenerHistorial(5L)).thenReturn(List.of(
+                new PujaHistorialDTO("a***", new BigDecimal("42"), LocalDate.of(2026, 11, 11))));
+
+        mvc.perform(get("/api/pujas/historial/5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].pujador").value("a***"))
+                .andExpect(jsonPath("$[0].importe").value(42))
+                .andExpect(jsonPath("$[0].pujadorID").doesNotExist());
+    }
+
+    @Test
+    void elHistorialDeUnaSubastaACiegasEnCursoDevuelve403() throws Exception {
+        when(pujaService.obtenerHistorial(5L)).thenThrow(new ForbiddenException("Pujas no visibles"));
+
+        mvc.perform(get("/api/pujas/historial/5")).andExpect(status().isForbidden());
     }
 
     @Test
