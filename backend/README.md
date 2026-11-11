@@ -35,6 +35,7 @@ Opcionales (con su valor por defecto):
 | `CORS_ALLOWED_ORIGIN_PATTERNS` | `https://bid-co-*.vercel.app` | Patrones de origen (previews de Vercel). |
 | `SESSION_COOKIE_SAME_SITE` | `none` | Cookie de la sesión de administración. En local: `lax`. |
 | `SESSION_COOKIE_SECURE` | `true` | En local sin HTTPS: `false`. |
+| `CLOUDINARY_CLOUD_NAME` | `dwgi3kagx` | Nombre de la nube de Cloudinary (no es un secreto). |
 | `SWAGGER_ENABLED` | `false` | Activa `/swagger-ui.html`. |
 | `BREVO_API_KEY` | vacío | Clave de Brevo para enviar el correo de recuperación. |
 | `MAIL_FROM` | vacío | Remitente verificado en Brevo. |
