@@ -197,6 +197,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || path.matches("/api/subastas/\\d+/eventos")
                 || path.matches("/api/sorteos/\\d+")
                 || path.matches("/api/pujas/mayor/\\d+")
+                || path.matches("/api/pujas/historial/\\d+")
                 || path.matches("/api/comentarios/\\d+")
                 || path.matches("/api/comentarios/subasta/\\d+")
                 || path.equals("/swagger-ui.html")
