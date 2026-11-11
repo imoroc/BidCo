@@ -2,10 +2,12 @@ package com.bidco.api_rest.controller;
 
 import com.bidco.api_rest.dto.subasta.SubastaCreateDTO;
 import com.bidco.api_rest.dto.subasta.SubastaResponseDTO;
+import com.bidco.api_rest.dto.subasta.SubastaUpdateDTO;
 import com.bidco.api_rest.dto.FiltroDTO;
 import com.bidco.api_rest.service.contract.SubastaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +38,22 @@ public class SubastaController {
     @GetMapping("/{id}")
     public SubastaResponseDTO buscarSubastaPorId(@PathVariable Long id) {
         return subastaService.buscarSubastaPorId(id);
+    }
+
+    @PutMapping("/{id}")
+    public SubastaResponseDTO actualizarSubasta(
+            @PathVariable Long id,
+            @RequestBody @Valid SubastaUpdateDTO datos,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        return subastaService.actualizarSubasta(id, authenticatedUserId, datos);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelarSubasta(
+            @PathVariable Long id,
+            @RequestAttribute("authenticatedUserId") Long authenticatedUserId) {
+        subastaService.cancelarSubasta(id, authenticatedUserId);
     }
 
     @PutMapping("/final/{id}")
