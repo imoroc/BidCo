@@ -19,6 +19,12 @@ public interface SubastaService {
     /** Cambia nombre, descripción y categoría. Solo el creador y mientras no haya pujas ni haya cerrado. */
     SubastaResponseDTO actualizarSubasta(Long id, Long usuarioId, SubastaUpdateDTO datos);
 
+    /**
+     * Retira una subasta por moderación, con independencia de quién la creó y de si tiene pujas. Devuelve el
+     * importe retenido a quien lideraba y avisa al creador con el motivo. No se puede si ya tiene ganador.
+     */
+    void retirarPorModeracion(Long id, String motivo);
+
     /** Retira la subasta. Solo el creador y mientras no haya pujas ni haya cerrado. */
     void cancelarSubasta(Long id, Long usuarioId);
     void asignarGanadorYActualizarPrecioFinal(Long id);

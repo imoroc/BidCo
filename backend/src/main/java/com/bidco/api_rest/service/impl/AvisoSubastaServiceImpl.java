@@ -57,6 +57,29 @@ public class AvisoSubastaServiceImpl implements AvisoSubastaService {
         enviarTrasConfirmar(ganador.getCorreoElectronico(), "Has ganado «" + subasta.getNombreArticulo() + "»", html);
     }
 
+    @Override
+    public void subastaRetiradaAlCreador(Usuario creador, Subasta subasta, String motivo) {
+        if (!puedeRecibirAvisos(creador)) {
+            return;
+        }
+        String html = "<p>La administración de BidCo ha retirado tu subasta de «" + escapar(subasta.getNombreArticulo()) + "».</p>"
+                + "<p>Motivo: " + escapar(motivo) + "</p>"
+                + "<p>Se te han retirado los puntos que recibiste por crearla. Si crees que ha sido un error, "
+                + "puedes escribirnos desde la página de contacto.</p>";
+        enviarTrasConfirmar(creador.getCorreoElectronico(), "Hemos retirado tu subasta «" + subasta.getNombreArticulo() + "»", html);
+    }
+
+    @Override
+    public void subastaRetiradaAlPujador(Usuario pujador, Subasta subasta, BigDecimal devuelto) {
+        if (!puedeRecibirAvisos(pujador)) {
+            return;
+        }
+        String html = "<p>La subasta de «" + escapar(subasta.getNombreArticulo()) + "», en la que ibas ganando, "
+                + "ha sido retirada por la administración de BidCo.</p>"
+                + "<p>Te hemos devuelto " + formatear(devuelto) + " a tu saldo.</p>";
+        enviarTrasConfirmar(pujador.getCorreoElectronico(), "Subasta retirada: «" + subasta.getNombreArticulo() + "»", html);
+    }
+
     private boolean puedeRecibirAvisos(Usuario usuario) {
         return usuario != null
                 && usuario.isCorreoVerificado()
