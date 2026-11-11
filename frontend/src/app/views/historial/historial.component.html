@@ -23,6 +23,9 @@
           <a [routerLink]="[product.subastaNormal ? '/auction/product' : '/blind-auctions/product', product.subastaID]" class="product-link">
             <app-product-item [product]="product"></app-product-item>
           </a>
+          @if (deSubastasListado) {
+            <app-acciones-subasta [subasta]="product" (cancelada)="subastaCancelada($event)" (actualizada)="subastaActualizada($event)"></app-acciones-subasta>
+          }
         </article>
       }
     </section>

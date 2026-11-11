@@ -105,3 +105,15 @@
   avisa a nadie. El envío es asíncrono y un fallo del proveedor se registra sin afectar a la puja ni al cierre.
 - El nombre del artículo lo escribe un usuario: se escapa antes de ir dentro del HTML del correo.
 - No hay ajuste para desactivarlos. Añadirlo exige una columna en `usuario` (migración nueva); queda para otra PR.
+
+## Editar y cancelar la subasta propia
+
+- El creador puede cambiar nombre, descripción y categoría, o retirar la subasta, solo mientras no tenga pujas ni
+  haya cerrado. Una vez que alguien ha pujado, lo que se ofrece ya no puede cambiar. No se pueden tocar precio,
+  fechas ni tipo.
+- La comprobación y el cambio van bajo el mismo bloqueo de fila que las pujas: una puja simultánea no se cuela.
+- Cancelar borra la subasta (no hay pujas) y los comentarios de expertos asociados, y devuelve los 50 puntos que
+  dio crearla. La imagen se queda en Cloudinary: el servicio no tiene operación de borrado.
+- En «Tus subastas» cada tarjeta abierta muestra «Editar» y «Cancelar subasta» (con confirmación). El listado no
+  informa de si hay pujas, así que el botón se ofrece siempre y el servidor decide; si responde 409 se explica el
+  motivo. Evita una consulta extra por tarjeta; se puede afinar añadiendo un indicador a la respuesta del listado.

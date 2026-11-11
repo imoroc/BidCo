@@ -427,7 +427,8 @@ Pendiente:
 - [ ] Pruebas e2e del flujo completo (registro, verificación, puja y cierre) con backend y PostgreSQL en el CI.
 - [x] Avisos por correo («te han superado», «has ganado»).
 - [ ] Pujas en tiempo real.
-- [ ] Editar y cancelar la subasta propia, y moderación desde la administración.
+- [x] Editar y cancelar la subasta propia (mientras no tenga pujas).
+- [ ] Moderación de subastas desde la administración.
 - [ ] Favoritos y valoraciones.
 - [ ] Cabeceras de seguridad y CSP también en el frontend (hoy la CSP está en modo informe).
 - [ ] Limitador de peticiones compartido entre instancias (hoy es en memoria).
