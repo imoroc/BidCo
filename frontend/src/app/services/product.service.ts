@@ -16,6 +16,8 @@ export interface SubastaResponseDto {
     comentarios: any[];
     pujas: any[];
     privacidad_anonimo: boolean;
+    /** false en las subastas a ciegas (el precio final no se muestra). */
+    subastaNormal?: boolean;
 }
 
 export interface SorteoResponseDto {

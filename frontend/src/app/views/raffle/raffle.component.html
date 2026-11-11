@@ -26,7 +26,7 @@
       @for (product of listado.items(); track product.sorteoID) {
         <article class="product-wrapper">
           <a [routerLink]="['/raffle/product', product.sorteoID]" class="product-link">
-            <app-product-item [product]="product"></app-product-item>
+            <app-product-item [product]="product" [prioridad]="$first"></app-product-item>
           </a>
         </article>
       }

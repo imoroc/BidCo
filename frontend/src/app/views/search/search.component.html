@@ -33,7 +33,7 @@
         @for (product of listado.items(); track product.subastaID) {
           <article class="product-wrapper">
             <a [routerLink]="[product.subastaNormal ? '/auction/product' : '/blind-auctions/product', product.subastaID]" class="product-link">
-              <app-product-item [product]="product"></app-product-item>
+              <app-product-item [product]="product" [prioridad]="$first"></app-product-item>
             </a>
           </article>
         }
