@@ -72,6 +72,52 @@ Usuario y experto se identifican con un token JWT y tienen su propio acceso (`/l
 - Al cerrarse, el ganador se elige con `SecureRandom` y probabilidad proporcional a los puntos aportados.
 - El resultado es definitivo: un sorteo cerrado no se puede volver a tirar.
 
+**Flujo de una puja.** Todo ocurre en una sola transacción: si una validación falla, no se persiste nada.
+
+```mermaid
+sequenceDiagram
+    actor U as Pujador
+    participant F as Angular
+    participant A as API
+    participant DB as PostgreSQL
+    U->>F: Introduce el importe
+    F->>A: POST /api/pujas
+    A->>DB: Bloquea la subasta (FOR UPDATE)
+    A->>A: Comprueba con la hora del servidor que está abierta
+    A->>A: Rechaza al creador de la subasta
+    alt Subasta normal
+        A->>A: El importe debe superar la puja actual
+    else Subasta a ciegas
+        A->>A: El importe debe superar el precio base
+    end
+    alt La puja pasa a liderar
+        A->>DB: Bloquea a los usuarios en orden de id
+        A->>DB: Devuelve el saldo al líder anterior
+        A->>A: Exige correo verificado y saldo suficiente
+        A->>DB: Retiene el importe del saldo
+        opt Subasta normal
+            A->>DB: Actualiza el precio y aplica el anti-sniping
+        end
+    end
+    A->>DB: Guarda la puja
+    A-->>F: Devuelve la puja
+    F-->>U: Muestra el resultado
+```
+
+**Ciclo de vida de una subasta.** El cierre lo hace el proceso programado (cada minuto) o la primera petición que lo pida; es idempotente, así que da igual quién llegue antes.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Programada: Se crea la subasta
+    Programada --> Abierta: Llega la fecha de inicio
+    Abierta --> Abierta: Puja líder cerca del cierre, se retrasa el cierre
+    Abierta --> Vencida: Pasa la hora de cierre
+    Vencida --> Cerrada: Hay pujas, gana la más alta y recibe puntos
+    Vencida --> Desierta: No hay pujas, se cierra sin ganador
+    Cerrada --> [*]
+    Desierta --> [*]
+```
+
 ## Stack tecnológico
 
 | Área | Tecnología |
