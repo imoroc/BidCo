@@ -80,8 +80,35 @@
 /* --- INPUTS DE PRECIO Y SELECT --- */
 .price-filter {
   display: flex;
-  gap: 6px;
+  align-items: flex-end;
+  gap: 8px;
 }
+
+.price-field { flex: 1 1 0; min-width: 0; display: block; }
+
+.price-field__etiqueta {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-texto-suave);
+}
+
+.price-field__caja { position: relative; display: block; }
+
+.price-field__caja input[type="number"] { padding-right: 24px; text-align: right; }
+
+.price-field__moneda {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 600;
+  color: var(--color-texto-suave);
+  pointer-events: none;
+}
+
+.price-sep { padding-bottom: 10px; color: var(--color-texto-suave); }
 
 .filter-container input[type="number"],
 .filter-container select {

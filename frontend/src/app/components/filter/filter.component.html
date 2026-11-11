@@ -22,23 +22,40 @@
     <!-- Filtro de Precio -->
     <fieldset>
       <legend>Precio</legend>
-      <!-- Inputs numéricos -->
+      <!-- Campos numéricos con el símbolo de la moneda -->
       <div class="price-filter">
-        <input
-          type="number"
-          placeholder="Mínimo"
-          name="minPriceInput"
-          [(ngModel)]="minPrice"
-          (input)="applyFilter('min')"
-          />
-          <input
-            type="number"
-            placeholder="Máximo"
-            name="maxPriceInput"
-            [(ngModel)]="maxPrice"
-            (input)="applyFilter('max')"
-            />
-          </div>
+        <label class="price-field">
+          <span class="price-field__etiqueta">Mínimo</span>
+          <span class="price-field__caja">
+            <input
+              type="number"
+              inputmode="numeric"
+              min="0"
+              placeholder="0"
+              name="minPriceInput"
+              [(ngModel)]="minPrice"
+              (input)="applyFilter('min')"
+              />
+            <span class="price-field__moneda" aria-hidden="true">€</span>
+          </span>
+        </label>
+        <span class="price-sep" aria-hidden="true">–</span>
+        <label class="price-field">
+          <span class="price-field__etiqueta">Máximo</span>
+          <span class="price-field__caja">
+            <input
+              type="number"
+              inputmode="numeric"
+              min="0"
+              placeholder="Sin límite"
+              name="maxPriceInput"
+              [(ngModel)]="maxPrice"
+              (input)="applyFilter('max')"
+              />
+            <span class="price-field__moneda" aria-hidden="true">€</span>
+          </span>
+        </label>
+      </div>
 
           <!-- Slider de rango dual -->
           <div class="range-slider">
