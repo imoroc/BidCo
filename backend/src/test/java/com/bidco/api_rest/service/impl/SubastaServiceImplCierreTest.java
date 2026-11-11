@@ -6,6 +6,7 @@ import com.bidco.api_rest.mapper.UsuarioMapper;
 import com.bidco.api_rest.model.Puja;
 import com.bidco.api_rest.model.Subasta;
 import com.bidco.api_rest.model.Usuario;
+import com.bidco.api_rest.repository.ComentarioRepository;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
@@ -48,7 +49,7 @@ class SubastaServiceImplCierreTest {
         avisos = mock(AvisoSubastaService.class);
         Clock reloj = Clock.fixed(Instant.parse("2026-11-10T10:00:00Z"), ZoneId.of("Europe/Madrid"));
         servicio = new SubastaServiceImpl(subastaRepository, mock(SubastaMapper.class), mock(UsuarioMapper.class),
-                usuarioRepository, pujaRepository, mock(PujaMapper.class), mock(CloudinaryService.class), avisos, reloj);
+                usuarioRepository, pujaRepository, mock(PujaMapper.class), mock(CloudinaryService.class), avisos, mock(ComentarioRepository.class), reloj);
 
         subasta = new Subasta();
         subasta.setSubastaNormal(true);

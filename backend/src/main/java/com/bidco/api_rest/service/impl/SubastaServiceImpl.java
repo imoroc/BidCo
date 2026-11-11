@@ -2,6 +2,7 @@ package com.bidco.api_rest.service.impl;
 
 import com.bidco.api_rest.dto.subasta.SubastaCreateDTO;
 import com.bidco.api_rest.dto.subasta.SubastaResponseDTO;
+import com.bidco.api_rest.dto.subasta.SubastaUpdateDTO;
 import com.bidco.api_rest.dto.FiltroDTO;
 import com.bidco.api_rest.mapper.PujaMapper;
 import com.bidco.api_rest.mapper.SubastaMapper;
@@ -9,7 +10,9 @@ import com.bidco.api_rest.mapper.UsuarioMapper;
 import com.bidco.api_rest.model.Puja;
 import com.bidco.api_rest.model.Subasta;
 import com.bidco.api_rest.exception.CorreoNoVerificadoException;
+import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.model.Usuario;
+import com.bidco.api_rest.repository.ComentarioRepository;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
@@ -25,10 +28,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bidco.api_rest.util.FechasCierre;
 import java.time.Clock;
 import java.time.Instant;
+import java.text.Normalizer;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class SubastaServiceImpl implements SubastaService {
+
+    /** Puntos que recibe quien crea una subasta; se devuelven si la retira. */
+    private static final int PUNTOS_POR_CREAR = 50;
 
 
     private final SubastaRepository subastaRepository;
@@ -39,11 +47,12 @@ public class SubastaServiceImpl implements SubastaService {
     private final PujaMapper pujaMapper;
     private final CloudinaryService cloudinaryService;
     private final AvisoSubastaService avisos;
+    private final ComentarioRepository comentarioRepository;
     private final Clock clock;
 
     public SubastaServiceImpl(SubastaRepository subastaRepository, SubastaMapper subastaMapper, UsuarioMapper usuarioMapper,
                 UsuarioRepository usuarioRepository, PujaRepository pujaRepository, PujaMapper pujaMapper,
-                CloudinaryService cloudinaryService, AvisoSubastaService avisos, Clock clock) {
+                CloudinaryService cloudinaryService, AvisoSubastaService avisos, ComentarioRepository comentarioRepository, Clock clock) {
         this.subastaRepository = subastaRepository;
         this.subastaMapper = subastaMapper;
         this.usuarioMapper = usuarioMapper;
@@ -52,6 +61,7 @@ public class SubastaServiceImpl implements SubastaService {
         this.pujaMapper = pujaMapper;
         this.cloudinaryService = cloudinaryService;
         this.avisos = avisos;
+        this.comentarioRepository = comentarioRepository;
         this.clock = clock;
     }
 
@@ -77,7 +87,7 @@ public class SubastaServiceImpl implements SubastaService {
         if (!user.isCorreoVerificado()) {
             throw new CorreoNoVerificadoException();
         }
-        user.setPuntos(user.getPuntos() + 50);
+        user.setPuntos(user.getPuntos() + PUNTOS_POR_CREAR);
 
         if(imagen != null && !imagen.isEmpty()) {
             try {
@@ -108,6 +118,55 @@ public class SubastaServiceImpl implements SubastaService {
                 .orElseThrow(() -> new EntityNotFoundException("Subasta no encontrada"));
 
         return subastaMapper.subastaToSubastaResponseDTO(subasta);
+    }
+
+    @Override
+    @Transactional
+    public SubastaResponseDTO actualizarSubasta(Long id, Long usuarioId, SubastaUpdateDTO datos) {
+        Subasta subasta = obtenerModificable(id, usuarioId);
+        subasta.setNombreArticulo(datos.getNombreArticulo().trim());
+        subasta.setDescripcion(datos.getDescripcion().trim());
+        subasta.setCategoria(normalizarCategoria(datos.getCategoria()));
+        subastaRepository.save(subasta);
+        return subastaMapper.subastaToSubastaResponseDTO(subasta);
+    }
+
+    @Override
+    @Transactional
+    public void cancelarSubasta(Long id, Long usuarioId) {
+        Subasta subasta = obtenerModificable(id, usuarioId);
+        // Crear la subasta dio 50 puntos: al retirarla se devuelven, para que no se pueda abusar de ello.
+        Usuario creador = usuarioRepository.findByIdForUpdate(usuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        creador.setPuntos(Math.max(0, creador.getPuntos() - PUNTOS_POR_CREAR));
+        usuarioRepository.save(creador);
+        comentarioRepository.eliminarPorSubasta(id);
+        subastaRepository.delete(subasta);
+    }
+
+    /**
+     * Devuelve la subasta bloqueada si el usuario es su creador y todavía se puede tocar. El bloqueo es el
+     * mismo que usan las pujas, así que una puja simultánea no puede colarse entre la comprobación y el cambio.
+     */
+    private Subasta obtenerModificable(Long id, Long usuarioId) {
+        Subasta subasta = subastaRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subasta no encontrada"));
+        if (subasta.getCreador() == null || !subasta.getCreador().getUsuarioID().equals(usuarioId)) {
+            throw new ForbiddenException("Solo el creador puede modificar la subasta");
+        }
+        if (!clock.instant().isBefore(subasta.getFechaFinal())) {
+            throw new IllegalStateException("La subasta ya cerró y no se puede modificar");
+        }
+        if (pujaRepository.haySubastaConPujas(id)) {
+            throw new IllegalStateException("La subasta ya tiene pujas y no se puede modificar");
+        }
+        return subasta;
+    }
+
+    /** Las categorías se guardan en minúsculas y sin tildes («tecnologia», «moda»…). */
+    static String normalizarCategoria(String categoria) {
+        String sinTildes = Normalizer.normalize(categoria.trim(), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+        return sinTildes.toLowerCase(Locale.ROOT);
     }
 
     @Override
