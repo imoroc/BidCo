@@ -13,6 +13,10 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
+    /** Versión de sesión vigente de una cuenta; vacío si la cuenta no existe. */
+    @Query("SELECT u.tokenVersion FROM Usuario u WHERE u.usuarioID = :id")
+    Optional<Integer> findTokenVersionById(@Param("id") Long id);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT u FROM Usuario u WHERE u.usuarioID = :id")
     Optional<Usuario> findByIdForUpdate(@Param("id") Long id);

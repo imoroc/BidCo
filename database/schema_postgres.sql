@@ -37,7 +37,8 @@ CREATE TABLE usuario (
     privacidad_anonimo_pujas BOOLEAN DEFAULT FALSE,
     privacidad_estadisticas BOOLEAN DEFAULT TRUE,
     privacidad_perfil_visible BOOLEAN DEFAULT TRUE,
-    correo_verificado BOOLEAN NOT NULL DEFAULT TRUE
+    correo_verificado BOOLEAN NOT NULL DEFAULT TRUE,
+    token_version INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE token_recuperacion (
