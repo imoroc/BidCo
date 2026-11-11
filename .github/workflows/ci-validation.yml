@@ -40,7 +40,7 @@ jobs:
       - name: Production build
         run: npm run build -- --configuration production
       - name: Instalar Chromium para Playwright
-        run: npx playwright install --with-deps chromium
+        run: npm run e2e:instalar
       - name: Pruebas e2e (humo, accesibilidad y capturas)
         run: npm run test:e2e
       - name: Subir capturas
