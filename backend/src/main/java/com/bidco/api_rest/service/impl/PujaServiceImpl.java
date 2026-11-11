@@ -9,6 +9,7 @@ import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
+import com.bidco.api_rest.service.contract.AvisoSubastaService;
 import com.bidco.api_rest.service.contract.PujaService;
 import com.bidco.api_rest.exception.CorreoNoVerificadoException;
 import com.bidco.api_rest.exception.ForbiddenException;
@@ -32,15 +33,18 @@ public class PujaServiceImpl implements PujaService {
     private final PujaMapper pujaMapper;
     private final SubastaRepository subastaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final AvisoSubastaService avisos;
     private final Clock clock;
     private final Duration ventanaAntisniping;
 
-    public PujaServiceImpl(PujaRepository pujaRepository, PujaMapper pujaMapper, SubastaRepository subastaRepository, UsuarioRepository usuarioRepository, Clock clock,
+    public PujaServiceImpl(PujaRepository pujaRepository, PujaMapper pujaMapper, SubastaRepository subastaRepository, UsuarioRepository usuarioRepository,
+                           AvisoSubastaService avisos, Clock clock,
                            @Value("${app.antisniping.minutos:5}") long minutosAntisniping) {
         this.pujaRepository = pujaRepository;
         this.pujaMapper = pujaMapper;
         this.subastaRepository = subastaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.avisos = avisos;
         this.clock = clock;
         this.ventanaAntisniping = Duration.ofMinutes(Math.max(minutosAntisniping, 0));
     }
@@ -107,7 +111,22 @@ public class PujaServiceImpl implements PujaService {
         // Una puja a ciegas que no supera a la máxima no puede ganar: se registra sin retener saldo.
 
         pujaRepository.save(puja);
+        avisarSiSeHaSuperado(subasta, pujaAnterior, pujadorId, lidera, importe);
         return pujaMapper.pujaToPujaResponseDTO(puja);
+    }
+
+    /**
+     * Avisa a quien lideraba de que lo han superado. Solo en subastas normales: en las a ciegas nadie
+     * debe saber qué ofrecen los demás. No se avisa a quien se supera a sí mismo.
+     */
+    private void avisarSiSeHaSuperado(Subasta subasta, Puja pujaAnterior, Long pujadorId, boolean lidera, BigDecimal importe) {
+        if (!lidera || !subasta.isSubastaNormal() || pujaAnterior == null) {
+            return;
+        }
+        Usuario superado = pujaAnterior.getPujador();
+        if (superado != null && !superado.getUsuarioID().equals(pujadorId)) {
+            avisos.pujaSuperada(superado, subasta, importe);
+        }
     }
 
     /**

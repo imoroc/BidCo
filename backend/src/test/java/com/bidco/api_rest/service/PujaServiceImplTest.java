@@ -10,6 +10,7 @@ import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
+import com.bidco.api_rest.service.contract.AvisoSubastaService;
 import com.bidco.api_rest.service.impl.PujaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ class PujaServiceImplTest {
     private PujaMapper pujaMapper;
     private SubastaRepository subastaRepository;
     private UsuarioRepository usuarioRepository;
+    private AvisoSubastaService avisos;
     private PujaServiceImpl service;
 
     @BeforeEach
@@ -41,8 +43,9 @@ class PujaServiceImplTest {
         pujaMapper = mock(PujaMapper.class);
         subastaRepository = mock(SubastaRepository.class);
         usuarioRepository = mock(UsuarioRepository.class);
+        avisos = mock(AvisoSubastaService.class);
         Clock clock = Clock.fixed(Instant.parse("2026-06-15T10:00:00Z"), ZoneOffset.UTC);
-        service = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, clock, 5L);
+        service = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, avisos, clock, 5L);
     }
 
     private static Instant finDeDia(LocalDate dia) {
@@ -211,7 +214,7 @@ class PujaServiceImplTest {
     @Test
     void conLaVentanaACeroElAntisnipingEstaDesactivado() {
         Clock clock = Clock.fixed(Instant.parse("2026-06-15T10:00:00Z"), ZoneOffset.UTC);
-        PujaServiceImpl sinAntisniping = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, clock, 0L);
+        PujaServiceImpl sinAntisniping = new PujaServiceImpl(pujaRepository, pujaMapper, subastaRepository, usuarioRepository, avisos, clock, 0L);
         Subasta s = subasta(true, HOY.minusDays(1), HOY);
         s.setFechaFinal(Instant.parse("2026-06-15T10:02:00Z"));
         when(subastaRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(s));
@@ -251,5 +254,56 @@ class PujaServiceImplTest {
         when(pujaRepository.findTopBySubastaIdOrderByImporteDesc(1L)).thenReturn(new Puja());
 
         assertDoesNotThrow(() -> service.obtenerPujaMasAlta(1L));
+    }
+
+    /** Deja a {@code anteriorId} como líder con 15 y prepara una puja de 20 del usuario 5. */
+    private Usuario lideraAntes(Subasta s, long anteriorId) {
+        Usuario anterior = usuario(anteriorId, "0");
+        Puja pujaAnterior = new Puja();
+        pujaAnterior.setPujador(anterior);
+        pujaAnterior.setImporte(new BigDecimal("15"));
+        when(subastaRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(s));
+        when(pujaRepository.findTopBySubastaIdOrderByImporteDesc(1L)).thenReturn(pujaAnterior);
+        when(usuarioRepository.findByIdForUpdate(anteriorId)).thenReturn(Optional.of(anterior));
+        when(usuarioRepository.findByIdForUpdate(5L)).thenReturn(Optional.of(usuario(5L, "100")));
+        when(pujaMapper.pujaCreateDTOToPuja(any())).thenReturn(new Puja());
+        return anterior;
+    }
+
+    @Test
+    void alSuperarAlLiderDeUnaSubastaNormalSeLeAvisa() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY.plusDays(5));
+        Usuario anterior = lideraAntes(s, 7L);
+
+        service.crearPuja(dto("20"));
+
+        verify(avisos).pujaSuperada(anterior, s, new BigDecimal("20"));
+    }
+
+    @Test
+    void enSubastaACiegasNoSeAvisaDeQueHanSuperadoAlguien() {
+        Subasta s = subasta(false, HOY.minusDays(1), HOY.plusDays(5));
+        lideraAntes(s, 7L);
+
+        service.crearPuja(dto("20"));
+
+        verify(avisos, never()).pujaSuperada(any(), any(), any());
+    }
+
+    @Test
+    void quienSeSuperaASiMismoNoRecibeAviso() {
+        Subasta s = subasta(true, HOY.minusDays(1), HOY.plusDays(5));
+        lideraAntes(s, 5L);
+
+        service.crearPuja(dto("20"));
+
+        verify(avisos, never()).pujaSuperada(any(), any(), any());
+    }
+
+    @Test
+    void laPrimeraPujaNoAvisaANadie() {
+        pujaValidaSobre(subasta(true, HOY.minusDays(1), HOY.plusDays(5)));
+
+        verify(avisos, never()).pujaSuperada(any(), any(), any());
     }
 }
