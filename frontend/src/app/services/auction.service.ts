@@ -12,6 +12,17 @@ export interface SubastaResponseDTO {
     fechaFinal: string;
 }
 
+/** Ficha completa de una subasta (el listado no incluye la descripción). */
+export interface SubastaDetalleDTO extends SubastaResponseDTO {
+    descripcion: string;
+}
+
+export interface SubastaEdicionDTO {
+    nombreArticulo: string;
+    descripcion: string;
+    categoria: string;
+}
+
 export interface Filtro {
     minPrice: number, 
     maxPrice: number, 
@@ -28,6 +39,18 @@ export class SubastaService {
     private subastasUrl = `${environment.apiUrl}/subastas`;
 
     constructor(private http: HttpClient) {}
+
+    obtenerSubasta(id: number): Observable<SubastaDetalleDTO> {
+        return this.http.get<SubastaDetalleDTO>(`${this.subastasUrl}/${id}`);
+    }
+
+    actualizarSubasta(id: number, datos: SubastaEdicionDTO): Observable<SubastaResponseDTO> {
+        return this.http.put<SubastaResponseDTO>(`${this.subastasUrl}/${id}`, datos);
+    }
+
+    cancelarSubasta(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.subastasUrl}/${id}`);
+    }
 
     getSubastasFiltradasNormal(filtro: HttpParams): Observable<SubastaResponseDTO[]> {
         return this.http.get<SubastaResponseDTO[]>(`${this.subastasUrl}/filtro-normal`, {params: filtro});
