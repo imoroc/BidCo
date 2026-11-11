@@ -20,6 +20,8 @@
     <properties>
         <java.version>25</java.version>
         <jjwt.version>0.13.0</jjwt.version>
+        <!-- Mínimo de cobertura de líneas (0-1). Medido en el CI: 50,6 % (11-nov-2026). Subirlo al mejorar, nunca bajarlo. -->
+        <jacoco.minimo.lineas>0.48</jacoco.minimo.lineas>
     </properties>
 
     <dependencies>
@@ -130,6 +132,27 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>umbral</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.minimo.lineas}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
