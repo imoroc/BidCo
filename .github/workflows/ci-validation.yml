@@ -39,6 +39,26 @@ jobs:
         run: npm run test:contraste
       - name: Production build
         run: npm run build -- --configuration production
+      - name: Instalar Chromium para Playwright
+        run: npm run e2e:instalar
+      - name: Pruebas e2e (humo, accesibilidad y capturas)
+        run: npm run test:e2e
+      - name: Subir capturas
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: capturas
+          path: frontend/e2e-resultados/capturas
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Subir trazas de las pruebas e2e fallidas
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: trazas-e2e
+          path: frontend/e2e-resultados/ejecuciones
+          if-no-files-found: ignore
+          retention-days: 7
 
   backend-checks:
     name: Backend (Spring Boot)

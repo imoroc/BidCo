@@ -38,6 +38,7 @@ La URL de la API está en `src/environments/`:
 | `npm start` | Servidor de desarrollo. |
 | `npm test` | Pruebas unitarias con Karma (en el CI: `npm test -- --watch=false --browsers=ChromeHeadlessCI`). |
 | `npm run build -- --configuration production` | Build de producción en `dist/frontend`. |
+| `npm run test:e2e` | Pruebas de extremo a extremo con Playwright sobre el build de producción (primero hay que compilar; la primera vez, `npx playwright install chromium`). |
 
 ## Estructura
 
@@ -49,6 +50,15 @@ src/app/
   interceptors/  Token JWT y gestión de errores HTTP
   utils/         Fechas, filtrado de listados y loader de imágenes de Cloudinary
 ```
+
+## Pruebas e2e
+
+Las pruebas de `e2e/` usan Playwright y sirven `dist/frontend/browser` con un servidor estático propio. La API se simula con `page.route`, así que no hacen falta backend ni base de datos. Se ejecutan en tres proyectos (escritorio, móvil y modo oscuro):
+
+- `humo.spec.ts`: cada ruta pública carga con su título y sin errores de JavaScript.
+- `listado.spec.ts`: el listado de subastas muestra lo que devuelve la API y el aviso de «sin resultados».
+- `accesibilidad.spec.ts`: axe-core (WCAG 2.1 A y AA) no encuentra infracciones graves ni críticas.
+- `capturas.spec.ts`: guarda una captura por vista y proyecto en `e2e-resultados/capturas`; el CI las sube como artefacto `capturas`.
 
 ## Convenciones
 

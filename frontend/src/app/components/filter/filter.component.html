@@ -56,6 +56,7 @@
               <input
                 type="range"
                 name="minRange"
+                aria-label="Precio mínimo"
                 class="thumb thumb--left"
                 [min]="minPossible"
                 [max]="maxPossible"
@@ -66,6 +67,7 @@
                 <input
                   type="range"
                   name="maxRange"
+                  aria-label="Precio máximo"
                   class="thumb thumb--right"
                   [min]="minPossible"
                   [max]="maxPossible"
@@ -100,7 +102,7 @@
               <fieldset>
                 <legend>Fecha Restante</legend>
                 <div class="date-filter">
-                  <select name="dateOrder" [(ngModel)]="dateOrder" (change)="applyFilter()">
+                  <select name="dateOrder" aria-label="Ordenar por fecha restante" [(ngModel)]="dateOrder" (change)="applyFilter()">
                     <option value="">Por Defecto</option>
                     <option value="asc">Ascendente</option>
                     <option value="desc">Descendente</option>
