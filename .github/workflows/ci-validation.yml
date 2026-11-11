@@ -42,7 +42,7 @@ jobs:
       - name: Descargar Chromium para Playwright
         # Sin --with-deps: el apt de las dependencias se cuelga en el CI y el runner ya trae las librerías.
         timeout-minutes: 4
-        run: npx playwright install chromium
+        run: npm run e2e:descargar
       - name: Pruebas e2e (humo, accesibilidad y capturas)
         run: npm run test:e2e
       - name: Lighthouse (rendimiento, accesibilidad y SEO)
