@@ -346,18 +346,30 @@ El mismo correo se usa para verificar la cuenta. Al registrarse, o al cambiar de
 ## Pruebas y CI
 
 ```bash
-# Backend (compila y ejecuta las pruebas)
+# Backend (compila, ejecuta las pruebas y comprueba el mínimo de cobertura)
 cd backend && ./mvnw clean verify
 
-# Frontend
+# Frontend: pruebas unitarias
 cd frontend && npm test
+
+# Frontend: e2e con Playwright sobre el build de producción
+cd frontend && npm run build -- --configuration production
+npm run e2e:instalar   # solo la primera vez (descarga Chromium)
+npm run test:e2e
+
+# Frontend: Lighthouse sobre el mismo build
+npm run lighthouse
 ```
 
 El workflow [`CI Validation`](.github/workflows/ci-validation.yml) se ejecuta en cada PR hacia `deploy` y en cada push a `deploy` y `master`:
 
-- **Frontend:** `npm ci`, `npm audit --omit=dev`, pruebas con Chrome headless y build de producción.
-- **Backend:** `mvn clean verify` con Java 25.
+- **Frontend:** `npm ci`, `npm audit --audit-level=moderate`, pruebas unitarias con Chrome headless, prueba de contraste de los tokens de color, build de producción, pruebas e2e y Lighthouse.
+- **Backend:** `mvn clean verify` con Java 25: pruebas de servicios, de filtros y de controladores (MockMvc), pruebas de repositorios y migraciones contra PostgreSQL real (Testcontainers) y un mínimo de cobertura de líneas con JaCoCo (`jacoco.minimo.lineas` en el `pom.xml`, hoy el 48 %).
 - **Revisión de dependencias** en las PR.
+
+Las pruebas e2e (`frontend/e2e`) se ejecutan en escritorio, móvil y modo oscuro, con la API simulada, y comprueban que las rutas públicas cargan sin errores, que el listado de subastas se pinta y que axe-core (WCAG 2.1 A y AA) no encuentra infracciones graves. Lighthouse exige rendimiento ≥ 90, accesibilidad ≥ 95 y SEO ≥ 90 en tres vistas, pero es informativo: no bloquea la PR.
+
+El CI sube artefactos descargables desde la pestaña Actions de cada ejecución: `capturas` (una captura por vista y proyecto), `lighthouse` (informes JSON), `cobertura-backend` (informe de JaCoCo) y, si falla alguna prueba e2e, `trazas-e2e`.
 
 Además, CodeQL analiza el código, SonarCloud mide calidad y duplicación, GitGuardian busca secretos y Vercel genera un despliegue de previsualización por PR. Dependabot propone actualizaciones semanales de npm, Maven y GitHub Actions, y las de tipo patch o minor se fusionan solas cuando el CI pasa.
 
