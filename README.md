@@ -32,6 +32,8 @@ BidCo es una aplicación desarrollada para la asignatura Servicios y Sistemas We
 - **Valoraciones de expertos:** comentarios con precio estimado sobre las subastas.
 - **Búsqueda y filtros** por nombre, categoría, precio y fecha, con subastas y sorteos vencidos ocultos por defecto.
 - **Recuperación de contraseña** por correo electrónico.
+- **Verificación de correo:** las cuentas nuevas confirman su correo con un enlace antes de pujar, participar en sorteos o crear subastas (ver [Recuperación de contraseña por correo](#recuperación-de-contraseña-por-correo)).
+- **Derechos sobre los datos:** cada usuario puede descargar sus datos en JSON y eliminar su cuenta. Al eliminarla se anonimiza en lugar de borrarla en cascada, y se rechaza mientras haya subastas propias, pujas en subastas o participaciones en sorteos sin cerrar.
 
 ### Roles y permisos
 
@@ -71,6 +73,52 @@ Usuario y experto se identifican con un token JWT y tienen su propio acceso (`/l
 - Cada participación aporta puntos enteros, con un mínimo por sorteo. Los puntos se descuentan al participar.
 - Al cerrarse, el ganador se elige con `SecureRandom` y probabilidad proporcional a los puntos aportados.
 - El resultado es definitivo: un sorteo cerrado no se puede volver a tirar.
+
+**Flujo de una puja.** Todo ocurre en una sola transacción: si una validación falla, no se persiste nada.
+
+```mermaid
+sequenceDiagram
+    actor U as Pujador
+    participant F as Angular
+    participant A as API
+    participant DB as PostgreSQL
+    U->>F: Introduce el importe
+    F->>A: POST /api/pujas
+    A->>DB: Bloquea la subasta (FOR UPDATE)
+    A->>A: Comprueba con la hora del servidor que está abierta
+    A->>A: Rechaza al creador de la subasta
+    alt Subasta normal
+        A->>A: El importe debe superar la puja actual
+    else Subasta a ciegas
+        A->>A: El importe debe superar el precio base
+    end
+    alt La puja pasa a liderar
+        A->>DB: Bloquea a los usuarios en orden de id
+        A->>DB: Devuelve el saldo al líder anterior
+        A->>A: Exige correo verificado y saldo suficiente
+        A->>DB: Retiene el importe del saldo
+        opt Subasta normal
+            A->>DB: Actualiza el precio y aplica el anti-sniping
+        end
+    end
+    A->>DB: Guarda la puja
+    A-->>F: Devuelve la puja
+    F-->>U: Muestra el resultado
+```
+
+**Ciclo de vida de una subasta.** El cierre lo hace el proceso programado (cada minuto) o la primera petición que lo pida; es idempotente, así que da igual quién llegue antes.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Programada: Se crea la subasta
+    Programada --> Abierta: Llega la fecha de inicio
+    Abierta --> Abierta: Puja líder cerca del cierre, se retrasa el cierre
+    Abierta --> Vencida: Pasa la hora de cierre
+    Vencida --> Cerrada: Hay pujas, gana la más alta y recibe puntos
+    Vencida --> Desierta: No hay pujas, se cierra sin ganador
+    Cerrada --> [*]
+    Desierta --> [*]
+```
 
 ## Stack tecnológico
 
@@ -175,6 +223,9 @@ Todas las rutas cuelgan de `/api`. Con `SWAGGER_ENABLED=true` la documentación 
 | Usuarios | `POST /usuarios` (registro), `POST /usuarios/login`, `GET/PUT /usuarios/{id}`, `PATCH /usuarios/{id}/password`, `PATCH /usuarios/{id}/recargar-saldo`, `GET/PUT /usuarios/{id}/privacidad`, `GET /usuarios/{id}/stats` | Registro y login públicos; el resto, usuario |
 | Perfil público | `GET /usuarios/{id}/publico` | Público |
 | Recuperación | `POST /usuarios/recuperar-contrasena`, `POST /usuarios/restablecer-contrasena` | Público |
+| Verificación de correo | `POST /usuarios/verificar-correo` | Público |
+| | `POST /usuarios/{id}/reenviar-verificacion` | Usuario |
+| Derechos sobre los datos | `GET /usuarios/{id}/exportar`, `DELETE /usuarios/{id}` (con la contraseña en el cuerpo) | Usuario |
 | Subastas | `GET /subastas`, `GET /subastas/{id}`, `GET /subastas/filtrar`, `/filtro-normal`, `/filtro-ciega`, `/filtro-nombre` | Público |
 | | `POST /subastas` (multipart), `PUT /subastas/final/{id}` | Usuario |
 | | `GET /subastas/filtrar-creador`, `/filtro-mis-subastas`, `/filtro-mis-pujas` | Con sesión iniciada |
@@ -193,7 +244,8 @@ Todas las rutas cuelgan de `/api`. Con `SWAGGER_ENABLED=true` la documentación 
 
 ## Seguridad
 
-- **Autenticación:** tokens JWT firmados con HS256 (el secreto debe tener al menos 32 bytes) y contraseñas con BCrypt. La administración usa una sesión de servidor con cookie `Secure` y cabecera anti-CSRF obligatoria.
+- **Autenticación:** tokens JWT firmados con HS256 (el secreto debe tener al menos 32 bytes) y contraseñas con BCrypt. La administración usa una sesión de servidor con cookie `Secure` y cabecera anti-CSRF obligatoria; la sesión se guarda en PostgreSQL (Spring Session JDBC), así que sobrevive a un reinicio del servicio.
+- **Revocación de sesiones de usuario:** el token lleva una versión de sesión que se comprueba en cada petición. Sube al cambiar o restablecer la contraseña y al eliminar la cuenta, y los tokens anteriores dejan de valer. La vida del token sigue siendo de 24 horas.
 - **Autorización por rol:** un filtro comprueba el rol del token en cada ruta, y los servicios verifican que el usuario autenticado sea el propietario del recurso.
 - **Fuerza bruta:** los logins se limitan a 5 fallos cada 15 minutos y el tiempo de respuesta se iguala entre cuenta existente e inexistente. El límite vive en memoria de cada instancia (ver [decisiones técnicas](docs/decisiones-tecnicas.md)).
 - **Recuperación de contraseña:** token aleatorio de un solo uso, guardado como hash y válido 30 minutos.
@@ -294,18 +346,30 @@ El mismo correo se usa para verificar la cuenta. Al registrarse, o al cambiar de
 ## Pruebas y CI
 
 ```bash
-# Backend (compila y ejecuta las pruebas)
+# Backend (compila, ejecuta las pruebas y comprueba el mínimo de cobertura)
 cd backend && ./mvnw clean verify
 
-# Frontend
+# Frontend: pruebas unitarias
 cd frontend && npm test
+
+# Frontend: e2e con Playwright sobre el build de producción
+cd frontend && npm run build -- --configuration production
+npm run e2e:instalar   # solo la primera vez (descarga Chromium)
+npm run test:e2e
+
+# Frontend: Lighthouse sobre el mismo build
+npm run lighthouse
 ```
 
 El workflow [`CI Validation`](.github/workflows/ci-validation.yml) se ejecuta en cada PR hacia `deploy` y en cada push a `deploy` y `master`:
 
-- **Frontend:** `npm ci`, `npm audit --omit=dev`, pruebas con Chrome headless y build de producción.
-- **Backend:** `mvn clean verify` con Java 25.
+- **Frontend:** `npm ci`, `npm audit --audit-level=moderate`, pruebas unitarias con Chrome headless, prueba de contraste de los tokens de color, build de producción, pruebas e2e y Lighthouse.
+- **Backend:** `mvn clean verify` con Java 25: pruebas de servicios, de filtros y de controladores (MockMvc), pruebas de repositorios y migraciones contra PostgreSQL real (Testcontainers) y un mínimo de cobertura de líneas con JaCoCo (`jacoco.minimo.lineas` en el `pom.xml`, hoy el 48 %).
 - **Revisión de dependencias** en las PR.
+
+Las pruebas e2e (`frontend/e2e`) se ejecutan en escritorio, móvil y modo oscuro, con la API simulada, y comprueban que las rutas públicas cargan sin errores, que el listado de subastas se pinta y que axe-core (WCAG 2.1 A y AA) no encuentra infracciones graves. Lighthouse exige rendimiento ≥ 90, accesibilidad ≥ 95 y SEO ≥ 90 en tres vistas, pero es informativo: no bloquea la PR.
+
+El CI sube artefactos descargables desde la pestaña Actions de cada ejecución: `capturas` (una captura por vista y proyecto), `lighthouse` (informes JSON), `cobertura-backend` (informe de JaCoCo) y, si falla alguna prueba e2e, `trazas-e2e`.
 
 Además, CodeQL analiza el código, SonarCloud mide calidad y duplicación, GitGuardian busca secretos y Vercel genera un despliegue de previsualización por PR. Dependabot propone actualizaciones semanales de npm, Maven y GitHub Actions, y las de tipo patch o minor se fusionan solas cuando el CI pasa.
 
@@ -346,13 +410,26 @@ BidCo/
 
 ## Hoja de ruta
 
-- [ ] `docker compose` con PostgreSQL, backend y frontend.
-- [ ] Pruebas de integración de los repositorios y pruebas end-to-end en el CI.
-- [ ] Paginación de listados y orden y filtros reflejados en la URL.
-- [ ] Favoritos y aviso al terminar una subasta.
-- [ ] Cabeceras de seguridad y CSP también en el frontend.
-- [ ] Limitador de peticiones compartido entre instancias (hoy hay uno general por IP, en memoria).
+Hecho:
+
+- [x] `docker compose` con PostgreSQL, backend y frontend.
+- [x] Pruebas de integración de los repositorios y de los controladores, y mínimo de cobertura en el CI.
+- [x] Pruebas e2e de las rutas públicas, accesibilidad con axe y Lighthouse en el CI.
+- [x] Paginación de listados, y orden y filtros reflejados en la URL.
+- [x] Cierre programado de subastas y sorteos, y anti-sniping.
+- [x] Verificación de correo, descarga de datos y eliminación de cuenta.
+- [x] Sesión de administración persistente y revocación de las sesiones de usuario.
+
+Pendiente:
+
+- [ ] Pruebas e2e del flujo completo (registro, verificación, puja y cierre) con backend y PostgreSQL en el CI.
+- [ ] Pujas en tiempo real y avisos por correo («te han superado», «has ganado»).
+- [ ] Editar y cancelar la subasta propia, y moderación desde la administración.
+- [ ] Favoritos y valoraciones.
+- [ ] Cabeceras de seguridad y CSP también en el frontend (hoy la CSP está en modo informe).
+- [ ] Limitador de peticiones compartido entre instancias (hoy es en memoria).
 - [ ] Endpoint de salud con Actuator y logs estructurados.
+- [ ] PWA: service worker y página sin conexión.
 - [ ] Interfaz en varios idiomas.
 
 ## Contribuir
