@@ -7,11 +7,15 @@ import com.bidco.api_rest.model.Trabajador;
 import com.bidco.api_rest.repository.SorteoRepository;
 import com.bidco.api_rest.repository.TrabajadorRepository;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
+import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.service.contract.AdminService;
+import com.bidco.api_rest.service.contract.SubastaService;
 import com.bidco.api_rest.service.contract.CloudinaryService;
 import com.bidco.api_rest.util.FechasCierre;
 
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,7 +30,9 @@ public class AdminServiceImpl implements AdminService {
     private final TrabajadorRepository trabajadorRepo;
     private final SorteoRepository sorteoRepo;
     private final CloudinaryService cloudinaryService;
+    private final SubastaService subastaService;
     private final Clock clock;
+    private static final Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
     private static final String CREDENCIALES_INCORRECTAS = "Credenciales incorrectas";
     private static final BCryptPasswordEncoder STATIC_ENCODER = new BCryptPasswordEncoder();
     private static final String DUMMY_HASH = STATIC_ENCODER.encode("contraseña-inexistente");
@@ -36,11 +42,13 @@ public class AdminServiceImpl implements AdminService {
         TrabajadorRepository trabajadorRepo,
         SorteoRepository sorteoRepo,
         CloudinaryService cloudinaryService,
+        SubastaService subastaService,
         Clock clock
     ) {
         this.trabajadorRepo = trabajadorRepo;
         this.sorteoRepo = sorteoRepo;
         this.cloudinaryService = cloudinaryService;
+        this.subastaService = subastaService;
         this.clock = clock;
     }
 
@@ -62,6 +70,21 @@ public class AdminServiceImpl implements AdminService {
         }
 
         session.setAttribute("adminId", admin.getTrabajadorID());
+    }
+
+    @Override
+    public void retirarSubasta(Long subastaId, String motivo, HttpSession session) {
+        Long adminId = (Long) session.getAttribute("adminId");
+        if (adminId == null) {
+            throw new IllegalArgumentException("No autenticado como admin");
+        }
+        // Los expertos comparten la sesión de /api/admin, pero moderar es cosa de la administración.
+        boolean esAdministrador = trabajadorRepo.findById(adminId).filter(t -> !t.isExperto()).isPresent();
+        if (!esAdministrador) {
+            throw new ForbiddenException("Solo la administración puede retirar subastas");
+        }
+        subastaService.retirarPorModeracion(subastaId, motivo);
+        log.info("Subasta {} retirada por moderación (administrador {}): {}", subastaId, adminId, motivo.trim().replaceAll("[\\r\\n]+", " "));
     }
 
     @Override

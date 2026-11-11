@@ -5,7 +5,9 @@ import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.model.Trabajador;
 import com.bidco.api_rest.repository.SorteoRepository;
 import com.bidco.api_rest.repository.TrabajadorRepository;
+import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.service.contract.CloudinaryService;
+import com.bidco.api_rest.service.contract.SubastaService;
 import com.bidco.api_rest.service.impl.AdminServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +23,7 @@ class AdminServiceImplTest {
 
     private TrabajadorRepository trabajadorRepository;
     private HttpSession session;
+    private SubastaService subastaService;
     private AdminServiceImpl service;
     private String clave;
 
@@ -28,7 +31,8 @@ class AdminServiceImplTest {
     void setUp() {
         trabajadorRepository = mock(TrabajadorRepository.class);
         session = mock(HttpSession.class);
-        service = new AdminServiceImpl(trabajadorRepository, mock(SorteoRepository.class), mock(CloudinaryService.class), java.time.Clock.systemUTC());
+        subastaService = mock(SubastaService.class);
+        service = new AdminServiceImpl(trabajadorRepository, mock(SorteoRepository.class), mock(CloudinaryService.class), subastaService, java.time.Clock.systemUTC());
         clave = "a".repeat(12);
     }
 
@@ -89,5 +93,32 @@ class AdminServiceImplTest {
     void loginSinDatosFalla() {
         assertThrows(AuthenticationFailedException.class, () -> service.login(null, session));
         assertThrows(AuthenticationFailedException.class, () -> service.login(credenciales(null, false), session));
+    }
+
+    @Test
+    void unAdministradorRetiraUnaSubastaConSuMotivo() {
+        when(session.getAttribute("adminId")).thenReturn(3L);
+        when(trabajadorRepository.findById(3L)).thenReturn(Optional.of(trabajador(false)));
+
+        service.retirarSubasta(9L, " Contenido no permitido ", session);
+
+        verify(subastaService).retirarPorModeracion(9L, " Contenido no permitido ");
+    }
+
+    @Test
+    void unExpertoNoPuedeRetirarSubastas() {
+        when(session.getAttribute("adminId")).thenReturn(3L);
+        when(trabajadorRepository.findById(3L)).thenReturn(Optional.of(trabajador(true)));
+
+        assertThrows(ForbiddenException.class, () -> service.retirarSubasta(9L, "motivo", session));
+        verifyNoInteractions(subastaService);
+    }
+
+    @Test
+    void sinSesionNoSeRetiraNada() {
+        when(session.getAttribute("adminId")).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> service.retirarSubasta(9L, "motivo", session));
+        verifyNoInteractions(subastaService);
     }
 }

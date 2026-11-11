@@ -2,6 +2,7 @@ package com.bidco.api_rest.controller;
 
 import com.bidco.api_rest.dto.admin.SorteoCreateDTO;
 import com.bidco.api_rest.dto.admin.AdminLoginDTO;
+import com.bidco.api_rest.dto.admin.RetirarSubastaDTO;
 import com.bidco.api_rest.service.contract.AdminService;
 import com.bidco.api_rest.config.LoginRateLimiter;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
@@ -42,6 +43,16 @@ public class AdminController {
         // Nuevo identificador de sesión tras autenticarse (evita la fijación de sesión).
         request.changeSessionId();
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/subastas/{id}/retirar")
+    public ResponseEntity<Void> retirarSubasta(
+            @PathVariable Long id,
+            @Valid @RequestBody RetirarSubastaDTO dto,
+            HttpSession session
+    ) {
+        adminService.retirarSubasta(id, dto.getMotivo(), session);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/sorteos")
