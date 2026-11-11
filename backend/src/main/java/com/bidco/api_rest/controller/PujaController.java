@@ -1,6 +1,7 @@
 package com.bidco.api_rest.controller;
 
 import com.bidco.api_rest.dto.puja.PujaCreateDTO;
+import com.bidco.api_rest.dto.puja.PujaHistorialDTO;
 import com.bidco.api_rest.dto.puja.PujaResponseDTO;
 import com.bidco.api_rest.dto.subasta.SubastaResponseDTO;
 import com.bidco.api_rest.exception.ForbiddenException;
@@ -42,6 +43,11 @@ public class PujaController {
     @GetMapping("/mayor/{subastaId}")
     public PujaResponseDTO obtenerPujaMasAlta(@PathVariable Long subastaId) {
         return pujaService.obtenerPujaMasAlta(subastaId);
+    }
+
+    @GetMapping("/historial/{subastaId}")
+    public List<PujaHistorialDTO> obtenerHistorial(@PathVariable Long subastaId) {
+        return pujaService.obtenerHistorial(subastaId);
     }
 
     @GetMapping("/subastas-usuario/{usuarioId}")

@@ -59,6 +59,13 @@ export interface PujaSorteoCreateDTO {
     pujadorId: number;
 }
 
+/** Una puja del historial público de una subasta; el pujador llega ya enmascarado. */
+export interface PujaHistorialDto {
+    pujador: string;
+    importe: number;
+    fecha: string;
+}
+
 export interface PujaSorteoResponseDTO {
     pujaID: number;
     puntos: number;
@@ -95,6 +102,10 @@ export class ProductoService {
 
     obtenerPujaMaximaPorSubasta(subastaId: number): Observable<PujaResponseDTO> {
         return this.http.get<PujaResponseDTO>(`${this.pujaSubastaUrl}/mayor/${subastaId}`);
+    }
+
+    obtenerHistorialPujas(subastaId: number): Observable<PujaHistorialDto[]> {
+        return this.http.get<PujaHistorialDto[]>(`${this.pujaSubastaUrl}/historial/${subastaId}`);
     }
 
     finalizarSubasta(id: number) {

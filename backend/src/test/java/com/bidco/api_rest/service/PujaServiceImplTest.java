@@ -1,6 +1,7 @@
 package com.bidco.api_rest.service;
 
 import com.bidco.api_rest.dto.puja.PujaCreateDTO;
+import com.bidco.api_rest.dto.puja.PujaHistorialDTO;
 import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.mapper.PujaMapper;
 import com.bidco.api_rest.model.Puja;
@@ -21,7 +22,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
+import jakarta.persistence.EntityNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -341,5 +344,59 @@ class PujaServiceImplTest {
 
         assertThrows(IllegalArgumentException.class, () -> service.crearPuja(dto("10")));
         verifyNoInteractions(eventos);
+    }
+
+    private Puja pujaDe(Usuario pujador, String importe) {
+        Puja p = new Puja();
+        p.setPujador(pujador);
+        p.setImporte(new BigDecimal(importe));
+        p.setFecha(HOY);
+        return p;
+    }
+
+    private Usuario conNombre(String nombre, boolean anonimo) {
+        Usuario u = new Usuario();
+        u.setNombreUsuario(nombre);
+        u.setPrivacidadAnonimoPujas(anonimo);
+        return u;
+    }
+
+    @Test
+    void elHistorialEnmascaraAlPujadorYRespetaElAnonimato() {
+        when(subastaRepository.findById(1L)).thenReturn(Optional.of(subasta(true, HOY.minusDays(1), HOY.plusDays(5))));
+        when(pujaRepository.findHistorialBySubastaId(1L)).thenReturn(List.of(
+                pujaDe(conNombre("Marta", false), "30"),
+                pujaDe(conNombre("Pedro", true), "20"),
+                pujaDe(conNombre("  ", false), "15"),
+                pujaDe(null, "12")));
+
+        List<PujaHistorialDTO> historial = service.obtenerHistorial(1L);
+
+        assertEquals(List.of("M***", "Anónimo", "Anónimo", "Anónimo"),
+                historial.stream().map(PujaHistorialDTO::pujador).toList());
+        assertEquals(0, new BigDecimal("30").compareTo(historial.get(0).importe()));
+    }
+
+    @Test
+    void elHistorialDeUnaSubastaACiegasEnCursoNoSeConsulta() {
+        when(subastaRepository.findById(1L)).thenReturn(Optional.of(subasta(false, HOY.minusDays(1), HOY.plusDays(5))));
+
+        assertThrows(ForbiddenException.class, () -> service.obtenerHistorial(1L));
+        verify(pujaRepository, never()).findHistorialBySubastaId(any());
+    }
+
+    @Test
+    void elHistorialDeUnaSubastaACiegasCerradaEsVisible() {
+        when(subastaRepository.findById(1L)).thenReturn(Optional.of(subasta(false, HOY.minusDays(10), HOY.minusDays(1))));
+        when(pujaRepository.findHistorialBySubastaId(1L)).thenReturn(List.of(pujaDe(conNombre("Luis", false), "50")));
+
+        assertEquals("L***", service.obtenerHistorial(1L).get(0).pujador());
+    }
+
+    @Test
+    void elHistorialDeUnaSubastaInexistenteDaNoEncontrada() {
+        when(subastaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.obtenerHistorial(1L));
     }
 }

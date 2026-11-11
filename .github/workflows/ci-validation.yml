@@ -16,7 +16,7 @@ concurrency:
 jobs:
   frontend-checks:
     name: Frontend (Angular)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend
@@ -39,8 +39,10 @@ jobs:
         run: npm run test:contraste
       - name: Production build
         run: npm run build -- --configuration production
-      - name: Instalar Chromium para Playwright
-        run: npm run e2e:instalar
+      - name: Descargar Chromium para Playwright
+        # Sin --with-deps: el apt de las dependencias se cuelga en el CI y el runner ya trae las librerías.
+        timeout-minutes: 4
+        run: npm run e2e:descargar
       - name: Pruebas e2e (humo, accesibilidad y capturas)
         run: npm run test:e2e
       - name: Lighthouse (rendimiento, accesibilidad y SEO)
