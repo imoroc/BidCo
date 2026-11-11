@@ -35,6 +35,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'sorteo' },
       { path: 'sorteo', loadComponent: () => import('./views/admin/admin-sorteo/admin-sorteo.component').then(m => m.AdminSorteoComponent) },
+      { path: 'moderacion', loadComponent: () => import('./views/admin/admin-moderacion/admin-moderacion.component').then(m => m.AdminModeracionComponent) },
       { path: 'expertos', loadComponent: () => import('./views/admin/admin-expert/admin-expert.component').then(m => m.AdminExpertComponent) }
     ]
   },

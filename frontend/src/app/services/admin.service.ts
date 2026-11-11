@@ -66,6 +66,15 @@ export class AdminService {
   }
   
 
+  /** Retira una subasta por moderación. Solo la administración; el motivo llega al creador por correo. */
+  retirarSubasta(id: number, motivo: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.api}/subastas/${id}/retirar`,
+      { motivo },
+      { withCredentials: true, headers: this.adminHeaders }
+    );
+  }
+
   createExpert(dto: ExpertDTO): Observable<void> {
     return this.http.post<void>(
       `${environment.apiUrl}/trabajadores`, // Corregido: antes era relativo
