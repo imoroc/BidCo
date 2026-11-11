@@ -1,6 +1,12 @@
 package com.bidco.api_rest.repository;
 
 import jakarta.persistence.EntityManager;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.session.Session;
+import org.springframework.session.SessionRepository;
+import org.springframework.session.jdbc.JdbcIndexedSessionRepository;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +17,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Aplica las migraciones de Flyway sobre un PostgreSQL vacío y arranca JPA con
@@ -40,6 +48,10 @@ class MigracionesTest {
 
     @Autowired
     private EntityManager em;
+    @Autowired
+    private JdbcTemplate jdbc;
+    @Autowired
+    private PlatformTransactionManager transacciones;
 
     @Test
     void creaLosIndicesDeLasConsultasHabituales() {
@@ -55,5 +67,32 @@ class MigracionesTest {
                 "SELECT COUNT(*) FROM pg_constraint WHERE conname LIKE 'ck\\_%'")
                 .getSingleResult();
         assertEquals(5, restricciones.intValue());
+    }
+
+    @Test
+    void creaLasTablasDeSesionesDeSpringSession() {
+        Number tablas = (Number) em.createNativeQuery(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' "
+                        + "AND table_name IN ('spring_session', 'spring_session_attributes')")
+                .getSingleResult();
+        assertEquals(2, tablas.intValue());
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void laSesionDeAdministracionSePersisteYSeRecuperaConElEsquemaMigrado() {
+        SessionRepository<Session> sesiones = (SessionRepository) new JdbcIndexedSessionRepository(
+                jdbc, new TransactionTemplate(transacciones));
+
+        Session creada = sesiones.createSession();
+        creada.setAttribute("adminId", 7L);
+        sesiones.save(creada);
+
+        Session leida = sesiones.findById(creada.getId());
+        assertNotNull(leida);
+        assertEquals(7L, (Long) leida.getAttribute("adminId"));
+
+        sesiones.deleteById(creada.getId());
+        assertNull(sesiones.findById(creada.getId()));
     }
 }
