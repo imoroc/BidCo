@@ -343,6 +343,8 @@ Sin `BREVO_API_KEY` y `MAIL_FROM` la función queda desactivada y la API respond
 
 El mismo correo se usa para verificar la cuenta. Al registrarse, o al cambiar de correo, se envía un enlace a `/verificar-correo` (hash del token guardado, válido 24 horas y de un solo uso). Mientras no se confirme, la cuenta puede entrar y navegar pero no pujar, participar en sorteos ni crear subastas; el aviso de la parte superior permite reenviar el enlace. Las cuentas anteriores a esta función se consideran verificadas, y si no hay Brevo configurado las cuentas nuevas nacen verificadas para no quedar bloqueadas.
 
+También se avisa por correo de dos hechos de las subastas: «te han superado» (solo en subastas normales; en las a ciegas no se revela qué ofrecen los demás) y «has ganado» (al cerrarse una subasta con pujas). Solo se envían a cuentas con el correo verificado, después de confirmar la transacción, y un fallo del proveedor no afecta a la puja ni al cierre.
+
 ## Pruebas y CI
 
 ```bash
@@ -423,7 +425,8 @@ Hecho:
 Pendiente:
 
 - [ ] Pruebas e2e del flujo completo (registro, verificación, puja y cierre) con backend y PostgreSQL en el CI.
-- [ ] Pujas en tiempo real y avisos por correo («te han superado», «has ganado»).
+- [x] Avisos por correo («te han superado», «has ganado»).
+- [ ] Pujas en tiempo real.
 - [ ] Editar y cancelar la subasta propia, y moderación desde la administración.
 - [ ] Favoritos y valoraciones.
 - [ ] Cabeceras de seguridad y CSP también en el frontend (hoy la CSP está en modo informe).

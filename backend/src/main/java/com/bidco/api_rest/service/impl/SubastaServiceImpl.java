@@ -13,6 +13,7 @@ import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
+import com.bidco.api_rest.service.contract.AvisoSubastaService;
 import com.bidco.api_rest.service.contract.CloudinaryService;
 import com.bidco.api_rest.service.contract.SubastaService;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,11 +38,12 @@ public class SubastaServiceImpl implements SubastaService {
     private final PujaRepository pujaRepository;
     private final PujaMapper pujaMapper;
     private final CloudinaryService cloudinaryService;
+    private final AvisoSubastaService avisos;
     private final Clock clock;
 
     public SubastaServiceImpl(SubastaRepository subastaRepository, SubastaMapper subastaMapper, UsuarioMapper usuarioMapper,
                 UsuarioRepository usuarioRepository, PujaRepository pujaRepository, PujaMapper pujaMapper,
-                CloudinaryService cloudinaryService, Clock clock) {
+                CloudinaryService cloudinaryService, AvisoSubastaService avisos, Clock clock) {
         this.subastaRepository = subastaRepository;
         this.subastaMapper = subastaMapper;
         this.usuarioMapper = usuarioMapper;
@@ -49,6 +51,7 @@ public class SubastaServiceImpl implements SubastaService {
         this.pujaRepository = pujaRepository;
         this.pujaMapper = pujaMapper;
         this.cloudinaryService = cloudinaryService;
+        this.avisos = avisos;
         this.clock = clock;
     }
 
@@ -143,6 +146,7 @@ public class SubastaServiceImpl implements SubastaService {
         subastaRepository.save(subasta);
         pujaRepository.save(puja);
         usuarioRepository.save(user);
+        avisos.subastaGanada(user, subasta, puja.getImporte());
     }
 
     @Override

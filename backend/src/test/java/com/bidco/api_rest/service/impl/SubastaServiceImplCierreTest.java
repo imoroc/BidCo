@@ -9,6 +9,7 @@ import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
+import com.bidco.api_rest.service.contract.AvisoSubastaService;
 import com.bidco.api_rest.service.contract.CloudinaryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ class SubastaServiceImplCierreTest {
     private SubastaRepository subastaRepository;
     private PujaRepository pujaRepository;
     private UsuarioRepository usuarioRepository;
+    private AvisoSubastaService avisos;
     private SubastaServiceImpl servicio;
     private Subasta subasta;
 
@@ -43,9 +45,10 @@ class SubastaServiceImplCierreTest {
         subastaRepository = mock(SubastaRepository.class);
         pujaRepository = mock(PujaRepository.class);
         usuarioRepository = mock(UsuarioRepository.class);
+        avisos = mock(AvisoSubastaService.class);
         Clock reloj = Clock.fixed(Instant.parse("2026-11-10T10:00:00Z"), ZoneId.of("Europe/Madrid"));
         servicio = new SubastaServiceImpl(subastaRepository, mock(SubastaMapper.class), mock(UsuarioMapper.class),
-                usuarioRepository, pujaRepository, mock(PujaMapper.class), mock(CloudinaryService.class), reloj);
+                usuarioRepository, pujaRepository, mock(PujaMapper.class), mock(CloudinaryService.class), avisos, reloj);
 
         subasta = new Subasta();
         subasta.setSubastaNormal(true);
@@ -60,6 +63,7 @@ class SubastaServiceImplCierreTest {
         assertDoesNotThrow(() -> servicio.asignarGanadorYActualizarPrecioFinal(ID));
 
         assertNull(subasta.getGanador());
+        verify(avisos, never()).subastaGanada(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
         verify(subastaRepository, never()).save(subasta);
         verify(usuarioRepository, never()).save(org.mockito.ArgumentMatchers.any());
     }
@@ -102,5 +106,6 @@ class SubastaServiceImplCierreTest {
         assertEquals(3L, subasta.getGanador());
         assertEquals(110, pujador.getPuntos());
         assertEquals(new BigDecimal("55.00"), subasta.getPrecioFinal());
+        verify(avisos).subastaGanada(pujador, subasta, new BigDecimal("55.00"));
     }
 }

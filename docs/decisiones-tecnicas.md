@@ -91,3 +91,17 @@
   infravalora la cobertura de la lógica. Excluirlos cambiaría la medición y exige fijar de nuevo el mínimo con el
   dato real, por eso no se ha hecho aquí.
 - Es un suelo contra regresiones, no una medida de calidad: no dice si las pruebas comprueban lo importante.
+
+## Avisos por correo de subastas
+
+- Se avisa de dos hechos: «te han superado» (quien lideraba, cuando otra puja pasa a liderar una subasta normal)
+  y «has ganado» (al cerrarse una subasta con pujas). Es lo que hace una casa de subastas grande: aviso de servicio
+  ligado a una acción propia, no publicidad.
+- En las subastas a ciegas no hay aviso de «te han superado»: confirmaría que otra puja es mayor. El de ganador sí,
+  porque al cierre el resultado ya es público.
+- Solo reciben avisos las cuentas con el correo verificado, nunca las anonimizadas (`@anonimo.invalid`) y solo si
+  Brevo está configurado. No se avisa a quien se supera a sí mismo.
+- El correo se envía tras confirmar la transacción (`afterCommit`), de modo que una puja rechazada o revertida no
+  avisa a nadie. El envío es asíncrono y un fallo del proveedor se registra sin afectar a la puja ni al cierre.
+- El nombre del artículo lo escribe un usuario: se escapa antes de ir dentro del HTML del correo.
+- No hay ajuste para desactivarlos. Añadirlo exige una columna en `usuario` (migración nueva); queda para otra PR.
