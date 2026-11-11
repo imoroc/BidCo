@@ -159,3 +159,18 @@
 - En una subasta a ciegas el historial no se publica hasta que termina el plazo, igual que `/pujas/mayor`; después se muestra con el mismo enmascarado.
 - La ficha de las subastas normales lo recarga cada vez que el flujo en directo informa de un precio nuevo.
 - La fecha de la puja se guarda como día (sin hora), de modo que el orden entre pujas del mismo día lo da el importe.
+
+## Repoblar el catálogo (`database/reabrir_catalogo.sql`)
+
+- Script manual, no una migración de Flyway: no lo ejecuta la aplicación ni el CI. Se lanza a mano cuando se
+  quiere que la web vuelva a verse poblada, **con una copia de la base de datos hecha antes**.
+- Las subastas y sorteos vencidos **sin ganador** se reabren alargando su cierre (10 años por defecto, con un
+  desfase de 0 a 364 días según el identificador para que no cierren todas el mismo día). Conservan sus pujas.
+- Los vencidos **con ganador** no se reabren: al cerrar una subasta se reparten puntos (100 en las normales,
+  200 en las ciegas) y se avisa al ganador, así que reabrirla repartiría puntos de más al volver a cerrarla.
+  Se mantienen como historial y se publica una copia nueva, sin pujas ni ganador, con el mismo artículo,
+  descripción, imagen y categoría.
+- Es repetible: no duplica un artículo que ya tiene una copia abierta del mismo creador, nombre e imagen.
+- Termina con `ROLLBACK` por defecto (muestra el resumen y no guarda nada); para aplicarlo se cambia a `COMMIT`.
+- Probado contra PostgreSQL con el esquema de las migraciones V1 a V6 y datos que cubren cada caso (abierta,
+  desierta, vencida con puja pendiente, cerrada con ganador, ciega, duplicada y ya reabierta).
