@@ -241,6 +241,7 @@ Todas las rutas cuelgan de `/api`. Con `SWAGGER_ENABLED=true` la documentación 
 | | `POST /trabajadores` (alta) | Administración |
 | Administración | `POST /admin/login`, `POST /admin/sorteos` | Sesión de administración |
 | Estado | `GET /ping` | Público |
+| Salud | `GET /actuator/health` (sin detalles) | Público |
 
 ## Seguridad
 
@@ -432,7 +433,8 @@ Pendiente:
 - [ ] Favoritos y valoraciones.
 - [ ] Cabeceras de seguridad y CSP también en el frontend (hoy la CSP está en modo informe).
 - [ ] Limitador de peticiones compartido entre instancias (hoy es en memoria).
-- [ ] Endpoint de salud con Actuator y logs estructurados.
+- [x] Endpoint de salud con Actuator e identificador de petición en los registros.
+- [ ] Logs en JSON y seguimiento de errores (Sentry).
 - [ ] PWA: service worker y página sin conexión.
 - [ ] Interfaz en varios idiomas.
 
