@@ -5,6 +5,7 @@ import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.mapper.PujaMapper;
 import com.bidco.api_rest.model.Puja;
 import com.bidco.api_rest.model.Subasta;
+import com.bidco.api_rest.exception.CorreoNoVerificadoException;
 import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
@@ -120,6 +121,20 @@ class PujaServiceImplTest {
 
         assertThrows(IllegalArgumentException.class, () -> service.crearPuja(dto("20")));
         verify(pujaRepository, never()).save(any());
+    }
+
+    @Test
+    void pujaConElCorreoSinVerificarSeRechaza() {
+        when(subastaRepository.findByIdForUpdate(1L))
+                .thenReturn(Optional.of(subasta(true, HOY.minusDays(1), HOY.plusDays(5))));
+        Usuario sinVerificar = usuario(5L, "100");
+        sinVerificar.setCorreoVerificado(false);
+        when(usuarioRepository.findByIdForUpdate(5L)).thenReturn(Optional.of(sinVerificar));
+        when(pujaMapper.pujaCreateDTOToPuja(any())).thenReturn(new Puja());
+
+        assertThrows(CorreoNoVerificadoException.class, () -> service.crearPuja(dto("20")));
+        verify(pujaRepository, never()).save(any());
+        assertEquals(0, new BigDecimal("100").compareTo(sinVerificar.getSaldo()));
     }
 
     @Test

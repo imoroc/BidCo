@@ -20,6 +20,7 @@ export interface UsuarioResponse {
   pais: string;
   saldo?: number;
   puntos?: number;
+  correoVerificado?: boolean;
 }
 
 @Injectable({
@@ -85,6 +86,20 @@ export class AuthService {
       'Authorization': `Bearer ${token}`
     });
     return this.http.get<UsuarioResponse>(`${this.userApiUrl}/${userID}`, { headers });
+  }
+
+  /** Vuelve a pedir el perfil (p. ej. tras verificar el correo). Sin sesión no hace nada. */
+  refrescarUsuario(): void {
+    const actual = this.currentUser.value;
+    if (!actual) {
+      return;
+    }
+    this.loadUserProfile(actual.usuarioID).subscribe({
+      next: (usuario) => this.setUser(usuario),
+      error: () => {
+        // Si falla no se cierra sesión: el aviso se actualizará en la próxima carga.
+      }
+    });
   }
 
   setUser(user: UsuarioResponse): void {

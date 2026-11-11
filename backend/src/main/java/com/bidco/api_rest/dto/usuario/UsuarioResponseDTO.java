@@ -15,6 +15,7 @@ public class UsuarioResponseDTO {
     private String letraPiso; // Puede ser null si no aplica
     private BigDecimal saldo; // Añadido por si lo necesitas mostrar
     private int puntos;       // Añadido por si lo necesitas mostrar
+    private boolean correoVerificado;
 
     // --- Constructor actualizado ---
     public UsuarioResponseDTO(Long usuarioID, String nombreUsuario, String correoElectronico,
@@ -65,4 +66,7 @@ public class UsuarioResponseDTO {
 
     public int getPuntos() { return puntos; }
     public void setPuntos(int puntos) { this.puntos = puntos; }
+
+    public boolean isCorreoVerificado() { return correoVerificado; }
+    public void setCorreoVerificado(boolean correoVerificado) { this.correoVerificado = correoVerificado; }
 }

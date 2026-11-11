@@ -16,6 +16,8 @@ import com.bidco.api_rest.repository.SorteoRepository;
 import com.bidco.api_rest.repository.SubastaRepository;
 import com.bidco.api_rest.repository.TokenRecuperacionRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
+import com.bidco.api_rest.service.contract.VerificacionCorreoService;
+import com.bidco.api_rest.dto.usuario.UsuarioUpdateDTO;
 import com.bidco.api_rest.service.impl.UsuarioServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,8 @@ class UsuarioServiceImplTest {
     private SubastaRepository subastaRepository;
     private SorteoRepository sorteoRepository;
     private TokenRecuperacionRepository tokenRecuperacionRepository;
+    private UsuarioMapper usuarioMapper;
+    private VerificacionCorreoService verificacionCorreoService;
     private UsuarioServiceImpl service;
 
     @BeforeEach
@@ -51,16 +55,19 @@ class UsuarioServiceImplTest {
         subastaRepository = mock(SubastaRepository.class);
         sorteoRepository = mock(SorteoRepository.class);
         tokenRecuperacionRepository = mock(TokenRecuperacionRepository.class);
+        usuarioMapper = mock(UsuarioMapper.class);
+        verificacionCorreoService = mock(VerificacionCorreoService.class);
         service = new UsuarioServiceImpl(
                 usuarioRepository,
-                mock(UsuarioMapper.class),
+                usuarioMapper,
                 pujaRepository,
                 subastaRepository,
                 pujaSorteoRepository,
                 sorteoRepository,
                 mock(JwtUtil.class),
                 tokenRecuperacionRepository,
-                Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC));
+                Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC),
+                verificacionCorreoService);
     }
 
     private UsuarioCreateDTO nuevoUsuario() {
@@ -237,5 +244,69 @@ class UsuarioServiceImplTest {
         ExportacionDatosDTO datos = service.exportarDatos(7L);
 
         assertFalse(datos.toString().contains(usuario.getContrasena()));
+    }
+
+    @Test
+    void registrarConCorreoDisponibleCreaLaCuentaSinVerificarYEnviaElEnlace() {
+        Usuario nuevo = new Usuario();
+        when(usuarioMapper.usuarioCreateDTOToUsuario(any())).thenReturn(nuevo);
+        when(usuarioRepository.save(any())).thenAnswer(invocacion -> invocacion.getArgument(0));
+        when(verificacionCorreoService.disponible()).thenReturn(true);
+
+        service.registrarUsuario(nuevoUsuario());
+
+        assertFalse(nuevo.isCorreoVerificado());
+        verify(verificacionCorreoService).enviar(nuevo);
+    }
+
+    @Test
+    void registrarSinCorreoDisponibleCreaLaCuentaYaVerificada() {
+        Usuario nuevo = new Usuario();
+        when(usuarioMapper.usuarioCreateDTOToUsuario(any())).thenReturn(nuevo);
+        when(usuarioRepository.save(any())).thenAnswer(invocacion -> invocacion.getArgument(0));
+        when(verificacionCorreoService.disponible()).thenReturn(false);
+
+        service.registrarUsuario(nuevoUsuario());
+
+        assertTrue(nuevo.isCorreoVerificado());
+        verify(verificacionCorreoService, never()).enviar(any());
+    }
+
+    private UsuarioUpdateDTO actualizacionConCorreo(String correo) {
+        UsuarioUpdateDTO dto = new UsuarioUpdateDTO();
+        dto.setNombreUsuario("ana");
+        dto.setCorreoElectronico(correo);
+        dto.setCiudad("Madrid");
+        dto.setCodigoPostal("28001");
+        dto.setCalle("Calle Mayor");
+        dto.setNumeroPiso(3);
+        dto.setLetraPiso("B");
+        return dto;
+    }
+
+    @Test
+    void cambiarDeCorreoExigeVerificarElNuevo() {
+        Usuario usuario = usuarioConClave("k".repeat(12));
+        when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.save(any())).thenAnswer(invocacion -> invocacion.getArgument(0));
+        when(verificacionCorreoService.disponible()).thenReturn(true);
+
+        service.actualizarUsuario(7L, actualizacionConCorreo("otra@example.com"));
+
+        assertFalse(usuario.isCorreoVerificado());
+        verify(verificacionCorreoService).enviar(usuario);
+    }
+
+    @Test
+    void conservarElMismoCorreoNoPideVerificarDeNuevo() {
+        Usuario usuario = usuarioConClave("k".repeat(12));
+        when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.save(any())).thenAnswer(invocacion -> invocacion.getArgument(0));
+        when(verificacionCorreoService.disponible()).thenReturn(true);
+
+        service.actualizarUsuario(7L, actualizacionConCorreo("ANA@example.com"));
+
+        assertTrue(usuario.isCorreoVerificado());
+        verify(verificacionCorreoService, never()).enviar(any());
     }
 }

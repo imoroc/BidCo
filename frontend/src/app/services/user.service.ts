@@ -15,6 +15,8 @@ export interface UsuarioResponse {
   pais: string;
   saldo?: number;
   puntos?: number;
+  // Ausente en sesiones guardadas antes de existir la verificación: se trata como verificado.
+  correoVerificado?: boolean;
 }
 
 export interface UsuarioCreate {
@@ -77,6 +79,18 @@ export class UserService {
     }).pipe(catchError(error => {
       throw new Error(error.error?.message || 'Error desconocido');
     }));
+  }
+
+  // Público: el enlace del correo se abre sin sesión.
+  verificarCorreo(token: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/verificar-correo`, { token });
+  }
+
+  reenviarVerificacion(id: number): Observable<void> {
+    const token = localStorage.getItem('authToken');
+    return this.http.post<void>(`${this.apiUrl}/${id}/reenviar-verificacion`, null, {
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
+    });
   }
 
   // Copia en JSON de los datos del usuario (derecho de acceso y portabilidad).

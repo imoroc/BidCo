@@ -6,6 +6,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { HeaderComponent } from '../../components/header/header.component';
 import { UserService, UsuarioCreate, UsuarioResponse } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -28,7 +29,8 @@ export class RegisterComponent {
   pais = 'España';
   formError = '';
 
-  constructor(private router: Router, private userService: UserService, private authService: AuthService) {}
+  constructor(private router: Router, private userService: UserService, private authService: AuthService,
+              private toastService: ToastService) {}
 
   register(form: NgForm) {
     if (form.invalid || this.password !== this.repeatPassword) {
@@ -50,7 +52,10 @@ export class RegisterComponent {
     };
 
     this.userService.registerUser(nuevoUsuario).subscribe({
-      next: (_respuesta: UsuarioResponse) => {
+      next: (respuesta: UsuarioResponse) => {
+        if (respuesta.correoVerificado === false) {
+          this.toastService.info('Te hemos enviado un correo para verificar tu cuenta', 8000);
+        }
         this.authService.loginUser({
           identificador: this.email.trim(),
           contrasena: this.password

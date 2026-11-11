@@ -5,6 +5,7 @@ import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.mapper.PujaSorteoMapper;
 import com.bidco.api_rest.model.PujaSorteo;
 import com.bidco.api_rest.model.Sorteo;
+import com.bidco.api_rest.exception.CorreoNoVerificadoException;
 import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaSorteoRepository;
 import com.bidco.api_rest.repository.SorteoRepository;
@@ -76,6 +77,18 @@ class PujaSorteoServiceImplTest {
     private void sorteoAbierto(int puntosNecesarios) {
         when(sorteoRepository.findByIdForUpdate(1L))
                 .thenReturn(Optional.of(sorteo(HOY.minusDays(1), HOY.plusDays(3), puntosNecesarios)));
+    }
+
+    @Test
+    void participarConElCorreoSinVerificarSeRechazaYNoGastaPuntos() {
+        sorteoAbierto(10);
+        Usuario u = usuario(100);
+        u.setCorreoVerificado(false);
+        when(usuarioRepository.findByIdForUpdate(5L)).thenReturn(Optional.of(u));
+
+        assertThrows(CorreoNoVerificadoException.class, () -> service.crearPujaSorteo(dto("20")));
+        assertEquals(100, u.getPuntos());
+        verify(pujaSorteoRepository, never()).save(any());
     }
 
     @Test

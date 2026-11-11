@@ -20,6 +20,7 @@ import com.bidco.api_rest.repository.TokenRecuperacionRepository;
 import com.bidco.api_rest.repository.UsuarioRepository;
 import com.bidco.api_rest.exception.AuthenticationFailedException;
 import com.bidco.api_rest.service.contract.UsuarioService;
+import com.bidco.api_rest.service.contract.VerificacionCorreoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final JwtUtil jwtUtil;
     private final TokenRecuperacionRepository tokenRecuperacionRepository;
     private final Clock clock;
+    private final VerificacionCorreoService verificacionCorreoService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UsuarioServiceImpl(
@@ -55,7 +57,8 @@ public class UsuarioServiceImpl implements UsuarioService {
             SorteoRepository sorteoRepository,
             JwtUtil jwtUtil,
             TokenRecuperacionRepository tokenRecuperacionRepository,
-            Clock clock) {
+            Clock clock,
+            VerificacionCorreoService verificacionCorreoService) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
         this.pujaRepository = pujaRepository;
@@ -65,6 +68,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.jwtUtil = jwtUtil;
         this.tokenRecuperacionRepository = tokenRecuperacionRepository;
         this.clock = clock;
+        this.verificacionCorreoService = verificacionCorreoService;
     }
 
     @Override
@@ -84,7 +88,14 @@ public class UsuarioServiceImpl implements UsuarioService {
         // El saldo y los puntos iniciales son reglas del servidor, nunca datos del cliente.
         usuario.setSaldo(BigDecimal.ZERO);
         usuario.setPuntos(10);
-        return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioRepository.save(usuario));
+        // Sin envío de correo configurado no se puede verificar: la cuenta nace verificada para no bloquearla.
+        boolean verificable = verificacionCorreoService.disponible();
+        usuario.setCorreoVerificado(!verificable);
+        Usuario guardado = usuarioRepository.save(usuario);
+        if (verificable) {
+            verificacionCorreoService.enviar(guardado);
+        }
+        return usuarioMapper.usuarioToUsuarioResponseDTO(guardado);
     }
 
     @Override
@@ -99,6 +110,13 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .filter(otro -> !otro.getUsuarioID().equals(id))
                 .ifPresent(otro -> { throw new IllegalStateException("El correo electrónico ya está registrado"); });
 
+        // Cambiar de correo obliga a confirmar el nuevo, igual que al registrarse.
+        boolean cambiaElCorreo = !dto.getCorreoElectronico().equalsIgnoreCase(usuario.getCorreoElectronico());
+        boolean verificable = cambiaElCorreo && verificacionCorreoService.disponible();
+        if (verificable) {
+            usuario.setCorreoVerificado(false);
+        }
+
         usuario.setNombreUsuario(dto.getNombreUsuario());
         usuario.setCorreoElectronico(dto.getCorreoElectronico());
         usuario.setCiudad(dto.getCiudad());
@@ -107,7 +125,11 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setNumeroPiso(dto.getNumeroPiso());
         usuario.setLetraPiso(dto.getLetraPiso());
 
-        return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioRepository.save(usuario));
+        Usuario guardado = usuarioRepository.save(usuario);
+        if (verificable) {
+            verificacionCorreoService.enviar(guardado);
+        }
+        return usuarioMapper.usuarioToUsuarioResponseDTO(guardado);
     }
 
     @Override

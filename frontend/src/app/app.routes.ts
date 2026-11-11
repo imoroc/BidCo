@@ -23,6 +23,7 @@ export const routes: Routes = [
   { path: 'my-bids', title: 'Mis pujas · BidCo', data: { noindex: true, historial: 'pujas' }, canActivate: [userGuard], loadComponent: () => import('./views/historial/historial.component').then(m => m.HistorialComponent) },
   { path: 'my-auctions', title: 'Mis subastas · BidCo', data: { noindex: true, historial: 'subastas' }, canActivate: [userGuard], loadComponent: () => import('./views/historial/historial.component').then(m => m.HistorialComponent) },
   { path: 'forgot-password', title: 'Recuperar contraseña · BidCo', data: { noindex: true }, loadComponent: () => import('./components/forgot-password/forgot-password').then(m => m.ForgotPasswordComponent) },
+  { path: 'verificar-correo', title: 'Verificar correo · BidCo', data: { noindex: true }, loadComponent: () => import('./views/verificar-correo/verificar-correo.component').then(m => m.VerificarCorreoComponent) },
   { path: 'reset-password', title: 'Nueva contraseña · BidCo', data: { noindex: true }, loadComponent: () => import('./views/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
   { path: 'admin/login', title: 'Acceso de administración · BidCo', data: { noindex: true }, loadComponent: () => import('./views/admin/admin-login/admin-login.component').then(m => m.AdminLoginComponent) },
   {

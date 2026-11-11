@@ -47,6 +47,11 @@ public class Usuario {
     private boolean privacidadPerfilVisible = true;
 
 
+    // Las cuentas ya existentes y las creadas sin correo configurado cuentan como verificadas; el registro
+    // normal la pone a false hasta que se pulsa el enlace del correo.
+    @Column(name = "correo_verificado", nullable = false)
+    private boolean correoVerificado = true;
+
     @OneToMany(mappedBy = "pujador",fetch = FetchType.LAZY)
     private List<PujaSorteo> pujasSorteo;
 
@@ -199,6 +204,9 @@ public class Usuario {
     public void setSubastas(List<Subasta> subastas) {
         this.subastas = subastas;
     }
+
+    public boolean isCorreoVerificado() { return correoVerificado; }
+    public void setCorreoVerificado(boolean correoVerificado) { this.correoVerificado = correoVerificado; }
 
     public Boolean getPrivacidadAnonimoPujas() { return privacidadAnonimoPujas; }
     public void setPrivacidadAnonimoPujas(Boolean v) { this.privacidadAnonimoPujas = v; }

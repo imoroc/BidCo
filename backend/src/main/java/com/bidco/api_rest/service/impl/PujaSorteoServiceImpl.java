@@ -7,6 +7,7 @@ import com.bidco.api_rest.exception.ForbiddenException;
 import com.bidco.api_rest.mapper.PujaSorteoMapper;
 import com.bidco.api_rest.model.PujaSorteo;
 import com.bidco.api_rest.model.Sorteo;
+import com.bidco.api_rest.exception.CorreoNoVerificadoException;
 import com.bidco.api_rest.model.Usuario;
 import com.bidco.api_rest.repository.PujaSorteoRepository;
 import com.bidco.api_rest.repository.SorteoRepository;
@@ -72,6 +73,9 @@ public class PujaSorteoServiceImpl implements PujaSorteoService {
         // Bloqueo de la fila del usuario: evita gastar dos veces los mismos puntos en paralelo.
         Usuario usuario = usuarioRepository.findByIdForUpdate(pujaSorteoCreateDTO.getPujadorId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        if (!usuario.isCorreoVerificado()) {
+            throw new CorreoNoVerificadoException();
+        }
         if (usuario.getPuntos() < puntos) {
             throw new IllegalArgumentException("No tienes puntos suficientes");
         }
