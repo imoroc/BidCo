@@ -1,18 +1,20 @@
-import { CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductoService, SorteoResponseDto, SubastaResponseDto } from '../../services/product.service';
 import { SeoService } from '../../services/seo.service';
+import { EstadoSubasta, SubastaDirectoService } from '../../services/subasta-directo.service';
 import { cloudinaryLoader } from '../../utils/cloudinary-loader';
 import { jsonLdProducto, resumirDescripcion } from '../../utils/datos-estructurados';
-import { cierreMs, estaVencida } from '../../utils/fechas';
+import { ZONA_HORARIA, cierreMs, estaVencida } from '../../utils/fechas';
 import { urlAbsoluta, urlCanonica } from '../../utils/seo';
 
 @Component({
   selector: 'app-product-details',
   changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, DatePipe],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.css'
 })
@@ -21,6 +23,16 @@ export class ProductDetailsComponent implements OnInit {
     productoSorteo!: SorteoResponseDto;
     nombreUsuario = '';
     tipo = '';
+    /** Zona en la que el servidor fija el cierre (para mostrarlo igual en cualquier dispositivo). */
+    readonly zona = ZONA_HORARIA;
+    /** Puja líder y cierre vigentes: se actualizan en directo mientras la subasta sigue abierta. */
+    precioActual = 0;
+    cierre = '';
+    /** true si el cierre se ha ampliado (anti-sniping) desde que se abrió la ficha. */
+    cierreAmpliado = false;
+
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly directo = inject(SubastaDirectoService);
 
     constructor(private route: ActivatedRoute, private productoService: ProductoService, private seo: SeoService, private router: Router) {}
 
@@ -33,7 +45,10 @@ export class ProductDetailsComponent implements OnInit {
                 this.productoService.getSubastaPorId(productId).subscribe({
                     next: (product) => {
                         this.productoSubasta = product;
+                        this.precioActual = product.precioFinal;
+                        this.cierre = product.fechaFinal;
                         this.publicarDatosSeo(product);
+                        this.seguirEnDirecto(product);
                         this.productoService.getPerfilPublicoPorId(product.creadorId).subscribe({
                             next: (profile) => {
                                 this.nombreUsuario = profile.privacidadAnonimoPujas
@@ -74,5 +89,27 @@ export class ProductDetailsComponent implements OnInit {
                 vencida: estaVencida(product.fechaFinal)
             })
         });
+    }
+
+    /** Solo las subastas normales y abiertas emiten; las ciegas no revelan el precio y las vencidas ya no cambian. */
+    private seguirEnDirecto(product: SubastaResponseDto): void {
+        if (product.subastaNormal === false || estaVencida(product.fechaFinal)) {
+            return;
+        }
+        this.directo.seguir(product.subastaID)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(estado => this.aplicarEstado(estado));
+    }
+
+    private aplicarEstado(estado: EstadoSubasta): void {
+        if (estado.precioFinal !== null) {
+            this.precioActual = estado.precioFinal;
+        }
+        if (estado.fechaFinal !== null) {
+            if (cierreMs(estado.fechaFinal) > cierreMs(this.cierre)) {
+                this.cierreAmpliado = true;
+            }
+            this.cierre = estado.fechaFinal;
+        }
     }
 }

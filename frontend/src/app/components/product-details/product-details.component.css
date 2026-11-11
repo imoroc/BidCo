@@ -104,6 +104,11 @@
   line-height: 1;
 }
 
+.price-cierre {
+  font-size: 0.95rem;
+  color: var(--color-texto-suave);
+}
+
 .points-text {
   font-size: 1.2rem;
   font-weight: 600;
