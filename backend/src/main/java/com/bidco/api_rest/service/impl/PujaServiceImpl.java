@@ -1,6 +1,7 @@
 package com.bidco.api_rest.service.impl;
 
 import com.bidco.api_rest.dto.puja.PujaCreateDTO;
+import com.bidco.api_rest.dto.puja.PujaHistorialDTO;
 import com.bidco.api_rest.dto.puja.PujaResponseDTO;
 import com.bidco.api_rest.mapper.PujaMapper;
 import com.bidco.api_rest.model.Puja;
@@ -232,6 +233,30 @@ public class PujaServiceImpl implements PujaService {
     @Override
     public List<Subasta> obtenerSubastasPorUsuarioId(Long usuarioId) {
         return pujaRepository.findSubastasByUsuarioId(usuarioId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PujaHistorialDTO> obtenerHistorial(Long subastaId) {
+        Subasta subasta = subastaRepository.findById(subastaId)
+                .orElseThrow(() -> new EntityNotFoundException("La subasta no existe"));
+        comprobarPujasVisibles(subasta);
+
+        return pujaRepository.findHistorialBySubastaId(subastaId).stream()
+                .map(p -> new PujaHistorialDTO(enmascarar(p.getPujador()), p.getImporte(), p.getFecha()))
+                .toList();
+    }
+
+    /** Quien pidió pujar de forma anónima no aparece; el resto, solo con la inicial: «j***». */
+    private static String enmascarar(Usuario pujador) {
+        if (pujador == null || Boolean.TRUE.equals(pujador.getPrivacidadAnonimoPujas())) {
+            return "Anónimo";
+        }
+        String nombre = pujador.getNombreUsuario();
+        if (nombre == null || nombre.isBlank()) {
+            return "Anónimo";
+        }
+        return nombre.substring(0, nombre.offsetByCodePoints(0, 1)) + "***";
     }
 
 }
