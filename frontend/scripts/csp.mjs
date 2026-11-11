@@ -16,7 +16,7 @@ export function hashSha256(texto) {
 /** Scripts en línea que se ejecutan (no los bloques de datos como JSON-LD) y manejadores `on...=`. */
 export function analizarIndex(html) {
   const scripts = [];
-  for (const m of html.matchAll(/<script(?<atributos>[^>]*)>(?<cuerpo>[\s\S]*?)<\/script>/gi)) {
+  for (const m of html.matchAll(/<script(?<atributos>[^>]*)>(?<cuerpo>[\s\S]*?)<\/script\b[^>]*>/gi)) {
     const { atributos, cuerpo } = m.groups;
     if (/\bsrc\s*=/i.test(atributos) || /type\s*=\s*["']application\/ld\+json["']/i.test(atributos)) continue;
     scripts.push(cuerpo);

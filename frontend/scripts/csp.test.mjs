@@ -28,6 +28,10 @@ test('ignora los scripts externos y los bloques JSON-LD', () => {
   assert.deepEqual(analizarIndex(html).scripts, [SCRIPT]);
 });
 
+test('reconoce el cierre del script con espacios antes de >', () => {
+  assert.deepEqual(analizarIndex(`<script>${SCRIPT}</script >`).scripts, [SCRIPT]);
+});
+
 test('detecta los manejadores en línea y los estilos en línea', () => {
   const html = '<link rel="stylesheet" href="a.css" onload="this.media=\'all\'"><div style="color:red"></div>';
   const r = analizarIndex(html);
