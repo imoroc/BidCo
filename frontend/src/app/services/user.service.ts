@@ -69,9 +69,10 @@ export class UserService {
     });
   }
 
-  updatePassword(id: number, passwords: { currentPassword: string, newPassword: string }): Observable<void> {
+  // Devuelve un token nuevo: el cambio cierra las demás sesiones y esta debe seguir con el token actualizado.
+  updatePassword(id: number, passwords: { currentPassword: string, newPassword: string }): Observable<{ token: string }> {
     const token = localStorage.getItem('authToken');
-    return this.http.patch<void>(`${this.apiUrl}/${id}/password`, passwords, {
+    return this.http.patch<{ token: string }>(`${this.apiUrl}/${id}/password`, passwords, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
