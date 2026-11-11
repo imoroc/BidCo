@@ -50,7 +50,7 @@ const MOTIVO_MAX = 500;
               <li class="fila">
                 <div class="datos">
                   <strong>{{ s.nombreArticulo }}</strong>
-                  <span>#{{ s.subastaID }} · {{ s.subastaNormal ? 'Normal' : 'A ciegas' }} · {{ s.categoria }} · {{ s.precioFinal | currency:'EUR':'symbol':'1.2-2':'es' }}</span>
+                  <span>#{{ s.subastaID }} · {{ s.subastaNormal ? 'Normal' : 'A ciegas' }} · {{ s.categoria }} · {{ s.precioFinal | currency:'EUR':'symbol':'1.0-2' }}</span>
                 </div>
                 @if (seleccionada?.subastaID !== s.subastaID) {
                   <button type="button" class="btn-secondary peligro" (click)="elegir(s)">Retirar</button>
