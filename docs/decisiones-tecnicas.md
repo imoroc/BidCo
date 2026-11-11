@@ -159,3 +159,17 @@
 - En una subasta a ciegas el historial no se publica hasta que termina el plazo, igual que `/pujas/mayor`; después se muestra con el mismo enmascarado.
 - La ficha de las subastas normales lo recarga cada vez que el flujo en directo informa de un precio nuevo.
 - La fecha de la puja se guarda como día (sin hora), de modo que el orden entre pujas del mismo día lo da el importe.
+
+## Poblar el catálogo de demostración (`seed/`)
+
+- Herramienta manual, no una migración de Flyway: no la ejecuta la aplicación ni el CI. Genera un SQL a partir de `seed/catalogo.json`
+  y se lanza a mano con `psql`, **con una copia de la base de datos hecha antes**.
+- Se genera SQL en lugar de llamar a la API porque el limitador permite 10 subidas de imagen y 5 registros por hora, los usuarios
+  nuevos nacerían sin verificar (no pueden pujar) y los sorteos exigen sesión de administración.
+- Respeta las reglas del servicio: solo quien lidera tiene el importe retenido del saldo, en las ciegas el precio no se actualiza,
+  crear una subasta da 50 puntos y participar en un sorteo gasta los puntos aportados.
+- Es repetible (cada subasta o sorteo solo se crea si no existe ya) y por defecto termina en `ROLLBACK`: para guardar hay que
+  pasar `-v confirmar=1`.
+- La contraseña de las cuentas de demostración se pasa al ejecutar y se guarda con `pgcrypto` (BCrypt), nunca en el repositorio.
+- Las fotos salen de Wikimedia Commons con licencias libres (CC0, dominio público, CC BY), se limitan a 1600 px al subirlas a
+  Cloudinary y se generan sus créditos. Se puede sustituir cualquiera por una propia.
