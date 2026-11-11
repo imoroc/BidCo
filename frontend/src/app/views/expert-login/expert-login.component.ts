@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { AuthExpertService } from '../../services/auth.expert.service';
+import { SesionStore } from '../../services/sesion.store';
 
 @Component({
   selector: 'app-expert-login',
@@ -18,7 +19,7 @@ export class ExpertLoginComponent {
     remember: boolean = false;
     loginError: string = '';
 
-    constructor(private auth: AuthExpertService, private router: Router) {}
+    constructor(private auth: AuthExpertService, private router: Router, private sesion: SesionStore) {}
 
     login() {
         const loginData = {
@@ -31,7 +32,7 @@ export class ExpertLoginComponent {
             next: (data) => {
                 // data.token contiene el JWT generado en el backend
                 if (this.remember) {
-                    localStorage.setItem('authTokenExpert', data.token);
+                    this.sesion.guardarTokenExperto(data.token);
                 }
                 // Decodificamos el token y cargamos el perfil completo
                 this.auth.setExpertFromToken(data.token);

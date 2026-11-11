@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService, UsuarioResponse } from '../../../services/auth.service';
 import { UserService, UsuarioUpdate } from '../../../services/user.service';
 import { AuthExpertService } from '../../../services/auth.expert.service';
+import { SesionStore } from '../../../services/sesion.store';
 
 @Component({
   selector: 'app-profile-datos',
@@ -38,15 +39,15 @@ export class ProfileDatosComponent implements OnInit {
   confirmPassword: string = '';
   isExpert = false;
 
-  constructor(private authService: AuthService, private expertAuthService: AuthExpertService, private userService: UserService) {}
+  constructor(private authService: AuthService, private expertAuthService: AuthExpertService, private userService: UserService, private sesion: SesionStore) {}
 
   ngOnInit() {
     var storedUser;
     //Comprobamos si un experto ha iniciado sesion
     this.expertAuthService.isLoggedIn$.subscribe((estado) => {
         this.isExpert = estado;
-        if (estado) storedUser = localStorage.getItem('authExpert');
-        else storedUser = localStorage.getItem('authUser');
+        if (estado) storedUser = this.sesion.perfilExperto();
+        else storedUser = this.sesion.perfilUsuario();
     });
 
     
@@ -117,7 +118,7 @@ export class ProfileDatosComponent implements OnInit {
     }).subscribe({
       next: ({ token }) => {
         // El token anterior ya no vale: se guarda el nuevo para no perder la sesión en este dispositivo.
-        localStorage.setItem('authToken', token);
+        this.sesion.guardarTokenUsuario(token);
         this.updatePasswdMessage = '¡Contraseña actualizada correctamente!';
         setTimeout(() => this.updatePasswdMessage = '', 3000);
         this.currentPassword = '';

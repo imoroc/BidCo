@@ -13,6 +13,7 @@ import { FooterComponent } from "../../components/footer/footer.component";
 import { AuthService } from '../../services/auth.service';
 import { SorteoService, SorteoResponseDto, Filtro } from '../../services/raffle.service';
 import { AuthExpertService } from '../../services/auth.expert.service';
+import { SesionStore } from '../../services/sesion.store';
 
 @Component({
   selector: 'app-raffle',
@@ -30,6 +31,7 @@ import { AuthExpertService } from '../../services/auth.expert.service';
   styleUrl: './raffle.component.css'
 })
 export class RaffleComponent {
+    private readonly sesion = inject(SesionStore);
     listado = new ListadoFiltrado<SorteoResponseDto>(params => this.sorteoService.getSorteosPorFiltro(params), inject(DestroyRef), s => s.fechaFin, TAMANO_PAGINA);
     isLoggedIn = false;
     isExpert = false;
@@ -41,7 +43,7 @@ export class RaffleComponent {
         var storedUser;
         this.authService.isLoggedIn$.subscribe((estado) => {
             this.isLoggedIn = estado;
-            if(estado) storedUser = localStorage.getItem('authUser');
+            if(estado) storedUser = this.sesion.perfilUsuario();
         });
         
         //Si no hay sesion de usuario se comprueba si hay sesion de experto
