@@ -117,3 +117,17 @@
 - En «Tus subastas» cada tarjeta abierta muestra «Editar» y «Cancelar subasta» (con confirmación). El listado no
   informa de si hay pujas, así que el botón se ofrece siempre y el servidor decide; si responde 409 se explica el
   motivo. Evita una consulta extra por tarjeta; se puede afinar añadiendo un indicador a la respuesta del listado.
+
+## Moderación de subastas
+
+- La administración puede retirar una subasta (`POST /api/admin/subastas/{id}/retirar`, con un motivo obligatorio de
+  hasta 500 caracteres). Las cuentas de experto comparten la sesión de `/api/admin`, pero reciben 403.
+- Se borra, no se oculta: ocultar exige una migración y tocar todas las consultas de listados. El registro de quién
+  la retiró y por qué queda en el log del servidor (el motivo va sin saltos de línea, para evitar inyección en el
+  registro). Si se quiere conservar el histórico, es una PR aparte con migración.
+- A diferencia del creador, la administración puede retirar una subasta con pujas: se devuelve el saldo retenido a
+  quien lideraba (el resto ya lo recuperó al ser superado), se borran pujas y comentarios y se retiran al creador los
+  50 puntos de crearla. Si ya tiene ganador no se puede (409): los puntos ya se repartieron y el resultado es definitivo.
+- Se avisa por correo al creador (con el motivo, escapado) y a quien lideraba (con el importe devuelto), con las
+  mismas reglas que los demás avisos: solo cuentas verificadas y tras confirmar la transacción.
+- En la administración, «Moderar subastas» busca por nombre (primeros 12 resultados) y pide el motivo antes de confirmar.
