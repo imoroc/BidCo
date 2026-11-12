@@ -7,7 +7,7 @@
 }
 
 .product-container { display: flex; flex-direction: column; gap: 64px; max-width: 1200px; margin: 0 auto; }
-.product-hero-layout { display: grid; grid-template-columns: 1fr 400px; gap: var(--espacio-6); align-items: start; }
+.product-hero-layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: var(--espacio-6); align-items: start; }
 
 /* Tarjeta de puja */
 .action-card {
@@ -77,6 +77,9 @@
 .reviews-header h2 { margin-bottom: var(--espacio-2); font-size: var(--texto-xl); color: var(--color-marca); }
 .reviews-subtitle { margin-bottom: var(--espacio-5); color: var(--color-texto-suave); }
 .reviews-list { display: flex; flex-direction: column; gap: var(--espacio-5); }
+
+/* Contenedor de consulta: la ficha decide su disposición según el ancho que le toca, no el de la ventana */
+.details-column { min-width: 0; container-type: inline-size; }
 
 @media (max-width: 900px) {
   .product-hero-layout { grid-template-columns: 1fr; }
