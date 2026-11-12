@@ -1,7 +1,10 @@
+/* El host debe ser un bloque para poder encogerse dentro de la rejilla de la ficha */
+:host { display: block; min-width: 0; }
+
 /* --- CONTENEDOR PRINCIPAL (GRID) --- */
 .product-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* Dos columnas iguales; minmax(0) evita que una foto grande las ensanche */
   gap: 48px; /* Espacio generoso entre foto y texto */
   max-width: 1200px;
   margin: 40px auto;
@@ -13,7 +16,7 @@
 /* --- COLUMNA 1: GALERÍA E IMAGEN --- */
 .product-gallery {
   position: relative;
-  background-color: var(--color-superficie-suave); /* Fondo gris claro estilo Apple */
+  background-color: var(--color-foto-fondo); /* Igual que las tarjetas: con multiply, un fondo oscuro ennegrecía la foto */
   border: 1px solid var(--color-borde-suave);
   border-radius: 20px;
   padding: 24px;
@@ -181,9 +184,9 @@
 }
 
 /* --- MODO MÓVIL (Auto-apilable) --- */
-@media (max-width: 900px) {
+@container (max-width: 720px) {
   .product-layout {
-    grid-template-columns: 1fr; /* Pasa de 2 columnas a 1 columna */
+    grid-template-columns: minmax(0, 1fr); /* Pasa de 2 columnas a 1 columna */
     gap: 24px;
     margin: 20px auto;
   }
