@@ -96,7 +96,7 @@
 
 .price-field__caja { position: relative; display: block; }
 
-.price-field__caja input[type="number"] { padding-right: 24px; text-align: right; }
+.filter-container .price-field__caja input[type="number"] { padding-right: 26px; text-align: right; }
 
 .price-field__moneda {
   position: absolute;
