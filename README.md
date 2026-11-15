@@ -411,33 +411,6 @@ BidCo/
 | `git status` muestra `backend/mvnw.cmd` modificado | Es solo un cambio de saltos de línea; no lo añadas al commit. |
 | Las cookies de administración no se guardan en local | Usa `SESSION_COOKIE_SECURE=false` y `SESSION_COOKIE_SAME_SITE=lax` sin HTTPS. |
 
-## Hoja de ruta
-
-Hecho:
-
-- [x] `docker compose` con PostgreSQL, backend y frontend.
-- [x] Pruebas de integración de los repositorios y de los controladores, y mínimo de cobertura en el CI.
-- [x] Pruebas e2e de las rutas públicas, accesibilidad con axe y Lighthouse en el CI.
-- [x] Paginación de listados, y orden y filtros reflejados en la URL.
-- [x] Cierre programado de subastas y sorteos, y anti-sniping.
-- [x] Verificación de correo, descarga de datos y eliminación de cuenta.
-- [x] Sesión de administración persistente y revocación de las sesiones de usuario.
-
-Pendiente:
-
-- [ ] Pruebas e2e del flujo completo (registro, verificación, puja y cierre) con backend y PostgreSQL en el CI.
-- [x] Avisos por correo («te han superado», «has ganado»).
-- [ ] Pujas en tiempo real.
-- [x] Editar y cancelar la subasta propia (mientras no tenga pujas).
-- [x] Moderación de subastas desde la administración.
-- [ ] Favoritos y valoraciones.
-- [ ] Cabeceras de seguridad y CSP también en el frontend (hoy la CSP está en modo informe).
-- [ ] Limitador de peticiones compartido entre instancias (hoy es en memoria).
-- [x] Endpoint de salud con Actuator e identificador de petición en los registros.
-- [ ] Logs en JSON y seguimiento de errores (Sentry).
-- [ ] PWA: service worker y página sin conexión.
-- [ ] Interfaz en varios idiomas.
-
 ## Contribuir
 
 Las contribuciones son bienvenidas. Lee [`CONTRIBUTING.md`](CONTRIBUTING.md) para ver el flujo de trabajo, las convenciones de commits y la lista de comprobación de una PR.
