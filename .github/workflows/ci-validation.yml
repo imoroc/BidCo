@@ -55,7 +55,7 @@ jobs:
         run: npm run lighthouse
       - name: Subir informes de Lighthouse
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: lighthouse
           path: frontend/e2e-resultados/lighthouse
@@ -63,7 +63,7 @@ jobs:
           retention-days: 14
       - name: Subir capturas
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: capturas
           path: frontend/e2e-resultados/capturas
@@ -71,7 +71,7 @@ jobs:
           retention-days: 14
       - name: Subir trazas de las pruebas e2e fallidas
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: trazas-e2e
           path: frontend/e2e-resultados/ejecuciones
@@ -114,7 +114,7 @@ jobs:
           }' "$csv"
       - name: Subir informe de cobertura
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: cobertura-backend
           path: backend/target/site/jacoco
